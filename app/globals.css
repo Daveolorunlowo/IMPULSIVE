@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply selection:bg-bloodred selection:text-alabaster bg-charcoal text-alabaster antialiased;
+    font-family: var(--font-inter), sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+  }
+}
+
+@layer utilities {
+  .stroke-text {
+    -webkit-text-stroke: 1px #F3F3F1;
+    color: transparent;
+  }
+}
+
+@layer components {
+  .editorial-container {
+    @apply max-w-[1400px] mx-auto px-6 md:px-12;
+  }
+
+  /* Luxury Card */
+  .luxury-card {
+    @apply bg-stone text-alabaster border-2 border-transparent hover:border-bloodred shadow-sm hover:shadow-[0_0_30px_rgba(255,0,0,0.2)] transition-all duration-300 ease-in-out;
+  }
+
+  /* Elegant Button */
+  .btn-luxury {
+    @apply px-12 py-5 bg-bloodred text-alabaster font-sans font-bold uppercase tracking-[0.2em] text-[10px] transition-all hover:bg-white hover:text-charcoal active:scale-[0.98] shadow-[0_0_20px_rgba(255,0,0,0.3)];
+  }
+
+  .btn-outline {
+    @apply px-12 py-5 border border-charcoal text-charcoal font-sans font-semibold uppercase tracking-[0.2em] text-[10px] transition-all hover:bg-charcoal hover:text-alabaster active:scale-[0.98];
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-alabaster;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-stone hover:bg-charcoal/20 transition-colors;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
