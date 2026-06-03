@@ -15,9 +15,9 @@ interface AuthStore {
   pendingEmail: string | null;
   
   // Actions
-  signup: (email: string) => void;
+  signup: (email: string) => Promise<void> | void;
   verify: (code: string) => boolean;
-  signin: (email: string) => void;
+  signin: (email: string) => Promise<void> | void;
   logout: () => void;
   trackActivity: (action: string) => void;
   getAllUsers: () => User[]; // For the admin dot
@@ -32,11 +32,22 @@ export const useAuth = create<AuthStore>()(
       verificationCode: null,
       pendingEmail: null,
 
-      signup: (email: string) => {
+      signup: async (email: string) => {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         console.log(`[AUTH] Verification code for ${email}: ${code}`);
         set({ verificationCode: code, pendingEmail: email });
-        // In a real app, you'd call an API here
+        
+        try {
+          await fetch('/api/auth/send-code', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, code }),
+          });
+        } catch (error) {
+          console.error('[AUTH] Failed to trigger send-code route:', error);
+        }
       },
 
       verify: (code: string) => {
@@ -59,11 +70,22 @@ export const useAuth = create<AuthStore>()(
         return false;
       },
 
-      signin: (email: string) => {
-        // Simple mock signin
+      signin: async (email: string) => {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
         console.log(`[AUTH] Login verification code for ${email}: ${code}`);
         set({ verificationCode: code, pendingEmail: email });
+
+        try {
+          await fetch('/api/auth/send-code', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, code }),
+          });
+        } catch (error) {
+          console.error('[AUTH] Failed to trigger send-code route:', error);
+        }
       },
 
       logout: () => set({ user: null, isAuthenticated: false }),

@@ -11,13 +11,14 @@ export class PaymentService {
   /**
    * Initializes a transaction with Paystack
    */
-  static async initializeTransaction(email: string, amount: number, reference: string) {
+  static async initializeTransaction(email: string, amount: number, reference: string, currency: string = 'USD') {
     const response = await axios.post(
       'https://api.paystack.co/transaction/initialize',
       {
         email,
-        amount: amount * 100, // Convert to kobo
+        amount: Math.round(amount * 100), // Convert to kobo/cents
         reference,
+        currency: currency.toUpperCase(),
         callback_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`
       },
       {
@@ -40,6 +41,10 @@ export class PaymentService {
       .update(payload)
       .digest('hex');
     
-    return hash === signature;
+    try {
+      return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(signature));
+    } catch {
+      return false; // Length mismatch
+    }
   }
 }

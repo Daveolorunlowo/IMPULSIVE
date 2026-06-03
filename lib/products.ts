@@ -142,12 +142,12 @@ export const products: Product[] = [
   },
   {
     id: '6',
-    slug: 'worldwide-syndicate-tee-red',
-    name: 'Worldwide Syndicate Tee',
+    slug: 'worldwide-instinct-tee-red',
+    name: 'Worldwide Instinct Tee',
     category: 'Archive',
     price: 95.00,
     status: 'Global Drop',
-    description: 'A global statement of spontaneity. The Worldwide Syndicate Tee features our expanded network graphic across the back with technical "IMPULSIVE" branding on the chest.',
+    description: 'A global statement of spontaneity. The Worldwide Instinct Tee features our expanded network graphic across the back with technical "IMPULSIVE" branding on the chest.',
     mainImage: '/images/impulsiveworldwider.jpeg',
     hoverImage: '/images/impulsiveworldwideb.jpeg',
     images: [
@@ -158,7 +158,7 @@ export const products: Product[] = [
       '350GSM Ultra-heavy cotton',
       'Global network screen print',
       'Relaxed oversized fit',
-      'Internal syndicate tag'
+      'Internal instinct tag'
     ],
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
@@ -167,8 +167,8 @@ export const products: Product[] = [
   },
   {
     id: '7',
-    slug: 'worldwide-syndicate-tee-black',
-    name: 'Worldwide Syndicate Tee',
+    slug: 'worldwide-instinct-tee-black',
+    name: 'Worldwide Instinct Tee',
     category: 'Archive',
     price: 95.00,
     status: 'Global Drop',

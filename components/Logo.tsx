@@ -2,27 +2,24 @@ import React from 'react';
 
 interface LogoProps {
   className?: string;
-  variant?: 'dark' | 'light';
+  variant?: 'dark' | 'light' | 'red';
 }
 
-export default function Logo({ className = '', variant = 'dark' }: LogoProps) {
-  // If variant is 'dark', we want black text (for light backgrounds like Navbar)
-  // If variant is 'light', we want white text (for dark backgrounds like Footer)
-  
-  // For black text: R, G, B are 0.
-  // For white text: R, G, B are 1.
+export default function Logo({ className = '', variant = 'light' }: LogoProps) {
+  // If variant is 'dark', we want black text
+  // If variant is 'light', we want white text
+  // If variant is 'red', we want original red text
   const colorValues = variant === 'dark' 
     ? "0 0 0 0 0  0 0 0 0 0  0 0 0 0 0" 
-    : "0 0 0 0 1  0 0 0 0 1  0 0 0 0 1";
+    : variant === 'light'
+      ? "0 0 0 0 1  0 0 0 0 1  0 0 0 0 1"
+      : "1 0 0 0 0  0 1 0 0 0  0 0 1 0 0";
 
-  // Alpha calculation:
-  // Original image is black text (0,0,0) on white bg (1,1,1).
-  // We want black -> opaque (A=1), white -> transparent (A=0), and transparent -> transparent (A=0).
-  // Formula: A' = -0.333*R - 0.333*G - 0.333*B + 1*A
-  // If white (1,1,1,1): -0.333 - 0.333 - 0.333 + 1 = 0
-  // If black (0,0,0,1): 0 + 0 + 0 + 1 = 1
-  // If transparent (0,0,0,0): 0 + 0 + 0 + 0 = 0
-
+  // Alpha calculation for red text on white background:
+  // We want red -> opaque (A=1), white -> transparent (A=0).
+  // Formula: A' = 2*R - 1*G - 1*B
+  // For white (1,1,1): 2 - 1 - 1 = 0
+  // For red (0.7,0.05,0.05): 1.4 - 0.05 - 0.05 = 1.3 -> 1.0
   return (
     <svg 
       className={className} 
@@ -34,14 +31,15 @@ export default function Logo({ className = '', variant = 'dark' }: LogoProps) {
         <filter id={`logo-filter-${variant}`}>
           <feColorMatrix 
             type="matrix" 
-            values={`${colorValues}  -0.333 -0.333 -0.333 1 0`} 
+            values={`${colorValues}  2 -1 -1 0 0`} 
           />
         </filter>
       </defs>
       <image 
         href="/images/impulsivelogo.jpeg" 
         width="180" 
-        height="60" 
+        height="180" 
+        y="-60"
         filter={`url(#logo-filter-${variant})`} 
       />
     </svg>

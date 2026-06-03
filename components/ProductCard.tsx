@@ -114,9 +114,12 @@ export default function ProductCard({
                       onClick={() => setSelectedColor(color)}
                       className={cn(
                         "w-5 h-5 rounded-full border transition-all",
-                        selectedColor.name === color.name ? "border-bloodred scale-110 shadow-[0_0_10px_rgba(255,0,0,0.5)]" : "border-transparent"
+                        selectedColor.name === color.name ? "border-bloodred scale-110 shadow-[0_0_10px_rgba(255,0,0,0.5)]" : "border-transparent",
+                        color.hex === '#800000' ? 'bg-[#800000]' : 
+                        color.hex === '#0A0A0A' ? 'bg-[#0A0A0A]' : 
+                        color.hex === '#F9F9F7' ? 'bg-[#F9F9F7]' : 'bg-stone'
                       )}
-                      style={{ backgroundColor: color.hex }}
+                      aria-label={`Select color ${color.name}`}
                     />
                   ))}
                 </div>
@@ -152,7 +155,7 @@ export default function ProductCard({
         <h3 className="text-xl font-serif text-alabaster group-hover:text-bloodred transition-colors duration-500">
           {name}
         </h3>
-        <p className="text-[10px] font-sans font-semibold tracking-widest text-bloodred">
+        <p className="text-[10px] font-sans font-semibold tracking-widest text-bloodred" suppressHydrationWarning>
           {formatPrice(price)}
         </p>
       </Link>

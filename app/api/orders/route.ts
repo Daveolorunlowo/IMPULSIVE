@@ -10,9 +10,9 @@ import { PaymentService } from '@/services/payment.service';
  */
 export async function POST(req: Request) {
   try {
-    const { customerId, email, items, totalPrice } = await req.json();
+    const { customerId, email, items, totalPrice, currency = 'USD', promoCode } = await req.json();
 
-    if (!customerId || !email || !items?.length || !totalPrice) {
+    if (!customerId || !email || !items?.length || totalPrice === undefined) {
       return NextResponse.json({ error: 'MISSING_REQUIRED_FIELDS' }, { status: 400 });
     }
 
@@ -36,6 +36,43 @@ export async function POST(req: Request) {
           { status: 403 }
         );
       }
+    }
+
+    // ── 1.5. SECURE PRICE VALIDATION ──────────────────────────────────────
+    const productIds = items.map((i: any) => i.productId || i.variantId);
+    
+    const { data: dbProducts, error: dbErr } = await supabase
+      .from('products')
+      .select('id, price')
+      .in('id', productIds);
+      
+    if (dbErr || !dbProducts) {
+      return NextResponse.json({ error: 'FAILED_TO_VERIFY_PRODUCTS' }, { status: 500 });
+    }
+
+    let expectedTotalPriceUSD = 0;
+    for (const item of items) {
+      const dbProduct = dbProducts.find((p) => p.id === (item.productId || item.variantId));
+      if (!dbProduct) {
+        return NextResponse.json({ error: 'INVALID_PRODUCT' }, { status: 400 });
+      }
+      
+      const isCustomized = !!item.customText;
+      const expectedItemPriceUSD = dbProduct.price + (isCustomized ? 10 : 0);
+      expectedTotalPriceUSD += expectedItemPriceUSD * item.quantity;
+    }
+
+    const uppercaseCode = promoCode?.toUpperCase()?.trim();
+    if (uppercaseCode === 'INSTINCT' || uppercaseCode === 'ARCHIVE10') {
+      expectedTotalPriceUSD = expectedTotalPriceUSD * 0.90;
+    }
+
+    const NGN_RATE = 1500;
+    const finalExpectedPrice = currency === 'NGN' ? expectedTotalPriceUSD * NGN_RATE : expectedTotalPriceUSD;
+
+    if (Math.abs(totalPrice - finalExpectedPrice) > 0.01) {
+      console.error(`[POST /api/orders] PRICE_TAMPERING_DETECTED: Expected ${finalExpectedPrice}, got ${totalPrice}`);
+      return NextResponse.json({ error: 'PRICE_TAMPERING_DETECTED' }, { status: 409 });
     }
 
     // ── 2. ATOMIC STOCK RESERVATION ──────────────────────────────────────
@@ -64,7 +101,7 @@ export async function POST(req: Request) {
 
     // ── 4. INSERT ORDER ITEMS ─────────────────────────────────────────────
     await supabase.from('order_items').insert(
-      items.map((item: { variantId: string; quantity: number; claimedPrice: number }) => ({
+      items.map((item: any) => ({
         order_id: order.id,
         variant_id: item.variantId,
         quantity: item.quantity,
@@ -73,7 +110,7 @@ export async function POST(req: Request) {
     );
 
     // ── 5. INITIALISE PAYMENT ─────────────────────────────────────────────
-    const payment = await PaymentService.initializeTransaction(email, totalPrice, reference);
+    const payment = await PaymentService.initializeTransaction(email, totalPrice, reference, currency);
 
     return NextResponse.json({
       orderId: order.id,

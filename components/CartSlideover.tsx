@@ -9,7 +9,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function CartSlideover() {
-  const { isOpen, toggleCart, items, removeItem, updateQuantity, clearCart, totalPrice } = useCart();
+  const { isOpen, toggleCart, items, removeItem, updateQuantity, clearCart, totalPrice, promoCode, getDiscountAmount } = useCart();
   const { formatPrice } = useCurrency();
   
   return (
@@ -39,7 +39,7 @@ export default function CartSlideover() {
                 <h2 className="text-2xl font-serif text-alabaster">Your Bag</h2>
                 <span className="text-[10px] uppercase tracking-widest text-stone font-bold">{items.length} Items Selected</span>
               </div>
-              <button onClick={toggleCart} className="p-2 hover:rotate-90 transition-transform text-alabaster/40 hover:text-bloodred">
+              <button onClick={toggleCart} aria-label="Close cart" className="p-2 hover:rotate-90 transition-transform text-alabaster/40 hover:text-bloodred">
                 <X size={24} strokeWidth={1.5} />
               </button>
             </div>
@@ -53,7 +53,7 @@ export default function CartSlideover() {
                 </div>
               ) : (
                 items.map((item) => {
-                  const cartItemId = `${item.id}-${item.selectedSize}-${item.selectedColor.name}`;
+                  const cartItemId = `${item.id}-${item.selectedSize}-${item.selectedColor.name}-${item.customText || ''}`;
                   return (
                     <div key={cartItemId} className="flex gap-6 group">
                       <div className="relative w-24 h-32 bg-[#F5F5F3] overflow-hidden flex-shrink-0">
@@ -66,10 +66,17 @@ export default function CartSlideover() {
                             <span>{item.selectedSize}</span>
                             <span>/</span>
                             <span className="flex items-center gap-1">
-                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.selectedColor.hex }} />
+                              <svg className="w-2.5 h-2.5 rounded-full inline-block align-middle" viewBox="0 0 10 10">
+                                <circle cx="5" cy="5" r="5" fill={item.selectedColor.hex} />
+                              </svg>
                               {item.selectedColor.name}
                             </span>
                           </div>
+                          {item.customText && (
+                            <div className="mt-2 bg-bloodred/10 border border-bloodred/25 px-2 py-0.5 inline-block text-[8px] font-mono text-bloodred tracking-wider font-bold">
+                              PRINT STUDIO: "{item.customText}"
+                            </div>
+                          )}
                           <p className="text-sm font-semibold text-bloodred mt-2">{formatPrice(item.price)}</p>
                         </div>
                         
@@ -77,6 +84,7 @@ export default function CartSlideover() {
                           <div className="flex items-center border border-alabaster/20 bg-charcoal">
                             <button 
                               onClick={() => updateQuantity(cartItemId, item.quantity - 1)}
+                              aria-label="Decrease quantity"
                               className="p-1.5 hover:bg-bloodred hover:text-alabaster transition-colors"
                             >
                               <Minus size={12} />
@@ -84,6 +92,7 @@ export default function CartSlideover() {
                             <span className="px-3 text-xs font-semibold">{item.quantity}</span>
                             <button 
                               onClick={() => updateQuantity(cartItemId, item.quantity + 1)} 
+                              aria-label="Increase quantity"
                               className="p-1.5 hover:bg-bloodred hover:text-alabaster transition-colors"
                             >
                               <Plus size={12} />
@@ -91,6 +100,7 @@ export default function CartSlideover() {
                           </div>
                           <button 
                             onClick={() => removeItem(cartItemId)} 
+                            aria-label="Remove item"
                             className="text-alabaster/20 hover:text-bloodred transition-colors"
                           >
                             <Trash2 size={16} strokeWidth={1.5} />
@@ -106,9 +116,21 @@ export default function CartSlideover() {
             {/* Footer */}
             {items.length > 0 && (
               <div className="p-8 border-t border-bloodred/20 bg-charcoal">
-                <div className="flex justify-between items-baseline mb-8">
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-stone">Subtotal</span>
-                  <span className="text-3xl font-serif text-bloodred">{formatPrice(totalPrice())}</span>
+                <div className="space-y-2 mb-8">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-stone">Subtotal</span>
+                    <span className="text-xl font-serif text-alabaster">{formatPrice(totalPrice())}</span>
+                  </div>
+                  {promoCode && (
+                    <div className="flex justify-between items-baseline text-bloodred">
+                      <span className="text-[10px] uppercase tracking-widest font-bold">Discount ({promoCode})</span>
+                      <span className="text-lg font-serif">-{formatPrice(getDiscountAmount())}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-baseline border-t border-alabaster/10 pt-2 mt-2">
+                    <span className="text-[10px] uppercase tracking-widest font-bold text-alabaster">Total</span>
+                    <span className="text-2xl font-serif text-bloodred">{formatPrice(totalPrice() - getDiscountAmount())}</span>
+                  </div>
                 </div>
                 <div className="space-y-4">
                   <Link 

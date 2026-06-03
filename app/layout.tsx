@@ -1,8 +1,11 @@
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter, Syne, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import CartSlideover from "@/components/CartSlideover";
+import NotificationToast from "@/components/NotificationToast";
+import ConciergeChat from "@/components/ConciergeChat";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { clsx } from "clsx";
@@ -26,11 +29,19 @@ export default function RootLayout({
     <html lang="en">
       <body className={clsx(inter.variable, syne.variable, playfair.variable, mono.variable, "font-sans antialiased bg-charcoal text-alabaster overflow-x-hidden")}>
         <CartSlideover />
+        <NotificationToast />
+        <ConciergeChat />
         <Navbar />
         <main className="min-h-screen">
-          <PageTransition>
-            {children}
-          </PageTransition>
+          <Suspense fallback={
+            <div className="min-h-screen bg-charcoal text-alabaster flex items-center justify-center">
+              <p className="text-xs uppercase tracking-[0.3em] font-semibold text-stone animate-pulse">Loading...</p>
+            </div>
+          }>
+            <PageTransition>
+              {children}
+            </PageTransition>
+          </Suspense>
         </main>
         <Footer />
       </body>

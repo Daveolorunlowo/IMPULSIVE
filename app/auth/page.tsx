@@ -13,6 +13,17 @@ function AuthPageInner() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [devCode, setDevCode] = useState<string | null>(null);
+  const emailInputRef = React.useCallback((node: HTMLInputElement | null) => {
+    if (node) {
+      setTimeout(() => node.focus(), 150);
+    }
+  }, []);
+
+  const codeInputRef = React.useCallback((node: HTMLInputElement | null) => {
+    if (node) {
+      setTimeout(() => node.focus(), 150);
+    }
+  }, []);
   
   const { signup, verify, signin, verificationCode } = useAuth();
   const router = useRouter();
@@ -68,10 +79,10 @@ function AuthPageInner() {
       <div className="max-w-md w-full">
         <div className="mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-serif text-alabaster mb-4">
-            {step === 'email' ? 'The Syndicate' : 'Verify Identity'}
+            {step === 'email' ? 'Member Access' : 'Verify Email'}
           </h1>
           <p className="text-alabaster/40 text-xs uppercase tracking-[0.3em] font-bold">
-            {step === 'email' ? 'Enter email to gain access' : 'A code was sent to your inbox'}
+            {step === 'email' ? 'Enter your email to sign in' : 'Please check your inbox for the code'}
           </p>
         </div>
 
@@ -101,8 +112,9 @@ function AuthPageInner() {
               className="space-y-6"
             >
               <div className="relative">
-                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-stone" size={18} />
+                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-alabaster/40" size={18} />
                 <input 
+                  ref={emailInputRef}
                   type="email"
                   required
                   placeholder="EMAIL ADDRESS"
@@ -120,7 +132,7 @@ function AuthPageInner() {
                 className="w-full bg-bloodred text-alabaster py-6 flex items-center justify-center gap-4 group hover:bg-alabaster hover:text-charcoal transition-all active:scale-[0.98] disabled:opacity-50"
               >
                 <span className="text-[10px] uppercase tracking-[0.3em] font-bold">
-                  {isLoading ? 'Processing...' : 'Request Access'}
+                  {isLoading ? 'Sending...' : 'Continue'}
                 </span>
                 {!isLoading && <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />}
                 {isLoading && <Loader2 size={16} className="animate-spin" />}
@@ -136,8 +148,9 @@ function AuthPageInner() {
               className="space-y-6"
             >
               <div className="relative">
-                <ShieldCheck className="absolute left-6 top-1/2 -translate-y-1/2 text-stone" size={18} />
+                <ShieldCheck className="absolute left-6 top-1/2 -translate-y-1/2 text-alabaster/40" size={18} />
                 <input 
+                  ref={codeInputRef}
                   type="text"
                   required
                   maxLength={6}
@@ -156,7 +169,7 @@ function AuthPageInner() {
                 className="w-full bg-bloodred text-alabaster py-6 flex items-center justify-center gap-4 group hover:bg-alabaster hover:text-charcoal transition-all active:scale-[0.98] disabled:opacity-50"
               >
                 <span className="text-[10px] uppercase tracking-[0.3em] font-bold">
-                  {isLoading ? 'Verifying...' : 'Initialize Session'}
+                  {isLoading ? 'Verifying...' : 'Sign In'}
                 </span>
                 {!isLoading && <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" />}
                 {isLoading && <Loader2 size={16} className="animate-spin" />}
@@ -165,7 +178,7 @@ function AuthPageInner() {
               <button 
                 type="button"
                 onClick={() => setStep('email')}
-                className="w-full text-[8px] uppercase tracking-[0.4em] text-stone hover:text-alabaster transition-colors py-4"
+                className="w-full text-[8px] uppercase tracking-[0.4em] text-alabaster/40 hover:text-alabaster transition-colors py-4"
               >
                 Back to email
               </button>
@@ -174,9 +187,9 @@ function AuthPageInner() {
         </AnimatePresence>
 
         <div className="mt-12 pt-12 border-t border-stone/10 text-center">
-          <p className="text-[8px] uppercase tracking-[0.4em] text-stone leading-relaxed">
-            By proceeding, you agree to the Syndicate Protocol.<br />
-            Data encryption is active.
+          <p className="text-[8px] uppercase tracking-[0.4em] text-alabaster/40 leading-relaxed">
+            By proceeding, you agree to our terms of service.<br />
+            Your security is our priority.
           </p>
         </div>
       </div>
