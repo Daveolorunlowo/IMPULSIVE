@@ -35,3 +35,7 @@ Thumbs.db
 
 *.crdownload
 *.rar
+
+# Large binaries and sensitive keys
+public/images/Antigravity IDE.exe
+public/images/recovery-codes-for vercel.om.txt

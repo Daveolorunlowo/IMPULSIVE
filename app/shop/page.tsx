@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/lib/products';
+import { useProducts } from '@/store/useProducts';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const categories = ['All', 'Signature', 'Archive', 'Essentials'];
 
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState('All');
+  const { products } = useProducts();
 
   const filteredProducts = activeCategory === 'All' 
     ? products 

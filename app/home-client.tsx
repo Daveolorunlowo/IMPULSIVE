@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { products } from '@/lib/products';
+import { useProducts } from '@/store/useProducts';
 import { useCurrency } from '@/store/useCurrency';
 import { motion, AnimatePresence, useSpring } from 'framer-motion';
 
 export default function HomeClient() {
+  const { products } = useProducts();
   const featuredProducts = products.slice(0, 4);
   const { formatPrice } = useCurrency();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -142,9 +143,9 @@ export default function HomeClient() {
       {/* Slide 2: Manifesto / Breather */}
       <section className="h-screen w-full snap-start snap-always relative flex flex-col items-center justify-center bg-charcoal px-6 md:px-24">
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <span className="text-[10px] uppercase tracking-[0.4em] text-bloodred font-bold block mb-12">The Manifesto</span>
+          <span className="text-[10px] uppercase tracking-[0.4em] text-bloodred font-bold block mb-12">Our Vision</span>
           <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif text-alabaster leading-[1.3] font-light italic">
-            "We construct garments not just to be worn, but to command the space they occupy. Raw architecture woven into every thread."
+            "We design clothing that looks great, fits perfectly, and stands out. High-quality streetwear in every piece."
           </h2>
           <div className="w-12 h-[1px] bg-bloodred mx-auto mt-12" />
         </div>
@@ -250,13 +251,13 @@ export default function HomeClient() {
             transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
             className="flex text-[100px] md:text-[200px] font-display font-bold uppercase text-charcoal whitespace-nowrap"
           >
-            <span className="mr-8">NO COMPROMISE // NO HESITATION //</span>
-            <span className="mr-8">NO COMPROMISE // NO HESITATION //</span>
+            <span className="mr-8">NO COMPROMISE // JUST DECIDE //</span>
+            <span className="mr-8">NO COMPROMISE // JUST DECIDE //</span>
           </motion.div>
         </div>
         <div className="relative z-10 text-center px-6">
-          <h2 className="text-5xl md:text-8xl font-serif text-charcoal leading-none mb-6">Pure Intent.</h2>
-          <p className="text-charcoal/80 text-xs md:text-sm tracking-[0.3em] uppercase font-bold">Engineering the future of raw aesthetics.</p>
+          <h2 className="text-5xl md:text-8xl font-serif text-charcoal leading-none mb-6">Pure Style.</h2>
+          <p className="text-charcoal/80 text-xs md:text-sm tracking-[0.3em] uppercase font-bold">Designing the future of streetwear.</p>
         </div>
       </section>
 
@@ -280,10 +281,10 @@ export default function HomeClient() {
         <div className="relative z-10 max-w-3xl mx-auto">
           <span className="text-[10px] uppercase tracking-[0.4em] text-bloodred font-bold block mb-8">Inner Circle</span>
           <h2 className="text-4xl sm:text-6xl md:text-8xl font-serif text-alabaster leading-[1.1] mb-6 md:mb-8 break-words">
-            The Movement Continues.
+            Join Our Club.
           </h2>
           <p className="text-alabaster/60 mb-12 text-sm md:text-base leading-relaxed max-w-lg mx-auto font-light">
-            Join the movement. Get early access to highly limited drops, architectural studies, and private events globally.
+            Sign up to get early access to new releases, limited drops, and special events.
           </p>
           <div className="flex flex-col sm:flex-row justify-center items-center gap-0 w-full max-w-lg mx-auto">
             <input 

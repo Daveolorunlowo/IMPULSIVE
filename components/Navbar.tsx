@@ -12,9 +12,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import { ShoppingBag, Search, Menu, X, ArrowLeft, LogOut, User, ArrowUpRight, Terminal, Heart, Truck } from 'lucide-react';
 import { useWishlist } from '@/store/useWishlist';
 import { useOrders } from '@/store/useOrders';
-import { products } from '@/lib/products';
+import { useProducts } from '@/store/useProducts';
 
 export default function Navbar() {
+  const { products } = useProducts();
   const [isOpen, setIsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -135,7 +136,7 @@ export default function Navbar() {
             <button 
               onClick={() => setIsCommandPaletteOpen(true)}
               className="text-alabaster/60 hover:text-bloodred transition-colors xl:hidden"
-              aria-label="Search catalog"
+              aria-label="Search items"
             >
               <Search size={20} strokeWidth={1.5} />
             </button>
@@ -359,7 +360,7 @@ export default function Navbar() {
               {/* Header */}
               <div className="flex justify-between items-center pb-4 border-b border-bloodred/10">
                 <span className="text-[9px] uppercase tracking-[0.3em] font-bold text-bloodred flex items-center gap-2">
-                  <Search size={12} /> Search Catalog
+                  <Search size={12} /> Search Items
                 </span>
                 <span className="text-[8px] uppercase tracking-widest text-stone font-bold">
                   Press [ESC] to close
@@ -373,7 +374,7 @@ export default function Navbar() {
                   ref={searchInputRef}
                   autoFocus
                   type="text"
-                  placeholder="SEARCH THE COLLECTION (e.g. Tee, Signature)..."
+                  placeholder="SEARCH ITEMS (e.g. Tee, Signature)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-charcoal border border-bloodred/20 pl-14 pr-6 py-4 text-xs font-semibold uppercase tracking-widest text-alabaster placeholder:text-stone/30 focus:outline-none focus:border-bloodred transition-all"

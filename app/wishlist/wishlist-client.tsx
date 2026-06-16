@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useWishlist } from '@/store/useWishlist';
-import { products } from '@/lib/products';
+import { useProducts } from '@/store/useProducts';
 import { useCurrency } from '@/store/useCurrency';
 import { Trash2, Heart, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function WishlistClient() {
   const { items, toggleWishlist } = useWishlist();
+  const { products } = useProducts();
   const { formatPrice } = useCurrency();
   const [mounted, setMounted] = useState(false);
 

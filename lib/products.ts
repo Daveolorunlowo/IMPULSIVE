@@ -22,7 +22,7 @@ export const products: Product[] = [
     category: 'Signature',
     price: 85.00,
     status: 'New Release',
-    description: 'The definitive IMPULSIVE statement. Featuring our iconic multi-face graphic in a bold crimson execution. Crafted from 300GSM heavy-weight cotton for a structural, boxy fit.',
+    description: 'Our classic brand t-shirt. Features a bold red faces graphic. Made from thick, heavy-weight cotton for a comfortable, boxy fit.',
     mainImage: '/images/impulsiveboy1red.jpeg',
     hoverImage: '/images/impulsiveboyblack.jpeg',
     images: [
@@ -30,10 +30,10 @@ export const products: Product[] = [
       '/images/impulsiveboyblack.jpeg'
     ],
     details: [
-      '300GSM Heavy-weight cotton',
-      'High-definition face graphic',
-      'Structural boxy fit',
-      'Pre-shrunk'
+      'Heavy-weight cotton',
+      'Clear faces graphic',
+      'Comfortable boxy fit',
+      'Won\'t shrink in wash'
     ],
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
@@ -47,7 +47,7 @@ export const products: Product[] = [
     category: 'Signature',
     price: 85.00,
     status: 'Trending',
-    description: 'A tribute to spontaneity. The Hotgirl Edition features our kinetic "Hotgirl Shit" typography and silhouette graphic. Engineered for a bold, architectural presence.',
+    description: 'A fun and bold t-shirt. Features a cool "Hotgirl Shit" text design and silhouette outline. Designed to look clean and stand out.',
     mainImage: '/images/impulsive-girlred.jpeg',
     hoverImage: '/images/impulsivegirl1black.jpeg',
     images: [
@@ -55,10 +55,10 @@ export const products: Product[] = [
       '/images/impulsivegirl1black.jpeg'
     ],
     details: [
-      'Soft-touch premium cotton',
-      'Kinetic typography print',
-      'Universal unisex silhouette',
-      'Side-seam branding'
+      'Soft premium cotton',
+      'Clean text print',
+      'Unisex fit for everyone',
+      'Side brand tag'
     ],
     sizes: ['XS', 'S', 'M', 'L'],
     colors: [
@@ -72,7 +72,7 @@ export const products: Product[] = [
     category: 'Signature',
     price: 85.00,
     status: 'Classic',
-    description: 'The face graphic rendered in stark monochrome. A deep obsidian base provides a sophisticated canvas for our brutalist visual documentation.',
+    description: 'Our classic brand t-shirt in solid black. Features our faces graphic in a simple black-and-white color style.',
     mainImage: '/images/impulsiveboyblack.jpeg',
     hoverImage: '/images/impulsiveboywhite.jpeg',
     images: [
@@ -80,10 +80,10 @@ export const products: Product[] = [
       '/images/impulsiveboywhite.jpeg'
     ],
     details: [
-      'Obsidian technical knit',
-      'High-density screen print',
-      'Reinforced collar',
-      'Archive series tag'
+      'Black cotton knit',
+      'Thick screen print',
+      'Durable collar',
+      'Classic brand tag'
     ],
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
@@ -97,7 +97,7 @@ export const products: Product[] = [
     category: 'Signature',
     price: 85.00,
     status: 'In Stock',
-    description: 'The noir edition of our Hotgirl graphic. A study in form and shadow, blending architectural precision with the energy of the urban night.',
+    description: 'The black edition of our Hotgirl graphic t-shirt. A clean and stylish dark design made for everyday street wear.',
     mainImage: '/images/impulsivegirl1black.jpeg',
     hoverImage: '/images/impulsiveboyblack.jpeg',
     images: [
@@ -105,10 +105,10 @@ export const products: Product[] = [
       '/images/impulsiveboyblack.jpeg'
     ],
     details: [
-      'Heavy-duty rib collar',
-      'Double-stitched hems',
-      'Premium noir pigment',
-      'Boxy architectural fit'
+      'Durable rib collar',
+      'Double-stitched edges',
+      'Premium black dye',
+      'Comfortable boxy fit'
     ],
     sizes: ['XS', 'S', 'M', 'L'],
     colors: [
@@ -122,7 +122,7 @@ export const products: Product[] = [
     category: 'Signature',
     price: 85.00,
     status: 'Pure White',
-    description: 'Purity meets brutalism. The Manifesto Face Tee in bone white showcases our multi-face graphic in a clean, high-velocity execution.',
+    description: 'A clean white faces t-shirt. Shows off our multi-face graphic in a simple, crisp style.',
     mainImage: '/images/impulsiveboywhite.jpeg',
     hoverImage: '/images/impulsiveboy1red.jpeg',
     images: [
@@ -130,10 +130,10 @@ export const products: Product[] = [
       '/images/impulsiveboy1red.jpeg'
     ],
     details: [
-      'Off-white technical knit',
-      'Structural boxy silhouette',
-      'Breathable heavy cotton',
-      'Internal care labels'
+      'Off-white cotton knit',
+      'Comfortable boxy fit',
+      'Breathable thick cotton',
+      'Easy wash care labels'
     ],
     sizes: ['S', 'M', 'L', 'XL'],
     colors: [
@@ -147,7 +147,7 @@ export const products: Product[] = [
     category: 'Archive',
     price: 95.00,
     status: 'Global Drop',
-    description: 'A global statement of spontaneity. The Worldwide Instinct Tee features our expanded network graphic across the back with technical "IMPULSIVE" branding on the chest.',
+    description: 'A world-map edition t-shirt. Features a large network graphic on the back and a small "IMPULSIVE" logo on the chest. Made with heavy-weight cotton.',
     mainImage: '/images/impulsiveworldwider.jpeg',
     hoverImage: '/images/impulsiveworldwideb.jpeg',
     images: [
@@ -155,10 +155,10 @@ export const products: Product[] = [
       '/images/impulsiveworldwideb.jpeg'
     ],
     details: [
-      '350GSM Ultra-heavy cotton',
-      'Global network screen print',
+      'Extra-thick heavy cotton',
+      'World network print on back',
       'Relaxed oversized fit',
-      'Internal instinct tag'
+      'Internal brand tag'
     ],
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
@@ -172,7 +172,7 @@ export const products: Product[] = [
     category: 'Archive',
     price: 95.00,
     status: 'Global Drop',
-    description: 'The obsidian edition of our global statement. Engineered for the midnight collective, featuring desaturated technical prints and a structural, heavyweight finish.',
+    description: 'The black edition of our world-map t-shirt. Made with high-quality, heavy-weight cotton and a clean grey-toned print.',
     mainImage: '/images/impulsiveworldwideb.jpeg',
     hoverImage: '/images/impulsiveworldwider.jpeg',
     images: [
@@ -180,10 +180,10 @@ export const products: Product[] = [
       '/images/impulsiveworldwider.jpeg'
     ],
     details: [
-      '350GSM Ultra-heavy cotton',
-      'Stealth desaturated print',
+      'Extra-thick heavy cotton',
+      'Grey-toned desaturated print',
       'Relaxed oversized fit',
-      'Industrial finish'
+      'Durable finish'
     ],
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [

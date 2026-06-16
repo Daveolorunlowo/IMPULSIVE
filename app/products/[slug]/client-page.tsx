@@ -11,10 +11,11 @@ import { useWishlist } from '@/store/useWishlist';
 import { useReviews } from '@/store/useReviews';
 import { useRouter, notFound } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { products } from '@/lib/products';
+import { useProducts } from '@/store/useProducts';
 
 export default function ProductDetailClient({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = React.use(params);
+  const { products } = useProducts();
   const productData = products.find(p => p.slug === slug);
   
   const [activeImage, setActiveImage] = useState(0);
@@ -27,8 +28,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
   const [weight, setWeight] = useState('');
   const [advisorResult, setAdvisorResult] = useState<string | null>(null);
 
-  // Custom print studio state
-  const [customText, setCustomText] = useState('');
+
 
   // Review form state
   const [reviewName, setReviewName] = useState('');
@@ -80,19 +80,15 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
       return;
     }
 
-    // Add $10 modification premium for customized designs
-    const finalPrice = productData.price + (customText ? 10 : 0);
-
     addItem({
       id: productData.id,
-      name: productData.name + (customText ? ' (Customized)' : ''),
-      price: finalPrice,
+      name: productData.name,
+      price: productData.price,
       image: productData.images[0],
       selectedSize: selectedSize,
       selectedColor: selectedColor,
-      customText: customText || undefined,
     });
-    trackActivity(`Added ${productData.name} to cart${customText ? ' with customization' : ''}`);
+    trackActivity(`Added ${productData.name} to cart`);
   };
 
   const handleFavorite = () => {
@@ -168,26 +164,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                         priority
                       />
 
-                      {/* Custom Print Overlayer (Interactive Print Studio Preview) */}
-                      {customText && (
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 select-none">
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.85 }}
-                            animate={{ opacity: 0.8, scale: 1 }}
-                            style={{
-                              fontFamily: 'var(--font-syne)',
-                              fontSize: 'clamp(12px, 2vw, 32px)',
-                              fontWeight: 'bold',
-                              color: selectedColor.hex === '#F9F9F7' ? '#0B0B0B' : '#FFFFFF',
-                              letterSpacing: '0.2em',
-                              textShadow: '0 2px 10px rgba(0,0,0,0.15)',
-                            }}
-                            className="text-center font-display max-w-[70%] break-all bg-charcoal/10 backdrop-blur-[2px] px-6 py-3 border border-white/10 uppercase font-black rotate-[-2deg]"
-                          >
-                            {customText}
-                          </motion.div>
-                        </div>
-                      )}
+
                     </motion.div>
                   </AnimatePresence>
 
@@ -265,7 +242,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 
                 <div className="flex items-center gap-6 flex-wrap">
                   <span className="text-4xl font-serif text-stone" suppressHydrationWarning>
-                    {formatPrice(productData.price + (customText ? 10 : 0))}
+                    {formatPrice(productData.price)}
                   </span>
                   
                   {/* Reviews aggregate pill */}
@@ -361,32 +338,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                   </motion.div>
                 )}
 
-                {/* Interactive Print Studio */}
-                <div className="bg-[#111111] p-6 border border-white/5 shadow-lg space-y-4">
-                  <div className="flex justify-between items-baseline">
-                    <h3 className="text-[10px] uppercase tracking-[0.4em] text-bloodred font-bold">Studio Print Customizer</h3>
-                    <span className="text-[9px] uppercase tracking-widest font-bold text-stone">[+$10.00 USD]</span>
-                  </div>
-                  <p className="text-xs text-alabaster/40 font-light leading-relaxed">
-                    Personalize your garment. Your text will be overlaid centered on the chest in raw typography.
-                  </p>
-                  <input
-                    type="text"
-                    placeholder="ENTER CUSTOM TEXT (MAX 15 CHARACTERS)"
-                    maxLength={15}
-                    value={customText}
-                    onChange={(e) => setCustomText(e.target.value.toUpperCase())}
-                    className="w-full bg-charcoal border border-white/10 text-alabaster placeholder:text-stone/30 px-4 py-3 outline-none focus:border-bloodred transition-colors text-[10px] uppercase tracking-[0.2em] font-semibold"
-                  />
-                  {customText && (
-                    <button
-                      onClick={() => setCustomText('')}
-                      className="text-[9px] uppercase tracking-widest text-bloodred/60 hover:text-bloodred font-bold font-mono transition-colors"
-                    >
-                      [Remove Custom Text]
-                    </button>
-                  )}
-                </div>
+
 
                 {/* Description & Details */}
                 <div className="space-y-6">
@@ -410,7 +362,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                     onClick={handleAddToCart}
                     className="w-full btn-luxury shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all py-6 text-xs"
                   >
-                    Initialize Order
+                    Order
                   </button>
                   <div className="mt-8 flex justify-between items-center px-2">
                     <div className="flex flex-col items-center gap-2">

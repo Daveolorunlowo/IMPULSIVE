@@ -1,30 +1,12 @@
 import { NextResponse } from 'next/server';
 
-const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const MAX_REQUESTS_PER_WINDOW = 3;
-
 export async function POST(request: Request) {
   try {
-    const { email, code } = await request.json();
+    const { email, productName, notificationType, message } = await request.json();
 
-    if (email) {
-      const now = Date.now();
-      const userLimit = rateLimitMap.get(email);
-      
-      if (userLimit && now - userLimit.timestamp < RATE_LIMIT_WINDOW_MS) {
-        if (userLimit.count >= MAX_REQUESTS_PER_WINDOW) {
-          return NextResponse.json({ error: 'TOO_MANY_REQUESTS' }, { status: 429 });
-        }
-        userLimit.count += 1;
-      } else {
-        rateLimitMap.set(email, { count: 1, timestamp: now });
-      }
-    }
-
-    if (!email || !code) {
+    if (!email || !productName || !notificationType || !message) {
       return NextResponse.json(
-        { error: 'Email and code are required' },
+        { error: 'Email, productName, notificationType, and message are required' },
         { status: 400 }
       );
     }
@@ -33,11 +15,12 @@ export async function POST(request: Request) {
 
     if (!resendApiKey) {
       console.log('\n==================================================');
-      console.log('📬 [IMPULSIVE EMAIL FALLBACK] (Development Mode)');
+      console.log('📬 [IMPULSIVE NOTIFICATION FALLBACK] (Development Mode)');
       console.log(`To: ${email}`);
-      console.log(`Code: ${code}`);
-      console.log('To receive actual emails, add the following to your .env.local:');
-      console.log('RESEND_API_KEY=re_yourApiKeyHere');
+      console.log(`Product: ${productName}`);
+      console.log(`Type: ${notificationType}`);
+      console.log(`Message: ${message}`);
+      console.log('To receive actual emails, verify you have RESEND_API_KEY configured.');
       console.log('==================================================\n');
 
       return NextResponse.json({ 
@@ -52,7 +35,7 @@ export async function POST(request: Request) {
       <html>
         <head>
           <meta charset="utf-8">
-          <title>IMPULSIVE Verification</title>
+          <title>IMPULSIVE - Product Alert</title>
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -92,19 +75,29 @@ export async function POST(request: Request) {
               margin-bottom: 40px;
               font-weight: 500;
             }
-            .code-box {
+            .message-box {
               background-color: #111111;
               border: 1px solid #1A1A1A;
               padding: 24px;
               margin: 30px 0;
+              text-align: left;
             }
-            .code {
-              font-size: 32px;
-              font-family: monospace;
-              letter-spacing: 0.4em;
+            .message-text {
+              font-size: 13px;
+              line-height: 1.8;
               color: #F9F9F7;
+              font-weight: 300;
+            }
+            .product-tag {
+              display: inline-block;
+              background-color: #800000;
+              color: #F9F9F7;
+              font-size: 9px;
               font-weight: bold;
-              margin-left: 0.4em; /* Align center due to letter-spacing */
+              text-transform: uppercase;
+              letter-spacing: 0.2em;
+              padding: 6px 12px;
+              margin-top: 15px;
             }
             .instructions {
               font-size: 11px;
@@ -114,35 +107,37 @@ export async function POST(request: Request) {
               font-weight: 300;
             }
             .footer {
-              border-t: 1px solid #1A1A1A;
+              border-top: 1px solid #1A1A1A;
               padding-top: 30px;
               font-size: 8px;
               text-transform: uppercase;
               letter-spacing: 0.3em;
               color: #444444;
+              margin-top: 40px;
             }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="logo">IMPULSIVE</div>
-            <div class="title">Log In</div>
-            <div class="subtitle">Verification Code</div>
+            <div class="logo">IMPULSIVE STUDIO</div>
+            <div class="title">${productName}</div>
+            <div class="subtitle">${notificationType}</div>
             
+            <div class="message-box">
+              <div class="message-text">
+                ${message}
+              </div>
+              <div class="text-center" style="text-align: center;">
+                <span class="product-tag">${notificationType}</span>
+              </div>
+            </div>
+
             <div class="instructions">
-              Please enter the 6-digit verification code below to log into your account.
-            </div>
-
-            <div class="code-box">
-              <div class="code">${code}</div>
-            </div>
-
-            <div class="instructions" style="margin-top: 30px;">
-              This code will expire soon. If you did not request this, you can ignore this email.
+              You are receiving this update because you are subscribed to notifications for the ${productName} drop or requested styling updates.
             </div>
 
             <div class="footer">
-              IMPULSIVE // ALL RIGHTS RESERVED
+              ARCHIVAL DESIGN SYSTEMS // ALL RIGHTS RESERVED
             </div>
           </div>
         </body>
@@ -159,7 +154,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         from: 'IMPULSIVE <onboarding@resend.dev>',
         to: email,
-        subject: 'IMPULSIVE - Verification Code',
+        subject: `[IMPULSIVE] Alert: ${productName} - ${notificationType}`,
         html: htmlContent,
       }),
     });
@@ -169,14 +164,14 @@ export async function POST(request: Request) {
     if (!response.ok) {
       console.error('Resend API Error:', data);
       return NextResponse.json(
-        { error: 'Failed to dispatch email via Resend' },
+        { error: 'Failed to dispatch email via Resend', details: data },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true, messageId: data.id });
   } catch (error) {
-    console.error('Email send api error:', error);
+    console.error('Product notification api error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

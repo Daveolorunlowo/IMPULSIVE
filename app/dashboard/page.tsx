@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/store/useAuth';
 import { useCurrency } from '@/store/useCurrency';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldAlert, LogOut, Award, User, Clock, Sparkles, MessageSquare, Copy, Check, ShieldCheck } from 'lucide-react';
+import { LogOut, Package, Heart, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardPage() {
@@ -43,115 +42,64 @@ export default function DashboardPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Mock data for productivity features
+  const recentOrders = [
+    { id: 'ORD-8X92M', date: 'Oct 24, 2026', status: 'In Transit', total: 450 },
+    { id: 'ORD-3F44P', date: 'Sep 12, 2026', status: 'Delivered', total: 890 },
+  ];
+
   if (!isAuthenticated || !user) {
     return (
       <div className="min-h-screen bg-charcoal text-alabaster flex flex-col items-center justify-center px-6 text-center">
-        <div className="border border-bloodred/20 bg-[#0A0A0A] p-10 max-w-md space-y-6 rounded-sm">
-          <ShieldAlert size={40} className="text-bloodred mx-auto" />
-          <div className="space-y-1">
-            <h1 className="text-2xl font-serif text-alabaster">SIGN IN REQUIRED</h1>
-            <p className="text-[9px] uppercase tracking-widest text-stone font-bold">
-              MEMBER ACCESS CONTROL
-            </p>
-          </div>
-          <p className="text-xs text-alabaster/60 leading-relaxed font-light">
-            Please sign in to view your profile dashboard, manage size profiles, and retrieve active styling codes.
-          </p>
-          <Link 
-            href="/auth?redirect=/dashboard"
-            className="w-full bg-bloodred hover:bg-white text-alabaster hover:text-charcoal py-4 text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center border border-bloodred/25 rounded-sm"
-          >
-            Sign In to Account
-          </Link>
-        </div>
+        <h1 className="text-3xl font-serif mb-6 text-alabaster">Sign In Required</h1>
+        <p className="text-sm font-light mb-10 max-w-sm text-alabaster/60 leading-relaxed">
+          Please sign in to view your dashboard, set your sizing preference, and check your orders.
+        </p>
+        <Link 
+          href="/auth?redirect=/dashboard"
+          className="border border-alabaster text-alabaster px-10 py-4 text-xs font-bold tracking-[0.2em] uppercase transition-all hover:bg-alabaster hover:text-charcoal"
+        >
+          Sign In
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-charcoal text-alabaster pt-40 pb-20 font-sans">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 space-y-12">
-        
-        {/* Simplified Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-white/5 pb-8 gap-6">
-          <div className="space-y-1">
-            <span className="text-[8px] uppercase tracking-[0.3em] font-mono text-bloodred font-bold">
-              Client Portal // Session Active
-            </span>
-            <h1 className="text-4xl font-serif text-alabaster">
-              My Profile
-            </h1>
-            <p className="text-xs text-alabaster/55 font-light">
-              Signed in as <span className="text-alabaster font-semibold">{user.email}</span>
-            </p>
+    <div className="min-h-screen bg-charcoal text-alabaster pt-40 pb-32 font-sans">
+      <div className="max-w-6xl mx-auto px-6 md:px-12">
+        <header className="mb-16 flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-white/10 pb-8 gap-6">
+          <div className="space-y-2">
+            <span className="text-[10px] uppercase tracking-[0.3em] font-mono text-bloodred font-bold">My Account</span>
+            <h1 className="text-4xl md:text-5xl font-serif text-alabaster mb-2">Profile</h1>
+            <p className="text-xs text-alabaster/60 font-light tracking-wide">{user.email}</p>
           </div>
-          
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-2 border border-white/10 hover:border-bloodred text-alabaster/70 hover:text-bloodred px-4 py-2.5 transition-colors text-[9px] uppercase tracking-widest font-bold rounded-sm"
+            className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-alabaster/60 hover:text-bloodred transition-colors pb-1"
           >
-            <LogOut size={12} /> Sign Out
+            <LogOut size={14} /> Sign Out
           </button>
-        </div>
+        </header>
 
-        {/* Simplified 2-Column Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="space-y-16">
           
-          {/* Left Column: Account Details & Size Profile */}
-          <div className="space-y-8">
+          {/* Quick Actions & Status Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
-            {/* Card 1: Membership & Rewards Summary */}
-            <div className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-6">
-              <div className="flex justify-between items-center border-b border-white/5 pb-4">
-                <span className="text-[9px] uppercase tracking-widest text-stone font-bold">Rewards & Status</span>
-                <Award size={18} className="text-bloodred" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-[8px] uppercase tracking-widest text-stone font-bold block mb-1">MEMBER LEVEL</span>
-                  <p className="text-xl font-serif text-alabaster">Gold Tier</p>
-                </div>
-                <div>
-                  <span className="text-[8px] uppercase tracking-widest text-stone font-bold block mb-1">ACCUMULATED POINTS</span>
-                  <p className="text-xl font-serif text-bloodred font-bold">250 Points</p>
-                </div>
-              </div>
-              <div className="space-y-2 pt-2">
-                <div className="flex justify-between text-[8px] uppercase tracking-widest text-stone font-bold">
-                  <span>Progress to Diamond Tier</span>
-                  <span>50 pts remaining</span>
-                </div>
-                <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-bloodred h-full rounded-full" style={{ width: '83.3%' }} />
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2: Sizing Preferences */}
-            <div className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-6">
-              <div className="flex justify-between items-center border-b border-white/5 pb-4">
-                <div className="space-y-1">
-                  <span className="text-[9px] uppercase tracking-widest text-stone font-bold block">Size Profile</span>
-                  <p className="text-[8px] text-stone leading-tight font-light lowercase">
-                    Select your sizing preference to quick-fill shop actions
-                  </p>
-                </div>
-                <User size={18} className="text-bloodred" />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-[8px] uppercase tracking-widest text-stone font-bold block mb-1">PREFERRED SIZE</span>
-                  <p className="text-3xl font-serif text-alabaster">Size {preferredSize}</p>
-                </div>
-                <div className="flex gap-1.5">
-                  {['XS', 'S', 'M', 'L', 'XL'].map((sz) => (
+            {/* Sizing Profile */}
+            <div className="border border-white/10 p-6 flex flex-col justify-between">
+              <div>
+                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone mb-6">My Size</h2>
+                <div className="flex gap-2">
+                  {['S', 'M', 'L', 'XL'].map((sz) => (
                     <button
                        key={sz}
                        onClick={() => handleUpdateSize(sz)}
-                       className={`w-9 h-9 text-[9px] font-bold uppercase tracking-widest transition-all rounded-sm ${
+                       className={`w-10 h-10 flex items-center justify-center text-xs font-light transition-all ${
                          preferredSize === sz
-                           ? 'bg-bloodred text-alabaster'
-                           : 'border border-white/10 text-alabaster/60 hover:text-bloodred hover:border-bloodred'
+                           ? 'bg-alabaster text-charcoal'
+                           : 'border border-white/10 text-alabaster/60 hover:border-alabaster hover:text-alabaster'
                        }`}
                     >
                        {sz}
@@ -161,77 +109,101 @@ export default function DashboardPage() {
               </div>
             </div>
 
-          </div>
-
-          {/* Right Column: Member Perks & Stylist Line */}
-          <div className="space-y-8">
-
-            {/* Card 3: Exclusive Member Codes & Drops */}
-            <div className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-6">
-              <div className="flex justify-between items-center border-b border-white/5 pb-4">
-                <span className="text-[9px] uppercase tracking-widest text-stone font-bold">Member Perks</span>
-                <Sparkles size={18} className="text-bloodred animate-pulse" />
-              </div>
-              
-              <div className="space-y-4">
-                {/* Promo Code Copy Item */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/[0.02] border border-white/5 p-4 rounded-sm">
-                  <div>
-                    <span className="text-[8px] uppercase tracking-widest text-stone font-bold block mb-1">ACTIVE PROMO CODE (10% OFF)</span>
-                    <span className="text-xs font-mono font-bold text-alabaster tracking-wider">INSTINCT</span>
-                  </div>
-                  <button
-                    onClick={copyPromoCode}
-                    className="flex items-center justify-center gap-2 border border-white/15 hover:border-bloodred hover:text-bloodred text-alabaster/70 text-[9px] uppercase tracking-widest font-bold py-2 px-3 rounded-sm transition-colors"
-                  >
-                    {copied ? (
-                      <>
-                        <ShieldCheck size={12} className="text-emerald-400" /> COPIED
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={12} /> COPY CODE
-                      </>
-                    )}
-                  </button>
+            {/* Membership */}
+            <div className="border border-white/10 p-6 flex flex-col justify-between">
+              <div>
+                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone mb-6">Membership Tier</h2>
+                <div className="flex justify-between items-end">
+                  <span className="text-2xl font-serif text-alabaster">Gold</span>
+                  <span className="text-sm font-light text-bloodred font-bold">250 pts</span>
                 </div>
-
-                {/* Upcoming Drop Countdown */}
-                <div className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-sm">
-                  <div>
-                    <span className="text-[8px] uppercase tracking-widest text-stone font-bold block mb-1">EARLY ACCESS CAPSULE</span>
-                    <span className="text-xs font-sans text-alabaster font-semibold">Archive Cropped Hoodie</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[9px] font-mono text-bloodred font-bold">
-                    <Clock size={12} /> 02d: 14h: 42m
-                  </div>
+              </div>
+              <div className="mt-6 border-t border-white/5 pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-alabaster/60 uppercase tracking-widest">Promo Code</span>
+                  <button onClick={copyPromoCode} className="text-[10px] font-mono hover:text-bloodred transition-colors">
+                    {copied ? 'COPIED' : 'INSTINCT (10%)'}
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Card 4: Stylist Help Line */}
-            <div className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-4">
-              <div className="flex justify-between items-center border-b border-white/5 pb-4">
-                <span className="text-[9px] uppercase tracking-widest text-stone font-bold">Direct Stylist Connection</span>
-                <MessageSquare size={18} className="text-bloodred" />
+            {/* Support */}
+            <div className="border border-white/10 p-6 flex flex-col justify-between">
+              <div>
+                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone mb-4">Customer Support</h2>
+                <p className="text-xs text-alabaster/60 leading-relaxed font-light">
+                  Need help with sizing or have a question? Contact our team.
+                </p>
               </div>
-              <p className="text-xs font-light text-alabaster/60 leading-relaxed">
-                Connect directly with our studio design team for bespoke fitting options, order modifications, or material advice.
-              </p>
-              <Link 
-                href="https://wa.me/2349018389254" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-full text-center bg-bloodred hover:bg-white text-alabaster hover:text-charcoal py-3.5 text-[9px] uppercase tracking-widest font-bold transition-all block rounded-sm border border-bloodred/20"
-              >
-                Chat with a Stylist
-              </Link>
+              <div className="mt-6">
+                <Link 
+                  href="https://wa.me/2349018389254" 
+                  target="_blank"
+                  className="text-[10px] uppercase tracking-widest font-bold text-bloodred hover:text-alabaster transition-colors flex items-center gap-1"
+                >
+                  Contact Us <ChevronRight size={12} />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Productivity Section: Orders & Wishlist */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            {/* Orders */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone">Recent Orders</h2>
+                <Link href="/track-order" className="text-[10px] uppercase tracking-widest text-alabaster/50 hover:text-alabaster transition-colors">
+                  View All
+                </Link>
+              </div>
+              <div className="space-y-4">
+                {recentOrders.map((order) => (
+                  <div key={order.id} className="flex justify-between items-center p-5 bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                    <div className="flex items-center gap-5">
+                      <div className="bg-charcoal p-3 border border-white/10">
+                        <Package size={16} className="text-alabaster/60" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-mono text-alabaster">{order.id}</p>
+                        <p className="text-[10px] text-alabaster/50 uppercase tracking-widest mt-1">{order.date}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-serif text-alabaster">{formatPrice(order.total)}</p>
+                      <p className={`text-[10px] uppercase tracking-widest mt-1 ${order.status === 'In Transit' ? 'text-bloodred' : 'text-emerald-500'}`}>
+                        {order.status}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Wishlist Quick Access */}
+            <div className="space-y-6">
+               <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone">Saved Items</h2>
+                <Link href="/wishlist" className="text-[10px] uppercase tracking-widest text-alabaster/50 hover:text-alabaster transition-colors">
+                  Go to Wishlist
+                </Link>
+              </div>
+              <div className="border border-white/5 bg-white/[0.02] p-8 text-center space-y-5 h-[200px] flex flex-col justify-center">
+                <Heart size={20} className="mx-auto text-alabaster/30" />
+                <p className="text-xs text-alabaster/60 font-light">
+                  You have <span className="text-alabaster font-bold">3 items</span> in your wishlist.
+                </p>
+                <Link href="/wishlist" className="inline-block border border-white/20 hover:border-alabaster hover:bg-alabaster hover:text-charcoal px-6 py-3 text-[9px] uppercase tracking-widest font-bold transition-all mx-auto">
+                  Review Items
+                </Link>
+              </div>
             </div>
 
           </div>
 
         </div>
-
       </div>
     </div>
   );

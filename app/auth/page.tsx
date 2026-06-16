@@ -79,7 +79,7 @@ function AuthPageInner() {
       <div className="max-w-md w-full">
         <div className="mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-serif text-alabaster mb-4">
-            {step === 'email' ? 'Member Access' : 'Verify Email'}
+            {step === 'email' ? 'Sign In' : 'Verify Email'}
           </h1>
           <p className="text-alabaster/40 text-xs uppercase tracking-[0.3em] font-bold">
             {step === 'email' ? 'Enter your email to sign in' : 'Please check your inbox for the code'}

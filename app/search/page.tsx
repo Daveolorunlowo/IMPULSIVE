@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import ProductCard from '@/components/ProductCard';
-import { products } from '@/lib/products';
+import { useProducts } from '@/store/useProducts';
 import { Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
+  const { products } = useProducts();
 
   const filteredProducts = query.trim() === '' 
     ? [] 

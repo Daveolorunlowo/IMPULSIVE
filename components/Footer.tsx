@@ -5,15 +5,127 @@ import Link from 'next/link';
 import Logo from '@/components/Logo';
 import { useAuth } from '@/store/useAuth';
 import { useOrders } from '@/store/useOrders';
+import { useProducts } from '@/store/useProducts';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Activity, Clock, ShoppingBag, Truck, Check } from 'lucide-react';
+import { X, User, Activity, Clock, ShoppingBag, Truck, Check, Edit, Mail, Save } from 'lucide-react';
 
 export default function Footer() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [adminPasscode, setAdminPasscode] = useState('');
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [adminTab, setAdminTab] = useState<'sessions' | 'orders'>('sessions');
+  const [adminTab, setAdminTab] = useState<'sessions' | 'orders' | 'products'>('sessions');
   const [trackingNumberInputs, setTrackingNumberInputs] = useState<Record<string, string>>({});
+
+  // Product management & notification states
+  const { products, updateProduct } = useProducts();
+  const [editingProduct, setEditingProduct] = useState<Record<string, { name: string; price: number; description: string; status: string }>>({});
+  const [notificationForm, setNotificationForm] = useState<Record<string, { email: string; type: string; message: string }>>({});
+  const [notificationStatus, setNotificationStatus] = useState<Record<string, { loading: boolean; success?: string; error?: string }>>({});
+
+  const handleProductEdit = (productId: string, field: string, value: any) => {
+    setEditingProduct(prev => {
+      const current = prev[productId] || {
+        name: products.find(p => p.id === productId)?.name || '',
+        price: products.find(p => p.id === productId)?.price || 0,
+        description: products.find(p => p.id === productId)?.description || '',
+        status: products.find(p => p.id === productId)?.status || ''
+      };
+      return {
+        ...prev,
+        [productId]: {
+          ...current,
+          [field]: value
+        }
+      };
+    });
+  };
+
+  const handleProductSave = (productId: string) => {
+    const original = products.find(p => p.id === productId);
+    if (!original) return;
+    const edits = editingProduct[productId];
+    if (!edits) return;
+
+    updateProduct({
+      ...original,
+      name: edits.name,
+      price: edits.price,
+      description: edits.description,
+      status: edits.status
+    });
+    alert(`Product "${edits.name}" updated successfully.`);
+  };
+
+  const getFormVal = (productId: string, field: 'email' | 'type' | 'message', productName: string) => {
+    const defaults = {
+      email: 'wearimpulsive@gmail.com',
+      type: 'Back in Stock',
+      message: `We are pleased to inform you that our ${productName} is back in stock in limited quantities.`
+    };
+    return notificationForm[productId]?.[field] ?? defaults[field];
+  };
+
+  const setFormVal = (productId: string, field: 'email' | 'type' | 'message', value: string, productName: string) => {
+    const defaults = {
+      email: 'wearimpulsive@gmail.com',
+      type: 'Back in Stock',
+      message: `We are pleased to inform you that our ${productName} is back in stock in limited quantities.`
+    };
+    const current = notificationForm[productId] || { ...defaults };
+    setNotificationForm(prev => ({
+      ...prev,
+      [productId]: {
+        ...current,
+        [field]: value
+      }
+    }));
+  };
+
+  const getProductVal = (product: any, field: 'name' | 'price' | 'description' | 'status') => {
+    return editingProduct[product.id]?.[field] ?? product[field] ?? '';
+  };
+
+  const handleNotificationSubmit = async (productId: string, productName: string) => {
+    const emailVal = getFormVal(productId, 'email', productName);
+    const typeVal = getFormVal(productId, 'type', productName);
+    const messageVal = getFormVal(productId, 'message', productName);
+    
+    setNotificationStatus(prev => ({
+      ...prev,
+      [productId]: { loading: true }
+    }));
+
+    try {
+      const res = await fetch('/api/products/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailVal,
+          productName,
+          notificationType: typeVal,
+          message: messageVal
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send');
+
+      setNotificationStatus(prev => ({
+        ...prev,
+        [productId]: { loading: false, success: 'Notification email dispatched successfully via Resend.' }
+      }));
+      setTimeout(() => {
+        setNotificationStatus(prev => ({
+          ...prev,
+          [productId]: { loading: false }
+        }));
+      }, 5000);
+    } catch (err: any) {
+      setNotificationStatus(prev => ({
+        ...prev,
+        [productId]: { loading: false, error: err.message || 'Failed to dispatch email' }
+      }));
+    }
+  };
   
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -83,7 +195,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm text-alabaster/40 font-light leading-relaxed">
-              Redefining modern elegance through curated collections and technical precision.
+              High-quality modern streetwear made with premium fabrics.
             </p>
           </div>
 
@@ -185,7 +297,7 @@ export default function Footer() {
                 </div>
 
                 {isAdminAuthenticated && (
-                  <div className="flex gap-4 border-t sm:border-t-0 sm:border-l border-stone/30 pt-4 sm:pt-0 sm:pl-8 sm:ml-8">
+                  <div className="flex flex-wrap gap-2 md:gap-4 border-t sm:border-t-0 sm:border-l border-stone/30 pt-4 sm:pt-0 sm:pl-8 sm:ml-8">
                     <button
                       onClick={() => setAdminTab('sessions')}
                       className={`text-[9px] uppercase tracking-widest font-bold py-2.5 px-4 transition-all ${
@@ -205,6 +317,16 @@ export default function Footer() {
                       }`}
                     >
                       Order Logistics ({orders.length})
+                    </button>
+                    <button
+                      onClick={() => setAdminTab('products')}
+                      className={`text-[9px] uppercase tracking-widest font-bold py-2.5 px-4 transition-all ${
+                        adminTab === 'products'
+                          ? 'bg-bloodred text-alabaster'
+                          : 'bg-stone/15 text-alabaster/40 hover:text-alabaster hover:bg-stone/25'
+                      }`}
+                    >
+                      Product Management
                     </button>
                   </div>
                 )}
@@ -247,42 +369,7 @@ export default function Footer() {
                       </button>
                     </form>
                   </div>
-                ) : adminTab === 'sessions' ? (
-                  users.length === 0 ? (
-                    <div className="h-60 flex flex-col items-center justify-center text-alabaster/40 italic">
-                      <User size={40} className="mb-4 opacity-20" />
-                      <p>No active session data found.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-12">
-                      {users.map((user, i) => (
-                        <div key={i} className="space-y-6">
-                          <div className="flex items-center gap-4 border-b border-stone/10 pb-4">
-                            <div className="w-2 h-2 rounded-full bg-bloodred" />
-                            <span className="text-xs uppercase tracking-widest font-bold text-alabaster">{user.email}</span>
-                            <span className="text-[10px] uppercase tracking-widest text-alabaster/40 ml-auto">Verified User</span>
-                          </div>
-                          
-                          <div className="grid gap-4">
-                            {user.activity.slice().reverse().map((act, j) => (
-                              <div key={j} className="flex items-center gap-6 bg-stone/5 p-4 group hover:bg-stone/10 transition-all">
-                                <div className="w-8 h-8 rounded-full border border-alabaster/20 flex items-center justify-center text-alabaster/40 group-hover:text-bloodred transition-colors">
-                                  <Clock size={12} />
-                                </div>
-                                <div className="flex-1">
-                                  <p className="text-[10px] uppercase tracking-widest text-alabaster/80">{act.action}</p>
-                                </div>
-                                <span className="text-[8px] uppercase tracking-widest text-alabaster/40">
-                                  {new Date(act.timestamp).toLocaleTimeString()}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                ) : (
+                ) : adminTab === 'orders' ? (
                   orders.length === 0 ? (
                     <div className="h-60 flex flex-col items-center justify-center text-alabaster/40 italic">
                       <ShoppingBag size={40} className="mb-4 opacity-20 animate-pulse" />
@@ -334,11 +421,6 @@ export default function Footer() {
                                     <p className="text-[9px] text-stone uppercase tracking-widest">
                                       Size {item.selectedSize} · {item.selectedColor.name} · Qty {item.quantity}
                                     </p>
-                                    {item.customText && (
-                                      <div className="mt-1 bg-bloodred/10 border border-bloodred/25 px-2 py-0.5 inline-block text-[8px] font-mono text-bloodred tracking-wider font-bold">
-                                        CUSTOM CANVAS: "{item.customText}"
-                                      </div>
-                                    )}
                                   </div>
                                 </div>
                               ))}
@@ -394,6 +476,171 @@ export default function Footer() {
                       ))}
                     </div>
                   )
+                ) : (
+                  /* Product Management Tab */
+                  <div className="space-y-8 text-alabaster">
+                    <div className="flex justify-between items-center border-b border-stone/30 pb-4">
+                      <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone">Store Product Catalog</span>
+                      <button 
+                        onClick={() => {
+                          if (confirm('Are you sure you want to reset all products back to default values?')) {
+                            const { resetProducts } = useProducts.getState();
+                            resetProducts();
+                            setEditingProduct({});
+                            alert('All products reset to default.');
+                          }
+                        }}
+                        className="text-[8px] bg-stone/20 border border-stone/30 text-alabaster/60 hover:text-bloodred px-3 py-1.5 uppercase tracking-widest font-semibold transition-all"
+                      >
+                        Reset Defaults
+                      </button>
+                    </div>
+
+                    <div className="space-y-8">
+                      {products.map((product) => (
+                        <div key={product.id} className="bg-stone/5 border border-stone/10 p-6 space-y-6 rounded-sm">
+                          
+                          {/* Image and name header */}
+                          <div className="flex gap-6 items-start flex-wrap sm:flex-nowrap pb-4 border-b border-stone/10">
+                            <div className="relative w-16 h-20 bg-stone/20 overflow-hidden flex-shrink-0">
+                              <img src={product.mainImage} alt="" className="object-cover w-full h-full" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <span className="text-[8px] uppercase tracking-widest text-stone font-bold">{product.category} ID: {product.id}</span>
+                              <h4 className="font-serif text-lg text-alabaster">{product.name}</h4>
+                              <p className="text-[10px] text-stone uppercase tracking-widest">
+                                Sizes: {product.sizes.join(', ')} · Price: ${product.price}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            
+                            {/* Editor fields */}
+                            <div className="space-y-4">
+                              <span className="text-[8px] uppercase tracking-widest text-bloodred font-bold flex items-center gap-1.5">
+                                <Edit size={10} /> Edit Product Fields
+                              </span>
+                              
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Display Name</label>
+                                  <input 
+                                    type="text"
+                                    value={getProductVal(product, 'name')}
+                                    onChange={(e) => handleProductEdit(product.id, 'name', e.target.value)}
+                                    className="w-full bg-[#111] border border-white/10 text-alabaster px-3 py-2 text-[10px] tracking-wide outline-none focus:border-bloodred transition-colors"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Price (USD)</label>
+                                  <input 
+                                    type="number"
+                                    value={getProductVal(product, 'price')}
+                                    onChange={(e) => handleProductEdit(product.id, 'price', parseFloat(e.target.value) || 0)}
+                                    className="w-full bg-[#111] border border-white/10 text-alabaster px-3 py-2 text-[10px] tracking-wide outline-none focus:border-bloodred transition-colors"
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Scarcity Status (e.g. Low Stock, Sold Out)</label>
+                                <input 
+                                  type="text"
+                                  value={getProductVal(product, 'status')}
+                                  onChange={(e) => handleProductEdit(product.id, 'status', e.target.value)}
+                                  className="w-full bg-[#111] border border-white/10 text-alabaster px-3 py-2 text-[10px] tracking-wide outline-none focus:border-bloodred transition-colors"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Composition / Description</label>
+                                <textarea 
+                                  rows={3}
+                                  value={getProductVal(product, 'description')}
+                                  onChange={(e) => handleProductEdit(product.id, 'description', e.target.value)}
+                                  className="w-full bg-[#111] border border-white/10 text-alabaster px-3 py-2 text-[10px] tracking-wide outline-none focus:border-bloodred transition-colors resize-none"
+                                />
+                              </div>
+
+                              {editingProduct[product.id] && (
+                                <button
+                                  onClick={() => handleProductSave(product.id)}
+                                  className="bg-white hover:bg-bloodred hover:text-alabaster text-charcoal px-6 py-2.5 text-[8px] uppercase tracking-widest font-bold transition-all flex items-center gap-2"
+                                >
+                                  <Save size={10} /> Save Changes
+                                </button>
+                              )}
+                            </div>
+
+                            {/* Email notification form */}
+                            <div className="space-y-4 border-t lg:border-t-0 lg:border-l border-stone/10 pt-6 lg:pt-0 lg:pl-8 flex flex-col justify-between">
+                              <div className="space-y-4">
+                                <span className="text-[8px] uppercase tracking-widest text-bloodred font-bold flex items-center gap-1.5">
+                                  <Mail size={10} /> Dispatch Alerts (via Resend)
+                                </span>
+
+                                <div>
+                                  <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Recipient Email</label>
+                                  <input 
+                                    type="email"
+                                    value={getFormVal(product.id, 'email', product.name)}
+                                    onChange={(e) => setFormVal(product.id, 'email', e.target.value, product.name)}
+                                    placeholder="wearimpulsive@gmail.com"
+                                    className="w-full bg-[#111] border border-white/10 text-alabaster px-3 py-2 text-[10px] tracking-wide outline-none focus:border-bloodred transition-colors"
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                  <div>
+                                    <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Alert Category</label>
+                                    <select
+                                      value={getFormVal(product.id, 'type', product.name)}
+                                      onChange={(e) => setFormVal(product.id, 'type', e.target.value, product.name)}
+                                      className="w-full bg-[#111] border border-white/10 text-alabaster px-3 py-2.5 text-[10px] tracking-wide outline-none focus:border-bloodred transition-colors"
+                                    >
+                                      <option value="Back in Stock">Back in Stock</option>
+                                      <option value="Low Stock Alert">Low Stock Alert</option>
+                                      <option value="Price Cut Alert">Price Cut Alert</option>
+                                      <option value="Exclusive Release">Exclusive Release</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Auto message preview</label>
+                                    <textarea
+                                      rows={2}
+                                      value={getFormVal(product.id, 'message', product.name)}
+                                      onChange={(e) => setFormVal(product.id, 'message', e.target.value, product.name)}
+                                      className="w-full bg-[#111] border border-white/10 text-alabaster px-3 py-2 text-[9px] tracking-wide outline-none focus:border-bloodred transition-colors resize-none"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="pt-4">
+                                {notificationStatus[product.id]?.success && (
+                                  <p className="text-emerald-400 text-[9px] uppercase tracking-wider mb-2">{notificationStatus[product.id]?.success}</p>
+                                )}
+                                {notificationStatus[product.id]?.error && (
+                                  <p className="text-bloodred text-[9px] uppercase tracking-wider mb-2">{notificationStatus[product.id]?.error}</p>
+                                )}
+
+                                <button
+                                  disabled={notificationStatus[product.id]?.loading}
+                                  onClick={() => handleNotificationSubmit(product.id, product.name)}
+                                  className="bg-bloodred hover:bg-white hover:text-charcoal disabled:opacity-50 text-alabaster px-6 py-2.5 text-[8px] uppercase tracking-widest font-bold transition-all flex items-center gap-2"
+                                >
+                                  {notificationStatus[product.id]?.loading ? 'Dispatching...' : 'Send Resend Notification'}
+                                </button>
+                              </div>
+
+                            </div>
+                          </div>
+
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
 
