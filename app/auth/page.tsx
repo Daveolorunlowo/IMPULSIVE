@@ -12,7 +12,6 @@ function AuthPageInner() {
   const [step, setStep] = useState<'email' | 'verify'>('email');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [devCode, setDevCode] = useState<string | null>(null);
   const emailInputRef = React.useCallback((node: HTMLInputElement | null) => {
     if (node) {
       setTimeout(() => node.focus(), 150);
@@ -40,13 +39,7 @@ function AuthPageInner() {
       await new Promise(resolve => setTimeout(resolve, 1000));
       await signup(email);
       setStep('verify');
-      
-      // Show dev code in UI for testing
-      // We need to wait for the store to update
-      setTimeout(() => {
-        const currentCode = useAuth.getState().verificationCode;
-        setDevCode(currentCode);
-      }, 100);
+
     } catch (err: any) {
       if (err.message === 'DISPOSABLE_EMAIL') {
         setError('Temporary / disposable emails are not permitted. Please use a real email.');
@@ -89,21 +82,6 @@ function AuthPageInner() {
             {step === 'email' ? 'Enter your email to sign in' : 'Please check your inbox for the code'}
           </p>
         </div>
-
-        {/* Development Code Toast */}
-        <AnimatePresence>
-          {devCode && step === 'verify' && (
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              className="mb-8 bg-bloodred/10 border border-bloodred/30 p-4 text-center backdrop-blur-md"
-            >
-              <p className="text-[10px] uppercase tracking-[0.3em] text-bloodred font-bold mb-2">Development Mode: Verification Code</p>
-              <p className="text-3xl font-mono text-alabaster tracking-[0.5em]">{devCode}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <AnimatePresence mode="wait">
           {step === 'email' ? (
