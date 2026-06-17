@@ -38,15 +38,22 @@ export const useAuth = create<AuthStore>()(
         set({ verificationCode: code, pendingEmail: email });
         
         try {
-          await fetch('/api/auth/send-code', {
+          const res = await fetch('/api/auth/send-code', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ email, code }),
           });
+
+          if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || 'Failed to send verification code');
+          }
         } catch (error) {
           console.error('[AUTH] Failed to trigger send-code route:', error);
+          set({ verificationCode: null, pendingEmail: null });
+          throw error;
         }
       },
 
@@ -76,15 +83,22 @@ export const useAuth = create<AuthStore>()(
         set({ verificationCode: code, pendingEmail: email });
 
         try {
-          await fetch('/api/auth/send-code', {
+          const res = await fetch('/api/auth/send-code', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ email, code }),
           });
+
+          if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || 'Failed to send verification code');
+          }
         } catch (error) {
           console.error('[AUTH] Failed to trigger send-code route:', error);
+          set({ verificationCode: null, pendingEmail: null });
+          throw error;
         }
       },
 

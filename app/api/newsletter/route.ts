@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { isDisposableEmail } from '@/lib/email-validator';
 
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
@@ -11,6 +12,10 @@ export async function POST(req: Request) {
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    }
+
+    if (isDisposableEmail(email)) {
+      return NextResponse.json({ error: 'DISPOSABLE_EMAIL' }, { status: 400 });
     }
 
     // Rate Limiting by IP or Email (Using Email for simplicity in edge)

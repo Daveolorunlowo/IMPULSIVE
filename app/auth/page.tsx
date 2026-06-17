@@ -38,7 +38,7 @@ function AuthPageInner() {
     try {
       // Mocking API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      signup(email);
+      await signup(email);
       setStep('verify');
       
       // Show dev code in UI for testing
@@ -47,8 +47,12 @@ function AuthPageInner() {
         const currentCode = useAuth.getState().verificationCode;
         setDevCode(currentCode);
       }, 100);
-    } catch (err) {
-      setError('Something went wrong. Please try again.');
+    } catch (err: any) {
+      if (err.message === 'DISPOSABLE_EMAIL') {
+        setError('Temporary / disposable emails are not permitted. Please use a real email.');
+      } else {
+        setError(err.message || 'Something went wrong. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isDisposableEmail } from '@/lib/email-validator';
 
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
@@ -7,6 +8,20 @@ const MAX_REQUESTS_PER_WINDOW = 3;
 export async function POST(request: Request) {
   try {
     const { email, code } = await request.json();
+
+    if (!email || !code) {
+      return NextResponse.json(
+        { error: 'Email and code are required' },
+        { status: 400 }
+      );
+    }
+
+    if (isDisposableEmail(email)) {
+      return NextResponse.json(
+        { error: 'DISPOSABLE_EMAIL' },
+        { status: 400 }
+      );
+    }
 
     if (email) {
       const now = Date.now();
@@ -20,13 +35,6 @@ export async function POST(request: Request) {
       } else {
         rateLimitMap.set(email, { count: 1, timestamp: now });
       }
-    }
-
-    if (!email || !code) {
-      return NextResponse.json(
-        { error: 'Email and code are required' },
-        { status: 400 }
-      );
     }
 
     const resendApiKey = process.env.RESEND_API_KEY;

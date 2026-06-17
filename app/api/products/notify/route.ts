@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isDisposableEmail } from '@/lib/email-validator';
 
 export async function POST(request: Request) {
   try {
@@ -7,6 +8,13 @@ export async function POST(request: Request) {
     if (!email || !productName || !notificationType || !message) {
       return NextResponse.json(
         { error: 'Email, productName, notificationType, and message are required' },
+        { status: 400 }
+      );
+    }
+
+    if (isDisposableEmail(email)) {
+      return NextResponse.json(
+        { error: 'DISPOSABLE_EMAIL' },
         { status: 400 }
       );
     }

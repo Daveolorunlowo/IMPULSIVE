@@ -13,6 +13,7 @@
     "axios": "^1.16.0",
     "clsx": "^2.1.1",
     "cors": "^2.8.6",
+    "disposable-email-domains": "^1.0.62",
     "dompurify": "^3.4.7",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",

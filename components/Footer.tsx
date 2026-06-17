@@ -175,7 +175,13 @@ export default function Footer() {
       setTimeout(() => setNewsletterStatus('idle'), 5000);
     } catch (err: any) {
       setNewsletterStatus('error');
-      setNewsletterMessage(err.message === 'ALREADY_SUBSCRIBED' ? 'You are already on the list.' : 'Something went wrong. Try again.');
+      if (err.message === 'ALREADY_SUBSCRIBED') {
+        setNewsletterMessage('You are already on the list.');
+      } else if (err.message === 'DISPOSABLE_EMAIL') {
+        setNewsletterMessage('Temporary emails are not permitted.');
+      } else {
+        setNewsletterMessage('Something went wrong. Try again.');
+      }
       setTimeout(() => setNewsletterStatus('idle'), 5000);
     }
   };
