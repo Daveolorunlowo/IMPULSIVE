@@ -5,7 +5,6 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import CartSlideover from "@/components/CartSlideover";
 import NotificationToast from "@/components/NotificationToast";
-import ConciergeChat from "@/components/ConciergeChat";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import { clsx } from "clsx";
@@ -30,7 +29,6 @@ export default function RootLayout({
       <body className={clsx(inter.variable, syne.variable, playfair.variable, mono.variable, "font-sans antialiased bg-charcoal text-alabaster overflow-x-hidden")}>
         <CartSlideover />
         <NotificationToast />
-        <ConciergeChat />
         <Navbar />
         <main className="min-h-screen">
           <Suspense fallback={
