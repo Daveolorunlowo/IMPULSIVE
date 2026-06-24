@@ -1,7 +1,6 @@
 import React, { Suspense } from 'react';
 import WishlistClient from './wishlist-client';
 
-export const unstable_instant = true;
 
 export default function WishlistPage() {
   return (

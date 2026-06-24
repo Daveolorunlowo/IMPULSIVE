@@ -2,7 +2,6 @@ import React, { Suspense } from 'react';
 import HomeClient from './home-client';
 import { HelpCircle } from 'lucide-react';
 
-export const unstable_instant = true;
 
 export default function Home() {
   return (

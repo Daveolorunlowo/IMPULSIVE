@@ -2,7 +2,6 @@ import React, { Suspense } from 'react';
 import { HelpCircle } from 'lucide-react';
 import ClientServicesContent from './client-page';
 
-export const unstable_instant = true;
 
 export default function ClientServicesPage() {
   return (

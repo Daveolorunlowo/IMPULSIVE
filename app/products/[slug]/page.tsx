@@ -3,7 +3,6 @@ import { HelpCircle } from 'lucide-react';
 import ProductDetailClient from './client-page';
 import { products } from '@/lib/products';
 
-export const unstable_instant = true;
 
 export async function generateStaticParams() {
   return products.map((product) => ({

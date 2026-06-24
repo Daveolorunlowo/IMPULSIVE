@@ -1,7 +1,6 @@
 import React, { Suspense } from 'react';
 import TrackClient from './track-client';
 
-export const unstable_instant = true;
 
 export default function TrackOrderPage() {
   return (
