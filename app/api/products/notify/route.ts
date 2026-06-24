@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
+import { withSupabase } from '@supabase/server';
 import { isDisposableEmail } from '@/lib/email-validator';
 
-export async function POST(request: Request) {
+export const POST = withSupabase({ auth: 'none' }, async (request, ctx) => {
   try {
     const { email, productName, notificationType, message } = await request.json();
 
@@ -185,4 +186,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
+});

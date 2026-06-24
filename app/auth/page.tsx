@@ -58,7 +58,7 @@ function AuthPageInner() {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1500));
-      const success = verify(code);
+      const success = await verify(code);
       if (success) {
         router.push(redirectTo);
       } else {

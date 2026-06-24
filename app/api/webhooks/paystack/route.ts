@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { PaymentService } from '@/services/payment.service';
-import { getSupabaseAdmin } from '@/lib/supabase';
+import { withSupabase } from '@supabase/server';
 
 /**
  * POST /api/webhooks/paystack
  * Listens for Paystack events. Only updates order status after
  * cryptographic signature verification.
  */
-export async function POST(req: Request) {
+export const POST = withSupabase({ auth: 'none' }, async (req, ctx) => {
   const payload = await req.text();
   const signature = req.headers.get('x-paystack-signature') ?? '';
 
@@ -22,7 +22,10 @@ export async function POST(req: Request) {
   if (event.event === 'charge.success') {
     const reference: string = event.data.reference;
 
-    const { error } = await getSupabaseAdmin()
+    const supabase = ctx.supabaseAdmin as any;
+
+    // Use ctx.supabaseAdmin to bypass RLS and mark as paid
+    const { error } = await supabase
       .from('orders')
       .update({ status: 'paid', updated_at: new Date().toISOString() })
       .eq('payment_reference', reference);
@@ -36,4 +39,4 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ status: 'received' });
-}
+});

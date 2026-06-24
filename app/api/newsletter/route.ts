@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase';
+import { withSupabase } from '@supabase/server';
 import { isDisposableEmail } from '@/lib/email-validator';
 
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 2;
 
-export async function POST(req: Request) {
+export const POST = withSupabase({ auth: 'none' }, async (req, ctx) => {
   try {
     const { email } = await req.json();
 
@@ -31,9 +31,9 @@ export async function POST(req: Request) {
       rateLimitMap.set(email, { count: 1, timestamp: now });
     }
 
-    const supabase = getSupabaseAdmin();
+    const supabase = ctx.supabaseAdmin as any;
 
-    // Insert into 'subscribers' table
+    // Insert into 'subscribers' table using the context admin client
     const { error } = await supabase
       .from('subscribers')
       .insert({ email });
@@ -64,4 +64,4 @@ export async function POST(req: Request) {
     console.error('[POST /api/newsletter]', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
-}
+});

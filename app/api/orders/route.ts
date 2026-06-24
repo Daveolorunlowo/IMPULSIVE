@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase';
+import { withSupabase } from '@supabase/server';
 import { InventoryService } from '@/services/inventory.service';
 import { PaymentService } from '@/services/payment.service';
+import { calculateShipping } from '@/lib/utils';
 
 /**
  * POST /api/orders
  * Creates a pending order, atomically decrements stock, and
  * returns a Paystack payment URL.
  */
-export async function POST(req: Request) {
+export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
-    const { customerId, email, items, totalPrice, currency = 'USD', promoCode } = await req.json();
+    const { customerId, email, items, totalPrice, currency = 'USD', promoCode, shippingAddress } = await req.json();
 
     if (!customerId || !email || !items?.length || totalPrice === undefined) {
       return NextResponse.json({ error: 'MISSING_REQUIRED_FIELDS' }, { status: 400 });
     }
 
-    const supabase = getSupabaseAdmin();
+    const supabase = ctx.supabaseAdmin as any;
 
     // ── 1. TIMED DROP WINDOW CHECK ────────────────────────────────────────
     const { data: activeDrop } = await supabase
@@ -52,7 +53,7 @@ export async function POST(req: Request) {
 
     let expectedTotalPriceUSD = 0;
     for (const item of items) {
-      const dbProduct = dbProducts.find((p) => p.id === (item.productId || item.variantId));
+      const dbProduct = dbProducts.find((p: any) => p.id === (item.productId || item.variantId));
       if (!dbProduct) {
         return NextResponse.json({ error: 'INVALID_PRODUCT' }, { status: 400 });
       }
@@ -68,7 +69,8 @@ export async function POST(req: Request) {
     }
 
     const NGN_RATE = 1500;
-    const finalExpectedPrice = currency === 'NGN' ? expectedTotalPriceUSD * NGN_RATE : expectedTotalPriceUSD;
+    const shippingFee = calculateShipping(shippingAddress?.state || '', currency as 'USD' | 'NGN');
+    const finalExpectedPrice = (currency === 'NGN' ? expectedTotalPriceUSD * NGN_RATE : expectedTotalPriceUSD) + shippingFee;
 
     if (Math.abs(totalPrice - finalExpectedPrice) > 0.01) {
       console.error(`[POST /api/orders] PRICE_TAMPERING_DETECTED: Expected ${finalExpectedPrice}, got ${totalPrice}`);
@@ -93,6 +95,11 @@ export async function POST(req: Request) {
         total_price: totalPrice,
         status: 'pending',
         payment_reference: reference,
+        metadata: {
+          shippingAddress,
+          promoCode,
+          currency,
+        },
       })
       .select()
       .single();
@@ -122,4 +129,45 @@ export async function POST(req: Request) {
     console.error('[POST /api/orders]', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
-}
+});
+
+/**
+ * GET /api/orders
+ * Fetches order transactions for the logged-in user.
+ */
+export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
+  try {
+    const userId = (ctx.userClaims as any)?.sub;
+    if (!userId) {
+      return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+
+    const supabase = ctx.supabaseAdmin as any;
+
+    // Retrieve user orders from Supabase
+    const { data: dbOrders, error } = await supabase
+      .from('orders')
+      .select(`
+        id,
+        status,
+        total_price,
+        payment_reference,
+        created_at,
+        metadata
+      `)
+      .eq('customer_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('[GET /api/orders] DB Error:', error.message);
+      return NextResponse.json({ error: 'DATABASE_ERROR' }, { status: 500 });
+    }
+
+    return NextResponse.json({ orders: dbOrders || [] });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'INTERNAL_SERVER_ERROR';
+    console.error('[GET /api/orders]', message);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+});
+

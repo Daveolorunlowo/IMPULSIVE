@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseAdmin } from '@/lib/supabase';
+import { withSupabase } from '@supabase/server';
 
 interface CartItem {
   productId: string;
@@ -11,7 +11,7 @@ interface CartItem {
  * Cross-references frontend cart prices against ground-truth DB prices.
  * Rejects the request if any price drift is detected.
  */
-export async function POST(req: Request) {
+export const POST = withSupabase({ auth: 'none' }, async (req, ctx) => {
   try {
     const { items }: { items: CartItem[] } = await req.json();
 
@@ -21,7 +21,10 @@ export async function POST(req: Request) {
 
     const productIds = items.map((i) => i.productId);
 
-    const { data: currentProducts, error } = await getSupabaseAdmin()
+    const supabase = ctx.supabaseAdmin as any;
+
+    // Fetch from Supabase using ctx.supabaseAdmin
+    const { data: currentProducts, error } = await supabase
       .from('products')
       .select('id, price')
       .in('id', productIds);
@@ -33,7 +36,7 @@ export async function POST(req: Request) {
     const mismatches: { productId: string; expected: number; received: number }[] = [];
 
     for (const item of items) {
-      const dbProduct = currentProducts.find((p) => p.id === item.productId);
+      const dbProduct = currentProducts.find((p: any) => p.id === item.productId);
 
       if (!dbProduct || dbProduct.price !== item.claimedPrice) {
         mismatches.push({
@@ -55,4 +58,4 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: 'VALIDATION_ERROR' }, { status: 400 });
   }
-}
+});

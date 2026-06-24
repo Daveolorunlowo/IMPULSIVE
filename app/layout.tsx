@@ -7,6 +7,7 @@ import CartSlideover from "@/components/CartSlideover";
 import NotificationToast from "@/components/NotificationToast";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
+import AuthListener from "@/components/AuthListener";
 import { clsx } from "clsx";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -25,8 +26,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={clsx(inter.variable, syne.variable, playfair.variable, mono.variable, "font-sans antialiased bg-charcoal text-alabaster overflow-x-hidden")}>
+        <AuthListener />
         <CartSlideover />
         <NotificationToast />
         <Navbar />

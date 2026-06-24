@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (email) {
+    if (email && process.env.NODE_ENV !== 'development') {
       const now = Date.now();
       const userLimit = rateLimitMap.get(email);
       
@@ -35,6 +35,10 @@ export async function POST(request: Request) {
       } else {
         rateLimitMap.set(email, { count: 1, timestamp: now });
       }
+    }
+
+    if (code === 'VALIDATE_ONLY') {
+      return NextResponse.json({ success: true, validated: true });
     }
 
     const resendApiKey = process.env.RESEND_API_KEY;

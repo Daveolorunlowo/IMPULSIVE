@@ -19,6 +19,28 @@ export function getSupabaseAdmin(): SupabaseClient {
   return _supabaseAdmin;
 }
 
+let _supabaseClient: SupabaseClient | null = null;
+
+export function getSupabaseClient(): SupabaseClient {
+  if (_supabaseClient) return _supabaseClient;
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL in .env.local');
+  }
+
+  // Fallback to service role key in development if anon key is not yet set
+  const keyToUse = key || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!keyToUse) {
+    throw new Error('Missing NEXT_PUBLIC_SUPABASE_ANON_KEY or SUPABASE_SERVICE_ROLE_KEY in .env.local');
+  }
+
+  _supabaseClient = createClient(url, keyToUse);
+  return _supabaseClient;
+}
+
 // ─── Database Type Definitions ─────────────────────────────────────────────
 
 export interface Product {

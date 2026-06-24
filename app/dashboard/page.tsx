@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/store/useAuth';
 import { useCurrency } from '@/store/useCurrency';
 import { useRouter } from 'next/navigation';
-import { LogOut, Package, Heart, ChevronRight } from 'lucide-react';
+import { LogOut, Package, Heart, ChevronRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export default function DashboardPage() {
   const { user, isAuthenticated, logout, trackActivity } = useAuth();
@@ -14,6 +15,8 @@ export default function DashboardPage() {
   
   const [preferredSize, setPreferredSize] = useState('M');
   const [copied, setCopied] = useState(false);
+  const [dbOrders, setDbOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -21,6 +24,32 @@ export default function DashboardPage() {
       if (saved) setPreferredSize(saved);
     }
   }, []);
+
+  useEffect(() => {
+    async function fetchUserOrders() {
+      if (!isAuthenticated || !user) return;
+      try {
+        const supabase = getSupabaseClient();
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+
+        const res = await fetch('/api/orders', {
+          headers: {
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setDbOrders(data.orders || []);
+        }
+      } catch (err) {
+        console.error('[Dashboard] Failed to fetch orders:', err);
+      } finally {
+        setLoadingOrders(false);
+      }
+    }
+    fetchUserOrders();
+  }, [user, isAuthenticated]);
 
   const handleUpdateSize = (size: string) => {
     setPreferredSize(size);
@@ -41,12 +70,6 @@ export default function DashboardPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  // Mock data for productivity features
-  const recentOrders = [
-    { id: 'ORD-8X92M', date: 'Oct 24, 2026', status: 'In Transit', total: 450 },
-    { id: 'ORD-3F44P', date: 'Sep 12, 2026', status: 'Delivered', total: 890 },
-  ];
 
   if (!isAuthenticated || !user) {
     return (
@@ -160,25 +183,71 @@ export default function DashboardPage() {
                 </Link>
               </div>
               <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div key={order.id} className="flex justify-between items-center p-5 bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
-                    <div className="flex items-center gap-5">
-                      <div className="bg-charcoal p-3 border border-white/10">
-                        <Package size={16} className="text-alabaster/60" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-mono text-alabaster">{order.id}</p>
-                        <p className="text-[10px] text-alabaster/50 uppercase tracking-widest mt-1">{order.date}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-serif text-alabaster">{formatPrice(order.total)}</p>
-                      <p className={`text-[10px] uppercase tracking-widest mt-1 ${order.status === 'In Transit' ? 'text-bloodred' : 'text-emerald-500'}`}>
-                        {order.status}
-                      </p>
-                    </div>
+                {loadingOrders ? (
+                  <div className="py-12 flex flex-col items-center justify-center gap-3 border border-white/5 bg-white/[0.02]">
+                    <Loader2 size={20} className="animate-spin text-bloodred" />
+                    <p className="text-[10px] uppercase tracking-widest text-stone">Synchronizing orders...</p>
                   </div>
-                ))}
+                ) : dbOrders.length === 0 ? (
+                  <div className="py-12 text-center border border-white/5 bg-white/[0.02] flex flex-col justify-center">
+                    <p className="text-xs text-alabaster/40 font-light">No order records found in the archive.</p>
+                    <Link href="/shop" className="mt-4 text-[10px] uppercase tracking-widest font-bold text-bloodred hover:text-alabaster transition-colors">
+                      Explore Inventory ➔
+                    </Link>
+                  </div>
+                ) : (
+                  dbOrders.map((order) => {
+                    const formattedDate = new Date(order.created_at).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric'
+                    });
+
+                    // Map Supabase database order status to CSS status strings & colors
+                    let statusColor = 'text-stone';
+                    let displayStatus = order.status;
+
+                    if (order.status === 'paid' || order.status === 'delivered') {
+                      statusColor = 'text-emerald-500';
+                      displayStatus = order.status === 'paid' ? 'Paid' : 'Delivered';
+                    } else if (order.status === 'pending') {
+                      statusColor = 'text-amber-500';
+                      displayStatus = 'Pending';
+                    } else if (order.status === 'shipped') {
+                      statusColor = 'text-bloodred';
+                      displayStatus = 'Shipped';
+                    } else if (order.status === 'cancelled') {
+                      statusColor = 'text-stone';
+                      displayStatus = 'Cancelled';
+                    }
+
+                    return (
+                      <Link 
+                        key={order.id} 
+                        href={`/track-order?code=${order.payment_reference}`}
+                        className="block"
+                      >
+                        <div className="flex justify-between items-center p-5 bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10 group">
+                          <div className="flex items-center gap-5">
+                            <div className="bg-charcoal p-3 border border-white/10 group-hover:border-bloodred/40 transition-colors">
+                              <Package size={16} className="text-alabaster/60" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-mono text-alabaster tracking-wider group-hover:text-bloodred transition-colors">{order.payment_reference}</p>
+                              <p className="text-[10px] text-alabaster/50 uppercase tracking-widest mt-1">{formattedDate}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-serif text-alabaster">{formatPrice(order.total_price)}</p>
+                            <p className={`text-[10px] uppercase tracking-widest mt-1 ${statusColor}`}>
+                              {displayStatus}
+                            </p>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })
+                )}
               </div>
             </div>
 

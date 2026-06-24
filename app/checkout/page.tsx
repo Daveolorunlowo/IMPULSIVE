@@ -6,6 +6,7 @@ import { useCurrency } from '@/store/useCurrency';
 import { useAuth } from '@/store/useAuth';
 import { useOrders } from '@/store/useOrders';
 import { useRouter } from 'next/navigation';
+import { getSupabaseClient } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight, ShieldCheck, Truck, CreditCard,
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { calculateShipping } from '@/lib/utils';
 
 /* ── Field component defined OUTSIDE the page to keep a stable reference ── */
 interface FieldProps {
@@ -75,7 +77,7 @@ type Step = 'details' | 'review';
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart, promoCode, getDiscountAmount } = useCart();
-  const { formatPrice } = useCurrency();
+  const { formatPrice, currency } = useCurrency();
   const { user } = useAuth();
   const router = useRouter();
   const { createOrder } = useOrders();
@@ -90,6 +92,8 @@ export default function CheckoutPage() {
     ...EMPTY_DETAILS,
     email: user?.email ?? ''
   });
+
+  const shippingFeeUSD = calculateShipping(details.state, 'USD');
 
   useEffect(() => {
     if (mounted && user) {
@@ -141,6 +145,17 @@ export default function CheckoutPage() {
     if (!user) return;
     setIsProcessing(true);
 
+    let token = '';
+    try {
+      const supabase = getSupabaseClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        token = session.access_token;
+      }
+    } catch (e) {
+      console.warn('Failed to retrieve session token:', e);
+    }
+
     const generatedOrderId = `IMP-${Date.now()}-${Math.floor(Math.random() * 9999).toString().padStart(4, '0')}`;
 
     const currentCurrency = useCurrency.getState().currency;
@@ -163,7 +178,7 @@ export default function CheckoutPage() {
         selectedColor: item.selectedColor,
         customText: item.customText
       })),
-      totalPrice: convert(totalPrice() - getDiscountAmount()),
+      totalPrice: convert(totalPrice() - getDiscountAmount() + shippingFeeUSD),
       currency: currentCurrency,
     };
 
@@ -173,11 +188,14 @@ export default function CheckoutPage() {
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           customerId: user.id,
           email: details.email,
-          totalPrice: convert(totalPrice() - getDiscountAmount()),
+          totalPrice: convert(totalPrice() - getDiscountAmount() + shippingFeeUSD),
           currency: currentCurrency,
           promoCode: useCart.getState().promoCode,
           shippingAddress: details,
@@ -370,7 +388,7 @@ export default function CheckoutPage() {
                   {isProcessing ? (
                     <><Loader2 size={16} className="animate-spin" /> Initializing Payment...</>
                   ) : (
-                    <><CreditCard size={16} /> Complete Order · {formatPrice(totalPrice() - getDiscountAmount())}</>
+                    <><CreditCard size={16} /> Complete Order · {formatPrice(totalPrice() - getDiscountAmount() + shippingFeeUSD)}</>
                   )}
                 </button>
 
@@ -413,11 +431,18 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between text-[11px] text-charcoal/40 uppercase tracking-widest">
-                <span>Shipping</span><span>Calculated at payment</span>
+                <span>Shipping</span>
+                <span>
+                  {details.state.trim()
+                    ? formatPrice(shippingFeeUSD)
+                    : 'Calculated at payment'}
+                </span>
               </div>
               <div className="flex justify-between items-center pt-3 border-t border-charcoal/8">
                 <span className="text-sm uppercase tracking-[0.3em] font-bold text-charcoal">Total</span>
-                <span className="text-2xl font-serif text-charcoal">{formatPrice(totalPrice() - getDiscountAmount())}</span>
+                <span className="text-2xl font-serif text-charcoal">
+                  {formatPrice(totalPrice() - getDiscountAmount() + shippingFeeUSD)}
+                </span>
               </div>
             </div>
 

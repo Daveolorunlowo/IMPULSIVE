@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getSupabaseClient } from '@/lib/supabase';
 
 interface User {
   id: string;
@@ -15,15 +16,14 @@ interface AuthStore {
   pendingEmail: string | null;
   
   // Actions
-  signup: (email: string) => Promise<void> | void;
-  verify: (code: string) => boolean;
-  signin: (email: string) => Promise<void> | void;
-  logout: () => void;
+  signup: (email: string) => Promise<void>;
+  verify: (code: string) => Promise<boolean>;
+  signin: (email: string) => Promise<void>;
+  logout: () => Promise<void>;
   trackActivity: (action: string) => void;
   getAllUsers: () => User[]; // For the admin dot
 }
 
-// In a real app, this would be a database. For this demo, we'll use local storage via persist.
 export const useAuth = create<AuthStore>()(
   persist(
     (set, get) => ({
@@ -33,76 +33,117 @@ export const useAuth = create<AuthStore>()(
       pendingEmail: null,
 
       signup: async (email: string) => {
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        console.log(`[AUTH] Verification code for ${email}: ${code}`);
-        set({ verificationCode: code, pendingEmail: email });
-        
+        // Pre-validate email with our backend endpoint
         try {
           const res = await fetch('/api/auth/send-code', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, code }),
+            body: JSON.stringify({ email, code: 'VALIDATE_ONLY' }),
           });
 
           if (!res.ok) {
             const data = await res.json();
-            throw new Error(data.error || 'Failed to send verification code');
+            throw new Error(data.error || 'Failed to validate email');
           }
         } catch (error) {
-          console.error('[AUTH] Failed to trigger send-code route:', error);
-          set({ verificationCode: null, pendingEmail: null });
+          console.error('[AUTH] Pre-validation failed:', error);
           throw error;
         }
+
+        // Trigger Supabase client-side OTP
+        const supabase = getSupabaseClient();
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: true,
+          },
+        });
+
+        if (error) {
+          console.error('[AUTH] Supabase signInWithOtp failed:', error.message);
+          throw error;
+        }
+
+        set({ pendingEmail: email });
       },
 
-      verify: (code: string) => {
-        const { verificationCode, pendingEmail } = get();
-        if (code === verificationCode && pendingEmail) {
-          const newUser: User = {
-            id: Math.random().toString(36).substring(2, 15),
-            email: pendingEmail,
-            isVerified: true,
-            activity: [{ action: 'Account Created', timestamp: new Date().toISOString() }]
-          };
-          set({ 
-            user: newUser, 
-            isAuthenticated: true, 
-            verificationCode: null, 
-            pendingEmail: null 
-          });
-          return true;
+      verify: async (code: string) => {
+        const { pendingEmail } = get();
+        if (!pendingEmail) return false;
+
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase.auth.verifyOtp({
+          email: pendingEmail,
+          token: code,
+          type: 'email',
+        });
+
+        if (error || !data.user) {
+          console.error('[AUTH] Supabase verifyOtp failed:', error?.message);
+          return false;
         }
-        return false;
+
+        const newUser: User = {
+          id: data.user.id,
+          email: data.user.email || pendingEmail,
+          isVerified: true,
+          activity: [{ action: 'Account Verified/Logged In', timestamp: new Date().toISOString() }],
+        };
+
+        set({
+          user: newUser,
+          isAuthenticated: true,
+          verificationCode: null,
+          pendingEmail: null,
+        });
+
+        return true;
       },
 
       signin: async (email: string) => {
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        console.log(`[AUTH] Login verification code for ${email}: ${code}`);
-        set({ verificationCode: code, pendingEmail: email });
-
+        // Trigger pre-validation
         try {
           const res = await fetch('/api/auth/send-code', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, code }),
+            body: JSON.stringify({ email, code: 'VALIDATE_ONLY' }),
           });
 
           if (!res.ok) {
             const data = await res.json();
-            throw new Error(data.error || 'Failed to send verification code');
+            throw new Error(data.error || 'Failed to validate email');
           }
         } catch (error) {
-          console.error('[AUTH] Failed to trigger send-code route:', error);
-          set({ verificationCode: null, pendingEmail: null });
+          console.error('[AUTH] Pre-validation failed:', error);
           throw error;
         }
+
+        // Trigger Supabase client-side OTP (same as signup for passwordless)
+        const supabase = getSupabaseClient();
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            shouldCreateUser: true,
+          },
+        });
+
+        if (error) {
+          console.error('[AUTH] Supabase signInWithOtp failed:', error.message);
+          throw error;
+        }
+
+        set({ pendingEmail: email });
       },
 
-      logout: () => set({ user: null, isAuthenticated: false }),
+      logout: async () => {
+        const supabase = getSupabaseClient();
+        await supabase.auth.signOut();
+        set({ user: null, isAuthenticated: false, pendingEmail: null, verificationCode: null });
+      },
 
       trackActivity: (action: string) => {
         const { user } = get();
@@ -116,7 +157,6 @@ export const useAuth = create<AuthStore>()(
       },
 
       getAllUsers: () => {
-        // This is a simplified mock. In a real app, this would fetch from a DB.
         const currentUser = get().user;
         return currentUser ? [currentUser] : [];
       }
