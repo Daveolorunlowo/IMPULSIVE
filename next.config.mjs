@@ -9,6 +9,9 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    webpackBuildWorker: false,
+  },
   async headers() {
     return [
       {
