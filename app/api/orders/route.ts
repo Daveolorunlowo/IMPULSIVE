@@ -96,6 +96,7 @@ export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
         status: 'pending',
         payment_reference: reference,
         metadata: {
+          email,
           shippingAddress,
           promoCode,
           currency,

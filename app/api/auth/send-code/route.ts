@@ -169,7 +169,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'WEARIMPULSIVE <onboarding@resend.dev>',
+        from: 'WEARIMPULSIVE <auth@wearimpulsive.site>',
         to: email,
         subject: 'WEARIMPULSIVE - Verification Code',
         html: htmlContent,

@@ -4,15 +4,19 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/store/useAuth';
 import { useCurrency } from '@/store/useCurrency';
 import { useRouter } from 'next/navigation';
-import { LogOut, Package, Heart, ChevronRight, Loader2 } from 'lucide-react';
+import { LogOut, Package, Heart, ChevronRight, Loader2, LayoutGrid, Settings as SettingsIcon, Copy, Check } from 'lucide-react';
 import Link from 'next/link';
 import { getSupabaseClient } from '@/lib/supabase';
+import { motion, AnimatePresence } from 'framer-motion';
+
+type Tab = 'overview' | 'orders' | 'settings';
 
 export default function DashboardPage() {
   const { user, isAuthenticated, logout, trackActivity } = useAuth();
   const { formatPrice } = useCurrency();
   const router = useRouter();
   
+  const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [preferredSize, setPreferredSize] = useState('M');
   const [copied, setCopied] = useState(false);
   const [dbOrders, setDbOrders] = useState<any[]>([]);
@@ -88,191 +92,271 @@ export default function DashboardPage() {
     );
   }
 
+  // Calculate stats for overview
+  const totalSpent = dbOrders.reduce((sum, order) => sum + (order.total_price || 0), 0);
+  
+  let membershipTier = 'New Member';
+  let tierIconColor = 'text-stone';
+  if (dbOrders.length >= 100) { // Originally 5
+    membershipTier = 'Platinum Member';
+    tierIconColor = 'text-purple-500';
+  } else if (dbOrders.length >= 40) { // Originally 2
+    membershipTier = 'Gold Member';
+    tierIconColor = 'text-amber-500';
+  } else if (dbOrders.length >= 20) { // Originally 1
+    membershipTier = 'Silver Member';
+    tierIconColor = 'text-stone-300';
+  }
+
   return (
-    <div className="min-h-screen bg-charcoal text-alabaster pt-40 pb-32 font-sans">
-      <div className="max-w-6xl mx-auto px-6 md:px-12">
-        <header className="mb-16 flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-white/10 pb-8 gap-6">
-          <div className="space-y-2">
-            <span className="text-[10px] uppercase tracking-[0.3em] font-mono text-bloodred font-bold">My Account</span>
-            <h1 className="text-4xl md:text-5xl font-serif text-alabaster mb-2">Profile</h1>
-            <p className="text-xs text-alabaster/60 font-light tracking-wide">{user.email}</p>
-          </div>
-          <button 
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-bold text-alabaster/60 hover:text-bloodred transition-colors pb-1"
-          >
-            <LogOut size={14} /> Sign Out
-          </button>
-        </header>
-
-        <div className="space-y-16">
-          
-          {/* Quick Actions & Status Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Sizing Profile */}
-            <div className="border border-white/10 p-6 flex flex-col justify-between">
-              <div>
-                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone mb-6">My Size</h2>
-                <div className="flex gap-2">
-                  {['S', 'M', 'L', 'XL'].map((sz) => (
-                    <button
-                       key={sz}
-                       onClick={() => handleUpdateSize(sz)}
-                       className={`w-10 h-10 flex items-center justify-center text-xs font-light transition-all ${
-                         preferredSize === sz
-                           ? 'bg-alabaster text-charcoal'
-                           : 'border border-white/10 text-alabaster/60 hover:border-alabaster hover:text-alabaster'
-                       }`}
-                    >
-                       {sz}
-                    </button>
-                  ))}
-                </div>
-              </div>
+    <div className="min-h-screen bg-charcoal text-alabaster pt-32 pb-32 font-sans selection:bg-bloodred selection:text-alabaster">
+      <div className="max-w-6xl mx-auto px-6 md:px-12 flex flex-col md:flex-row gap-12 lg:gap-24">
+        
+        {/* Sidebar Navigation */}
+        <aside className="w-full md:w-64 flex-shrink-0">
+          <div className="sticky top-32 space-y-12">
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.3em] font-mono text-bloodred font-bold">My Account</span>
+              <h1 className="text-3xl font-serif text-alabaster mt-2 truncate" title={user.email}>{user.email.split('@')[0]}</h1>
+              <p className="text-[10px] text-alabaster/40 uppercase tracking-widest mt-1 truncate">{user.email}</p>
             </div>
 
-            {/* Membership */}
-            <div className="border border-white/10 p-6 flex flex-col justify-between">
-              <div>
-                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone mb-6">Membership Tier</h2>
-                <div className="flex justify-between items-end">
-                  <span className="text-2xl font-serif text-alabaster">Gold</span>
-                  <span className="text-sm font-light text-bloodred font-bold">250 pts</span>
-                </div>
-              </div>
-              <div className="mt-6 border-t border-white/5 pt-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-alabaster/60 uppercase tracking-widest">Promo Code</span>
-                  <button onClick={copyPromoCode} className="text-[10px] font-mono hover:text-bloodred transition-colors">
-                    {copied ? 'COPIED' : 'INSTINCT (10%)'}
-                  </button>
-                </div>
-              </div>
-            </div>
+            <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-none">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
+                  activeTab === 'overview' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
+                }`}
+              >
+                <LayoutGrid size={16} className={activeTab === 'overview' ? 'text-bloodred' : ''} /> Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('orders')}
+                className={`flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
+                  activeTab === 'orders' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
+                }`}
+              >
+                <Package size={16} className={activeTab === 'orders' ? 'text-bloodred' : ''} /> Order History
+                {dbOrders.length > 0 && (
+                  <span className="ml-auto bg-bloodred/20 text-bloodred px-2 py-0.5 rounded text-[10px]">{dbOrders.length}</span>
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
+                  activeTab === 'settings' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
+                }`}
+              >
+                <SettingsIcon size={16} className={activeTab === 'settings' ? 'text-bloodred' : ''} /> Settings
+              </button>
+            </nav>
 
-            {/* Support */}
-            <div className="border border-white/10 p-6 flex flex-col justify-between">
-              <div>
-                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone mb-4">Customer Support</h2>
-                <p className="text-xs text-alabaster/60 leading-relaxed font-light">
-                  Need help with sizing or have a question? Contact our team.
-                </p>
-              </div>
-              <div className="mt-6">
-                <Link 
-                  href="https://wa.me/2349018389254" 
-                  target="_blank"
-                  className="text-[10px] uppercase tracking-widest font-bold text-bloodred hover:text-alabaster transition-colors flex items-center gap-1"
-                >
-                  Contact Us <ChevronRight size={12} />
-                </Link>
-              </div>
+            <div className="pt-8 border-t border-white/10">
+              <button 
+                onClick={handleLogout}
+                className="flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold text-alabaster/40 hover:text-bloodred transition-colors w-full"
+              >
+                <LogOut size={16} /> Sign Out
+              </button>
             </div>
           </div>
+        </aside>
 
-          {/* Productivity Section: Orders & Wishlist */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Main Content Area */}
+        <main className="flex-1 min-w-0">
+          <AnimatePresence mode="wait">
             
-            {/* Orders */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone">Recent Orders</h2>
-                <Link href="/track-order" className="text-[10px] uppercase tracking-widest text-alabaster/50 hover:text-alabaster transition-colors">
-                  View All
-                </Link>
-              </div>
-              <div className="space-y-4">
+            {/* OVERVIEW TAB */}
+            {activeTab === 'overview' && (
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-8"
+              >
+                <h2 className="text-xl font-serif border-b border-white/10 pb-4">Welcome back to WEARIMPULSIVE.</h2>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Status Card */}
+                  <div className="border border-white/10 p-6 bg-white/[0.02]">
+                    <p className="text-[10px] uppercase tracking-widest text-stone mb-2">Total Spent</p>
+                    <p className="text-3xl font-serif text-alabaster">{formatPrice(totalSpent)}</p>
+                  </div>
+                  
+                  {/* Membership Card */}
+                  <div className="border border-white/10 p-6 bg-white/[0.02] flex flex-col justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-stone mb-2">Status</p>
+                      <div className="flex justify-between items-center">
+                        <p className="text-2xl font-serif text-alabaster">{membershipTier}</p>
+                        <Heart size={20} className={tierIconColor} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {dbOrders.length > 0 ? (
+                  <div className="border border-white/10 p-8 bg-gradient-to-br from-white/[0.03] to-transparent">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                      <div>
+                        <h3 className="text-sm uppercase tracking-widest font-bold text-alabaster mb-2">Active Promo Code</h3>
+                        <p className="text-xs text-alabaster/60 font-light">Use this code at checkout for 10% off your entire order.</p>
+                      </div>
+                      <button 
+                        onClick={copyPromoCode}
+                        className="flex items-center gap-3 border border-white/20 hover:border-bloodred hover:text-bloodred px-6 py-3 transition-colors group"
+                      >
+                        <span className="font-mono text-sm tracking-wider">INSTINCT</span>
+                        {copied ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} className="text-stone group-hover:text-bloodred" />}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border border-white/5 bg-white/[0.01] p-8 text-center border-dashed">
+                    <p className="text-xs text-alabaster/50 font-light mb-4">Place your first order to unlock exclusive member promo codes.</p>
+                    <Link href="/shop" className="text-[10px] uppercase tracking-widest font-bold text-bloodred hover:text-alabaster transition-colors">
+                      Shop Now →
+                    </Link>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ORDERS TAB */}
+            {activeTab === 'orders' && (
+              <motion.div
+                key="orders"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                  <h2 className="text-xl font-serif">Order History</h2>
+                </div>
+
                 {loadingOrders ? (
-                  <div className="py-12 flex flex-col items-center justify-center gap-3 border border-white/5 bg-white/[0.02]">
-                    <Loader2 size={20} className="animate-spin text-bloodred" />
+                  <div className="py-20 flex flex-col items-center justify-center gap-4">
+                    <Loader2 size={24} className="animate-spin text-bloodred" />
                     <p className="text-[10px] uppercase tracking-widest text-stone">Synchronizing orders...</p>
                   </div>
                 ) : dbOrders.length === 0 ? (
-                  <div className="py-12 text-center border border-white/5 bg-white/[0.02] flex flex-col justify-center">
-                    <p className="text-xs text-alabaster/40 font-light">No order records found in the archive.</p>
-                    <Link href="/shop" className="mt-4 text-[10px] uppercase tracking-widest font-bold text-bloodred hover:text-alabaster transition-colors">
-                      Explore Inventory ➔
+                  <div className="py-20 text-center border border-white/5 bg-white/[0.02] flex flex-col justify-center items-center">
+                    <Package size={32} className="text-stone mb-4" />
+                    <p className="text-sm text-alabaster/40 font-light mb-6">No order records found in the archive.</p>
+                    <Link href="/shop" className="text-[10px] uppercase tracking-widest font-bold bg-bloodred text-alabaster px-8 py-3 hover:bg-alabaster hover:text-charcoal transition-colors">
+                      Explore Collection
                     </Link>
                   </div>
                 ) : (
-                  dbOrders.map((order) => {
-                    const formattedDate = new Date(order.created_at).toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric'
-                    });
+                  <div className="space-y-4">
+                    {dbOrders.map((order) => {
+                      const formattedDate = new Date(order.created_at).toLocaleDateString(undefined, {
+                        month: 'short', day: 'numeric', year: 'numeric'
+                      });
 
-                    // Map Supabase database order status to CSS status strings & colors
-                    let statusColor = 'text-stone';
-                    let displayStatus = order.status;
+                      let statusColor = 'text-stone border-stone';
+                      let displayStatus = order.status;
 
-                    if (order.status === 'paid' || order.status === 'delivered') {
-                      statusColor = 'text-emerald-500';
-                      displayStatus = order.status === 'paid' ? 'Paid' : 'Delivered';
-                    } else if (order.status === 'pending') {
-                      statusColor = 'text-amber-500';
-                      displayStatus = 'Pending';
-                    } else if (order.status === 'shipped') {
-                      statusColor = 'text-bloodred';
-                      displayStatus = 'Shipped';
-                    } else if (order.status === 'cancelled') {
-                      statusColor = 'text-stone';
-                      displayStatus = 'Cancelled';
-                    }
+                      if (order.status === 'paid' || order.status === 'delivered') {
+                        statusColor = 'text-emerald-500 border-emerald-500/30';
+                        displayStatus = order.status === 'paid' ? 'Paid' : 'Delivered';
+                      } else if (order.status === 'pending') {
+                        statusColor = 'text-amber-500 border-amber-500/30';
+                        displayStatus = 'Pending';
+                      } else if (order.status === 'shipped') {
+                        statusColor = 'text-bloodred border-bloodred/30';
+                        displayStatus = 'Shipped';
+                      }
 
-                    return (
-                      <Link 
-                        key={order.id} 
-                        href={`/track-order?code=${order.payment_reference}`}
-                        className="block"
-                      >
-                        <div className="flex justify-between items-center p-5 bg-white/5 hover:bg-white/10 transition-all border border-transparent hover:border-white/10 group">
-                          <div className="flex items-center gap-5">
-                            <div className="bg-charcoal p-3 border border-white/10 group-hover:border-bloodred/40 transition-colors">
-                              <Package size={16} className="text-alabaster/60" />
+                      return (
+                        <Link 
+                          key={order.id} 
+                          href={`/track-order?code=${order.payment_reference}`}
+                          className="block group"
+                        >
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 gap-6">
+                            <div className="flex items-center gap-6">
+                              <div className="hidden sm:flex bg-charcoal p-4 border border-white/10 group-hover:border-bloodred/40 transition-colors">
+                                <Package size={20} className="text-alabaster/60" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-mono text-alabaster tracking-wider group-hover:text-bloodred transition-colors mb-1">
+                                  {order.payment_reference}
+                                </p>
+                                <p className="text-[10px] text-alabaster/50 uppercase tracking-widest">{formattedDate}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="text-sm font-mono text-alabaster tracking-wider group-hover:text-bloodred transition-colors">{order.payment_reference}</p>
-                              <p className="text-[10px] text-alabaster/50 uppercase tracking-widest mt-1">{formattedDate}</p>
+                            <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-4 sm:gap-2">
+                              <p className="text-lg font-serif text-alabaster">{formatPrice(order.total_price)}</p>
+                              <p className={`text-[9px] uppercase tracking-widest px-2 py-1 border ${statusColor}`}>
+                                {displayStatus}
+                              </p>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-sm font-serif text-alabaster">{formatPrice(order.total_price)}</p>
-                            <p className={`text-[10px] uppercase tracking-widest mt-1 ${statusColor}`}>
-                              {displayStatus}
-                            </p>
-                          </div>
-                        </div>
-                      </Link>
-                    );
-                  })
+                        </Link>
+                      );
+                    })}
+                  </div>
                 )}
-              </div>
-            </div>
+              </motion.div>
+            )}
 
-            {/* Wishlist Quick Access */}
-            <div className="space-y-6">
-               <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                <h2 className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone">Saved Items</h2>
-                <Link href="/wishlist" className="text-[10px] uppercase tracking-widest text-alabaster/50 hover:text-alabaster transition-colors">
-                  Go to Wishlist
-                </Link>
-              </div>
-              <div className="border border-white/5 bg-white/[0.02] p-8 text-center space-y-5 h-[200px] flex flex-col justify-center">
-                <Heart size={20} className="mx-auto text-alabaster/30" />
-                <p className="text-xs text-alabaster/60 font-light">
-                  You have <span className="text-alabaster font-bold">3 items</span> in your wishlist.
-                </p>
-                <Link href="/wishlist" className="inline-block border border-white/20 hover:border-alabaster hover:bg-alabaster hover:text-charcoal px-6 py-3 text-[9px] uppercase tracking-widest font-bold transition-all mx-auto">
-                  Review Items
-                </Link>
-              </div>
-            </div>
+            {/* SETTINGS TAB */}
+            {activeTab === 'settings' && (
+              <motion.div
+                key="settings"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-12"
+              >
+                <div>
+                  <h2 className="text-xl font-serif border-b border-white/10 pb-4 mb-8">Preferences & Settings</h2>
+                  
+                  <div className="space-y-4 max-w-md">
+                    <h3 className="text-[10px] uppercase tracking-widest text-stone font-bold">Default Sizing Profile</h3>
+                    <p className="text-xs text-alabaster/50 font-light mb-4">Set your preferred size. We will use this to recommend fits across the collection.</p>
+                    <div className="flex gap-3">
+                      {['S', 'M', 'L', 'XL'].map((sz) => (
+                        <button
+                          key={sz}
+                          onClick={() => handleUpdateSize(sz)}
+                          className={`w-12 h-12 flex items-center justify-center text-sm font-light transition-all ${
+                            preferredSize === sz
+                              ? 'bg-alabaster text-charcoal shadow-lg shadow-alabaster/20'
+                              : 'border border-white/10 text-alabaster/60 hover:border-alabaster hover:text-alabaster'
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
-          </div>
+                <div>
+                  <h3 className="text-[10px] uppercase tracking-widest text-stone font-bold mb-4 border-b border-white/10 pb-4">Customer Support</h3>
+                  <p className="text-xs text-alabaster/50 leading-relaxed font-light mb-6 max-w-lg">
+                    Need help with an order, sizing inquiries, or general questions? Our concierge team is available to assist you.
+                  </p>
+                  <Link 
+                    href="https://wa.me/2349018389254" 
+                    target="_blank"
+                    className="inline-flex items-center gap-3 text-[10px] uppercase tracking-widest font-bold border border-white/20 px-6 py-4 hover:border-bloodred hover:text-bloodred transition-colors"
+                  >
+                    Contact via WhatsApp <ChevronRight size={14} />
+                  </Link>
+                </div>
+              </motion.div>
+            )}
 
-        </div>
+          </AnimatePresence>
+        </main>
       </div>
     </div>
   );

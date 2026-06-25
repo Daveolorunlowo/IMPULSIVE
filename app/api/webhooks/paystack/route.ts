@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PaymentService } from '@/services/payment.service';
+import { EmailService } from '@/services/email.service';
 import { withSupabase } from '@supabase/server';
 
 /**
@@ -21,21 +22,46 @@ export const POST = withSupabase({ auth: 'none' }, async (req, ctx) => {
   // ── 2. HANDLE SUCCESSFUL PAYMENT ─────────────────────────────────────
   if (event.event === 'charge.success') {
     const reference: string = event.data.reference;
+    const customerEmail: string = event.data.customer?.email;
 
     const supabase = ctx.supabaseAdmin as any;
 
-    // Use ctx.supabaseAdmin to bypass RLS and mark as paid
-    const { error } = await supabase
+    // Use ctx.supabaseAdmin to bypass RLS and mark as paid, returning the updated order with items
+    const { data: order, error } = await supabase
       .from('orders')
       .update({ status: 'paid', updated_at: new Date().toISOString() })
-      .eq('payment_reference', reference);
+      .eq('payment_reference', reference)
+      .select(`
+        id,
+        total_price,
+        order_items (
+          quantity,
+          unit_price,
+          variants (
+            size,
+            color,
+            products (
+              name
+            )
+          )
+        )
+      `)
+      .single();
 
-    if (error) {
-      console.error('[Webhook] DB update failed:', error.message);
+    if (error || !order) {
+      console.error('[Webhook] DB update failed:', error?.message);
       return NextResponse.json({ error: 'DB_UPDATE_FAILED' }, { status: 500 });
     }
 
     console.log(`[Webhook] Order ${reference} marked as PAID.`);
+
+    // ── 3. SEND ORDER CONFIRMATION EMAIL ────────────────────────────────
+    if (customerEmail) {
+      // Send asynchronously without awaiting so the webhook returns quickly
+      EmailService.sendOrderConfirmation(customerEmail, order).catch(e => {
+        console.error('[Webhook] Email dispatch failed:', e);
+      });
+    }
   }
 
   return NextResponse.json({ status: 'received' });

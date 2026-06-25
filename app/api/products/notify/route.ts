@@ -161,7 +161,7 @@ export const POST = withSupabase({ auth: 'none' }, async (request, ctx) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'WEARIMPULSIVE <onboarding@resend.dev>',
+        from: 'WEARIMPULSIVE <notify@wearimpulsive.site>',
         to: email,
         subject: `[WEARIMPULSIVE] Alert: ${productName} - ${notificationType}`,
         html: htmlContent,

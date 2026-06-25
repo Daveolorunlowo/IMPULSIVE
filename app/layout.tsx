@@ -16,8 +16,36 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "IMPULSIVE | Modern Luxury Fashion",
-  description: "Curated collections for the modern era. Experience refined shopping.",
+  metadataBase: new URL('https://wearimpulsive.site'),
+  title: {
+    default: "WEARIMPULSIVE | Modern Luxury Fashion",
+    template: "%s | WEARIMPULSIVE"
+  },
+  description: "Curated collections for the modern era. Experience refined shopping. Archival design systems.",
+  openGraph: {
+    title: "WEARIMPULSIVE",
+    description: "Curated collections for the modern era. Experience refined shopping.",
+    url: 'https://wearimpulsive.site',
+    siteName: 'WEARIMPULSIVE',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'WEARIMPULSIVE',
+    description: 'Curated collections for the modern era. Experience refined shopping.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({

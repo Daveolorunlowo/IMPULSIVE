@@ -18,7 +18,8 @@ interface AuthStore {
   // Actions
   signup: (email: string) => Promise<void>;
   verify: (code: string) => Promise<boolean>;
-  signin: (email: string) => Promise<void>;
+  setPassword: (password: string) => Promise<void>;
+  signin: (email: string, password?: string) => Promise<void>;
   logout: () => Promise<void>;
   trackActivity: (action: string) => void;
   getAllUsers: () => User[]; // For the admin dot
@@ -81,8 +82,7 @@ export const useAuth = create<AuthStore>()(
         });
 
         if (error || !data.user) {
-          console.error('[AUTH] Supabase verifyOtp failed:', error?.message);
-          return false;
+          throw new Error(error?.message || 'Invalid or expired verification code.');
         }
 
         const newUser: User = {
@@ -102,41 +102,48 @@ export const useAuth = create<AuthStore>()(
         return true;
       },
 
-      signin: async (email: string) => {
-        // Trigger pre-validation
-        try {
-          const res = await fetch('/api/auth/send-code', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, code: 'VALIDATE_ONLY' }),
-          });
-
-          if (!res.ok) {
-            const data = await res.json();
-            throw new Error(data.error || 'Failed to validate email');
-          }
-        } catch (error) {
-          console.error('[AUTH] Pre-validation failed:', error);
+      setPassword: async (password: string) => {
+        const supabase = getSupabaseClient();
+        const { error } = await supabase.auth.updateUser({ password });
+        
+        if (error) {
+          console.error('[AUTH] Supabase setPassword failed:', error.message);
           throw error;
         }
 
-        // Trigger Supabase client-side OTP (same as signup for passwordless)
+        get().trackActivity('Password Set');
+      },
+
+      signin: async (email: string, password?: string) => {
         const supabase = getSupabaseClient();
-        const { error } = await supabase.auth.signInWithOtp({
+
+        if (!password) {
+          throw new Error('Password is required for signing in.');
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
-          options: {
-            shouldCreateUser: true,
-          },
+          password,
         });
 
-        if (error) {
-          console.error('[AUTH] Supabase signInWithOtp failed:', error.message);
+        if (error || !data.user) {
+          console.error('[AUTH] Supabase signInWithPassword failed:', error?.message);
           throw error;
         }
 
-        set({ pendingEmail: email });
+        const newUser: User = {
+          id: data.user.id,
+          email: data.user.email || email,
+          isVerified: true,
+          activity: [{ action: 'Logged In', timestamp: new Date().toISOString() }],
+        };
+
+        set({
+          user: newUser,
+          isAuthenticated: true,
+          verificationCode: null,
+          pendingEmail: null,
+        });
       },
 
       logout: async () => {
@@ -166,3 +173,4 @@ export const useAuth = create<AuthStore>()(
     }
   )
 );
+
