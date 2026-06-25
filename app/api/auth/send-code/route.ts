@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
     if (!resendApiKey) {
       console.log('\n==================================================');
-      console.log('📬 [IMPULSIVE EMAIL FALLBACK] (Development Mode)');
+      console.log('📬 [WEARIMPULSIVE EMAIL FALLBACK] (Development Mode)');
       console.log(`To: ${email}`);
       console.log(`Code: ${code}`);
       console.log('To receive actual emails, add the following to your .env.local:');
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       <html>
         <head>
           <meta charset="utf-8">
-          <title>IMPULSIVE Verification</title>
+          <title>WEARIMPULSIVE Verification</title>
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
         </head>
         <body>
           <div class="container">
-            <div class="logo">IMPULSIVE</div>
+            <div class="logo">WEARIMPULSIVE</div>
             <div class="title">Log In</div>
             <div class="subtitle">Verification Code</div>
             
@@ -154,7 +154,7 @@ export async function POST(request: Request) {
             </div>
 
             <div class="footer">
-              IMPULSIVE // ALL RIGHTS RESERVED
+              WEARIMPULSIVE // ALL RIGHTS RESERVED
             </div>
           </div>
         </body>
@@ -169,9 +169,9 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'IMPULSIVE <onboarding@resend.dev>',
+        from: 'WEARIMPULSIVE <onboarding@resend.dev>',
         to: email,
-        subject: 'IMPULSIVE - Verification Code',
+        subject: 'WEARIMPULSIVE - Verification Code',
         html: htmlContent,
       }),
     });

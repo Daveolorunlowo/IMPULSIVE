@@ -24,7 +24,7 @@ export const POST = withSupabase({ auth: 'none' }, async (request, ctx) => {
 
     if (!resendApiKey) {
       console.log('\n==================================================');
-      console.log('📬 [IMPULSIVE NOTIFICATION FALLBACK] (Development Mode)');
+      console.log('📬 [WEARIMPULSIVE NOTIFICATION FALLBACK] (Development Mode)');
       console.log(`To: ${email}`);
       console.log(`Product: ${productName}`);
       console.log(`Type: ${notificationType}`);
@@ -44,7 +44,7 @@ export const POST = withSupabase({ auth: 'none' }, async (request, ctx) => {
       <html>
         <head>
           <meta charset="utf-8">
-          <title>IMPULSIVE - Product Alert</title>
+          <title>WEARIMPULSIVE - Product Alert</title>
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -128,7 +128,7 @@ export const POST = withSupabase({ auth: 'none' }, async (request, ctx) => {
         </head>
         <body>
           <div class="container">
-            <div class="logo">IMPULSIVE STUDIO</div>
+            <div class="logo">WEARIMPULSIVE STUDIO</div>
             <div class="title">${productName}</div>
             <div class="subtitle">${notificationType}</div>
             
@@ -161,9 +161,9 @@ export const POST = withSupabase({ auth: 'none' }, async (request, ctx) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'IMPULSIVE <onboarding@resend.dev>',
+        from: 'WEARIMPULSIVE <onboarding@resend.dev>',
         to: email,
-        subject: `[IMPULSIVE] Alert: ${productName} - ${notificationType}`,
+        subject: `[WEARIMPULSIVE] Alert: ${productName} - ${notificationType}`,
         html: htmlContent,
       }),
     });
