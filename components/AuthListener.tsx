@@ -6,6 +6,9 @@ import { useAuth } from '@/store/useAuth';
 
 export default function AuthListener() {
   useEffect(() => {
+    // Fetch products in the background on app load
+    import('@/store/useProducts').then(m => m.useProducts.getState().fetchProducts());
+
     try {
       const supabase = getSupabaseClient();
 
@@ -22,6 +25,7 @@ export default function AuthListener() {
             },
             isAuthenticated: true
           });
+          import('@/store/useCart').then(m => m.useCart.getState().syncWithCloud());
         }
       });
 
@@ -38,6 +42,8 @@ export default function AuthListener() {
             },
             isAuthenticated: true
           });
+          // Sync cart with cloud on login
+          import('@/store/useCart').then(m => m.useCart.getState().syncWithCloud());
         } else {
           useAuth.setState({
             user: null,

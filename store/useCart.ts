@@ -23,9 +23,11 @@ interface CartState {
   toggleCart: () => void;
   clearCart: () => void;
   totalPrice: () => number;
-  applyPromoCode: (code: string) => boolean;
+  applyPromoCode: (code: string) => Promise<boolean>;
   removePromoCode: () => void;
   getDiscountAmount: () => number;
+  syncWithCloud: () => Promise<void>;
+  pushToCloud: () => Promise<void>;
 }
 
 export const useCart = create<CartState>()(
@@ -47,46 +49,121 @@ export const useCart = create<CartState>()(
           if (existingItemIndex > -1) {
             const newItems = [...state.items];
             newItems[existingItemIndex].quantity += 1;
+            setTimeout(() => get().pushToCloud(), 0);
             return { items: newItems, isOpen: true };
           }
 
+          setTimeout(() => get().pushToCloud(), 0);
           return { 
             items: [...state.items, { ...product, quantity: 1 }], 
             isOpen: true 
           };
         }),
       removeItem: (cartItemId) =>
-        set((state) => ({
-          items: state.items.filter((item) => 
-            `${item.id}-${item.selectedSize}-${item.selectedColor.name}-${item.customText || ''}` !== cartItemId
-          ),
-        })),
+        set((state) => {
+          setTimeout(() => get().pushToCloud(), 0);
+          return {
+            items: state.items.filter((item) => 
+              `${item.id}-${item.selectedSize}-${item.selectedColor.name}-${item.customText || ''}` !== cartItemId
+            )
+          };
+        }),
       updateQuantity: (cartItemId, quantity) =>
-        set((state) => ({
-          items: state.items.map((item) =>
-            `${item.id}-${item.selectedSize}-${item.selectedColor.name}-${item.customText || ''}` === cartItemId
-              ? { ...item, quantity: Math.max(1, quantity) }
-              : item
-          ),
-        })),
+        set((state) => {
+          setTimeout(() => get().pushToCloud(), 0);
+          return {
+            items: state.items.map((item) =>
+              `${item.id}-${item.selectedSize}-${item.selectedColor.name}-${item.customText || ''}` === cartItemId
+                ? { ...item, quantity: Math.max(1, quantity) }
+                : item
+            )
+          };
+        }),
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
-      clearCart: () => set({ items: [], promoCode: null, discountRate: 0 }),
+      clearCart: () => {
+        set({ items: [], promoCode: null, discountRate: 0 });
+        setTimeout(() => get().pushToCloud(), 0);
+      },
       totalPrice: () => {
         return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
       },
-      applyPromoCode: (code) => {
+      applyPromoCode: async (code) => {
         const uppercaseCode = code.toUpperCase().trim();
-        if (uppercaseCode === 'INSTINCT' || uppercaseCode === 'ARCHIVE10') {
-          set({ promoCode: uppercaseCode, discountRate: 0.10 });
-          return true;
+        try {
+          const res = await fetch('/api/cart/validate-promo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: uppercaseCode })
+          });
+          
+          if (!res.ok) {
+            set({ promoCode: null, discountRate: 0 });
+            return false;
+          }
+
+          const data = await res.json();
+          if (data.success) {
+            // DB returns percentage like 10 for 10%. We convert to 0.10
+            const rate = data.discount_percentage / 100;
+            set({ promoCode: uppercaseCode, discountRate: rate });
+            return true;
+          }
+          return false;
+        } catch (error) {
+          console.error('[useCart] Failed to apply promo code:', error);
+          return false;
         }
-        return false;
       },
       removePromoCode: () => {
         set({ promoCode: null, discountRate: 0 });
       },
       getDiscountAmount: () => {
         return get().totalPrice() * get().discountRate;
+      },
+      syncWithCloud: async () => {
+        try {
+          const supabase = (await import('@/lib/supabase')).getSupabaseClient();
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.access_token) return;
+
+          const res = await fetch('/api/cart/sync', {
+            headers: { 'Authorization': `Bearer ${session.access_token}` }
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.items) {
+              // Merge cloud items with local items, or overwrite
+              // For simplicity, we overwrite local if cloud has items, unless local has items and cloud is empty
+              const localItems = get().items;
+              if (data.items.length > 0) {
+                set({ items: data.items });
+              } else if (localItems.length > 0) {
+                await get().pushToCloud();
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[useCart] syncWithCloud error:', err);
+        }
+      },
+      pushToCloud: async () => {
+        try {
+          const supabase = (await import('@/lib/supabase')).getSupabaseClient();
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.access_token) return;
+
+          await fetch('/api/cart/sync', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({ items: get().items })
+          });
+        } catch (err) {
+          console.error('[useCart] pushToCloud error:', err);
+        }
       }
     }),
     {

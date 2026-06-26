@@ -38,11 +38,11 @@ export default function CartPage() {
       </div>
     );
   }
-  const handleApplyPromo = (e: React.FormEvent) => {
+  const handleApplyPromo = async (e: React.FormEvent) => {
     e.preventDefault();
     setPromoError(false);
     setPromoSuccess(false);
-    const success = applyPromoCode(promoInput);
+    const success = await applyPromoCode(promoInput);
     if (success) {
       setPromoSuccess(true);
       setPromoInput('');

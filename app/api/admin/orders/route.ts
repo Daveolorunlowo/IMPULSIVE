@@ -34,7 +34,7 @@ export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
             color,
             products (
               name,
-              mainImage
+              main_image
             )
           )
         )
