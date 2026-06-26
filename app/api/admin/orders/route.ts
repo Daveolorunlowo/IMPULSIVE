@@ -1,23 +1,21 @@
 import { NextResponse } from 'next/server';
-import { withSupabase } from '@supabase/server';
-
-const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 /**
  * GET /api/admin/orders
  * Fetches all orders across the platform.
  */
-export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
+export const GET = async (req: Request) => {
   try {
-    const userEmail = (ctx.userClaims as any)?.email;
-    const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site').toLowerCase();
+    const adminPassword = process.env.ADMIN_PASSWORD || 'impulsive2006';
+    const providedPassword = req.headers.get('x-admin-password');
     
-    // Security Check: Only allow the configured admin email (or allow all in local dev)
-    if (userEmail?.toLowerCase() !== adminEmail && process.env.NODE_ENV !== 'development') {
+    // Security Check
+    if (providedPassword !== adminPassword && process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 
-    const supabase = ctx.supabaseAdmin as any;
+    const supabase = getSupabaseAdmin();
 
     const { data: orders, error } = await supabase
       .from('orders')
@@ -58,19 +56,19 @@ export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
     console.error('[Admin GET /orders]', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
-});
+};
 
 /**
  * PATCH /api/admin/orders
  * Updates the status of an order.
  */
-export const PATCH = withSupabase({ auth: 'user' }, async (req, ctx) => {
+export const PATCH = async (req: Request) => {
   try {
-    const userEmail = (ctx.userClaims as any)?.email;
-    const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site').toLowerCase();
+    const adminPassword = process.env.ADMIN_PASSWORD || 'impulsive2006';
+    const providedPassword = req.headers.get('x-admin-password');
     
     // Security Check
-    if (userEmail?.toLowerCase() !== adminEmail && process.env.NODE_ENV !== 'development') {
+    if (providedPassword !== adminPassword && process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 
@@ -80,7 +78,7 @@ export const PATCH = withSupabase({ auth: 'user' }, async (req, ctx) => {
       return NextResponse.json({ error: 'MISSING_FIELDS' }, { status: 400 });
     }
 
-    const supabase = ctx.supabaseAdmin as any;
+    const supabase = getSupabaseAdmin();
 
     const { data: updatedOrder, error } = await supabase
       .from('orders')
@@ -100,4 +98,4 @@ export const PATCH = withSupabase({ auth: 'user' }, async (req, ctx) => {
     console.error('[Admin PATCH /orders]', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
-});
+};

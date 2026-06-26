@@ -1,20 +1,15 @@
 import { NextResponse } from 'next/server';
-import { withSupabase } from '@supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
-// Helper to check admin access
-const isAdmin = (email: string | undefined | null) => {
-  const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site').toLowerCase();
-  return process.env.NODE_ENV === 'development' || email?.toLowerCase() === adminEmail;
-};
-
-export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
+export const GET = async (req: Request) => {
   try {
-    const userEmail = (ctx.userClaims as any)?.email;
-    if (!isAdmin(userEmail)) {
+    const adminPassword = process.env.ADMIN_PASSWORD || 'impulsive2006';
+    const providedPassword = req.headers.get('x-admin-password');
+    if (providedPassword !== adminPassword && process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 
-    const supabase = ctx.supabaseAdmin as any;
+    const supabase = getSupabaseAdmin();
     const { data: promos, error } = await supabase
       .from('promo_codes')
       .select('*')
@@ -28,12 +23,13 @@ export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
     console.error('[Admin GET /promos]', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
-});
+};
 
-export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
+export const POST = async (req: Request) => {
   try {
-    const userEmail = (ctx.userClaims as any)?.email;
-    if (!isAdmin(userEmail)) {
+    const adminPassword = process.env.ADMIN_PASSWORD || 'impulsive2006';
+    const providedPassword = req.headers.get('x-admin-password');
+    if (providedPassword !== adminPassword && process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 
@@ -43,7 +39,7 @@ export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
       return NextResponse.json({ error: 'MISSING_FIELDS' }, { status: 400 });
     }
 
-    const supabase = ctx.supabaseAdmin as any;
+    const supabase = getSupabaseAdmin();
     const { data: newPromo, error } = await supabase
       .from('promo_codes')
       .insert({
@@ -67,12 +63,13 @@ export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
     console.error('[Admin POST /promos]', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
-});
+};
 
-export const DELETE = withSupabase({ auth: 'user' }, async (req, ctx) => {
+export const DELETE = async (req: Request) => {
   try {
-    const userEmail = (ctx.userClaims as any)?.email;
-    if (!isAdmin(userEmail)) {
+    const adminPassword = process.env.ADMIN_PASSWORD || 'impulsive2006';
+    const providedPassword = req.headers.get('x-admin-password');
+    if (providedPassword !== adminPassword && process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 
@@ -83,7 +80,7 @@ export const DELETE = withSupabase({ auth: 'user' }, async (req, ctx) => {
       return NextResponse.json({ error: 'MISSING_ID' }, { status: 400 });
     }
 
-    const supabase = ctx.supabaseAdmin as any;
+    const supabase = getSupabaseAdmin();
     const { error } = await supabase
       .from('promo_codes')
       .delete()
@@ -97,4 +94,4 @@ export const DELETE = withSupabase({ auth: 'user' }, async (req, ctx) => {
     console.error('[Admin DELETE /promos]', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
-});
+};

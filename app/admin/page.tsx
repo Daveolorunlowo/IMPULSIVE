@@ -1,21 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/store/useAuth';
 import { useCurrency } from '@/store/useCurrency';
 import { useRouter } from 'next/navigation';
-import { LogOut, Package, Loader2, ChevronDown, Check, Tag, Plus, Trash2 } from 'lucide-react';
+import { Package, Loader2, ChevronDown, Check, Tag, Plus, Trash2, KeyRound, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { getSupabaseClient } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
-
-// Helper to calculate total items
-const calculateTotalItems = (items: any[]) => items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
 type AdminTab = 'orders' | 'promos';
 
+const calculateTotalItems = (items: any[]) => items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+
 export default function AdminDashboardPage() {
-  const { user, isAuthenticated, logout } = useAuth();
   const { formatPrice } = useCurrency();
   const router = useRouter();
   
@@ -34,79 +30,93 @@ export default function AdminDashboardPage() {
   const [creatingPromo, setCreatingPromo] = useState(false);
   const [promoError, setPromoError] = useState('');
 
-  // Use NEXT_PUBLIC_ADMIN_EMAIL for client-side check. Default to orders@wearimpulsive.site
-  const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site').toLowerCase();
-  const isAdmin = process.env.NODE_ENV === 'development' || user?.email?.toLowerCase() === adminEmail;
+  const [isAuthenticatedAdmin, setIsAuthenticatedAdmin] = useState(false);
+  const [adminPasswordInput, setAdminPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-    if (!isAdmin) {
-      router.push('/');
-      return;
+    const savedPassword = sessionStorage.getItem('adminPassword');
+    if (savedPassword) {
+      setIsAuthenticatedAdmin(true);
+      fetchAllOrders(savedPassword);
+      fetchAllPromos(savedPassword);
     }
+  }, []);
 
-    async function fetchAllOrders() {
-      try {
-        const supabase = getSupabaseClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token;
-
-        const res = await fetch('/api/admin/orders', {
-          headers: {
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-          }
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setOrders(data.orders || []);
-        }
-      } catch (err) {
-        console.error('[Admin] Failed to fetch orders:', err);
-      } finally {
-        setLoadingOrders(false);
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    setLoadingOrders(true);
+    setLoadingPromos(true);
+    
+    // Test the password by fetching orders
+    try {
+      const res = await fetch('/api/admin/orders', {
+        headers: { 'x-admin-password': adminPasswordInput }
+      });
+      if (res.ok) {
+        sessionStorage.setItem('adminPassword', adminPasswordInput);
+        setIsAuthenticatedAdmin(true);
+        const data = await res.json();
+        setOrders(data.orders || []);
+        fetchAllPromos(adminPasswordInput);
+      } else {
+        setLoginError('Incorrect password');
       }
+    } catch (err) {
+      setLoginError('Network error');
+    } finally {
+      setLoadingOrders(false);
+      setLoadingPromos(false);
     }
+  };
 
-    async function fetchAllPromos() {
-      try {
-        const supabase = getSupabaseClient();
-        const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token;
-
-        const res = await fetch('/api/admin/promos', {
-          headers: {
-            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-          }
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setPromos(data.promos || []);
-        }
-      } catch (err) {
-        console.error('[Admin] Failed to fetch promos:', err);
-      } finally {
-        setLoadingPromos(false);
+  async function fetchAllOrders(password: string) {
+    try {
+      setLoadingOrders(true);
+      const res = await fetch('/api/admin/orders', {
+        headers: { 'x-admin-password': password }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data.orders || []);
+      } else if (res.status === 403 || res.status === 401) {
+        setIsAuthenticatedAdmin(false);
+        sessionStorage.removeItem('adminPassword');
       }
+    } catch (err) {
+      console.error('[Admin] Failed to fetch orders:', err);
+    } finally {
+      setLoadingOrders(false);
     }
+  }
 
-    fetchAllOrders();
-    fetchAllPromos();
-  }, [user, isAuthenticated, isAdmin, router]);
+  async function fetchAllPromos(password: string) {
+    try {
+      setLoadingPromos(true);
+      const res = await fetch('/api/admin/promos', {
+        headers: { 'x-admin-password': password }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPromos(data.promos || []);
+      }
+    } catch (err) {
+      console.error('[Admin] Failed to fetch promos:', err);
+    } finally {
+      setLoadingPromos(false);
+    }
+  }
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     setUpdatingId(orderId);
     try {
-      const supabase = getSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
+      const password = sessionStorage.getItem('adminPassword') || '';
       const res = await fetch('/api/admin/orders', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          'x-admin-password': password
         },
         body: JSON.stringify({ orderId, status: newStatus })
       });
@@ -131,15 +141,12 @@ export default function AdminDashboardPage() {
     setPromoError('');
 
     try {
-      const supabase = getSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
+      const password = sessionStorage.getItem('adminPassword') || '';
       const res = await fetch('/api/admin/promos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          'x-admin-password': password
         },
         body: JSON.stringify({ 
           code: newPromoCode, 
@@ -167,14 +174,11 @@ export default function AdminDashboardPage() {
     if (!confirm('Are you sure you want to delete this promo code?')) return;
     
     try {
-      const supabase = getSupabaseClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
+      const password = sessionStorage.getItem('adminPassword') || '';
       const res = await fetch(`/api/admin/promos?id=${id}`, {
         method: 'DELETE',
         headers: {
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+          'x-admin-password': password
         }
       });
 
@@ -186,22 +190,33 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (!isAuthenticated || !user) {
+  if (!isAuthenticatedAdmin) {
     return (
       <div className="min-h-screen bg-charcoal text-alabaster flex flex-col items-center justify-center px-6 text-center">
-        <h1 className="text-3xl font-serif mb-6">Admin Access</h1>
-        <Link 
-          href="/auth?redirect=/admin"
-          className="border border-alabaster text-alabaster px-10 py-4 text-xs font-bold tracking-[0.2em] uppercase transition-all hover:bg-alabaster hover:text-charcoal"
-        >
-          Sign In
-        </Link>
+        <KeyRound className="mb-6 text-stone" size={48} />
+        <h1 className="text-3xl font-serif mb-2">Admin Portal</h1>
+        <p className="text-xs text-stone mb-8 tracking-widest uppercase">Restricted Access</p>
+        
+        <form onSubmit={handleAdminLogin} className="flex flex-col gap-4 w-full max-w-xs">
+          <input
+            type="password"
+            placeholder="ENTER PASSWORD"
+            value={adminPasswordInput}
+            onChange={(e) => setAdminPasswordInput(e.target.value)}
+            className="w-full bg-[#111] border border-white/10 text-alabaster text-center placeholder:text-stone/40 px-6 py-4 outline-none focus:border-bloodred transition-colors text-[10px] uppercase tracking-[0.2em] font-semibold"
+            autoFocus
+          />
+          <button 
+            type="submit"
+            className="bg-bloodred hover:bg-alabaster hover:text-charcoal px-10 py-4 uppercase tracking-[0.2em] text-[10px] font-bold transition-all w-full flex justify-center items-center gap-2"
+            disabled={loadingOrders}
+          >
+            {loadingOrders ? <Loader2 size={14} className="animate-spin" /> : 'Access Database'}
+          </button>
+        </form>
+        {loginError && <p className="text-bloodred text-[10px] mt-4 uppercase tracking-widest font-bold">{loginError}</p>}
       </div>
     );
-  }
-
-  if (!isAdmin) {
-    return null; // Will redirect in useEffect
   }
 
   return (
@@ -214,7 +229,7 @@ export default function AdminDashboardPage() {
             <div>
               <span className="text-[10px] uppercase tracking-[0.3em] font-mono text-bloodred font-bold">Admin Portal</span>
               <h1 className="text-3xl font-serif text-alabaster mt-2">Command Center</h1>
-              <p className="text-[10px] text-alabaster/40 uppercase tracking-widest mt-1 truncate">{user.email}</p>
+              <p className="text-[10px] text-alabaster/40 uppercase tracking-widest mt-1 truncate">Authenticated</p>
             </div>
 
             <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-none">
@@ -238,7 +253,11 @@ export default function AdminDashboardPage() {
 
             <div className="pt-8 border-t border-white/10">
               <button 
-                onClick={() => { logout(); router.push('/'); }}
+                onClick={() => { 
+                  sessionStorage.removeItem('adminPassword');
+                  setIsAuthenticatedAdmin(false);
+                  router.push('/'); 
+                }}
                 className="flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold text-alabaster/40 hover:text-bloodred transition-colors w-full"
               >
                 <LogOut size={16} /> Sign Out
