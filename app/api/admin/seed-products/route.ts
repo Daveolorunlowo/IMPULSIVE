@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server';
 import { withSupabase } from '@supabase/server';
 import { products } from '@/lib/products';
 
-// Helper to check admin access
-const isAdminEmail = (email: string) => {
-  return process.env.NODE_ENV === 'development' || email === 'orders@wearimpulsive.site';
-};
+
 
 export const GET = async (req: Request) => {
   try {

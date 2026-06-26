@@ -34,8 +34,9 @@ export default function AdminDashboardPage() {
   const [creatingPromo, setCreatingPromo] = useState(false);
   const [promoError, setPromoError] = useState('');
 
-  // Hardcoded check for MVP. In a real app this would be validated exclusively server-side.
-  const isAdmin = process.env.NODE_ENV === 'development' || user?.email === 'orders@wearimpulsive.site';
+  // Use NEXT_PUBLIC_ADMIN_EMAIL for client-side check. Default to orders@wearimpulsive.site
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site';
+  const isAdmin = process.env.NODE_ENV === 'development' || user?.email === adminEmail;
 
   useEffect(() => {
     if (!isAuthenticated) return;

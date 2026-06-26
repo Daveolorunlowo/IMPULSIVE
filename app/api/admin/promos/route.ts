@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { withSupabase } from '@supabase/server';
 
 // Helper to check admin access
-const isAdminEmail = (email: string) => {
-  return process.env.NODE_ENV === 'development' || email === 'orders@wearimpulsive.site';
+const isAdmin = (email: string | undefined | null) => {
+  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site';
+  return process.env.NODE_ENV === 'development' || email === adminEmail;
 };
 
 export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const userEmail = (ctx.userClaims as any)?.email;
-    if (!isAdminEmail(userEmail)) {
+    if (!isAdmin(userEmail)) {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 
@@ -32,7 +33,7 @@ export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
 export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const userEmail = (ctx.userClaims as any)?.email;
-    if (!isAdminEmail(userEmail)) {
+    if (!isAdmin(userEmail)) {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 
@@ -71,7 +72,7 @@ export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
 export const DELETE = withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const userEmail = (ctx.userClaims as any)?.email;
-    if (!isAdminEmail(userEmail)) {
+    if (!isAdmin(userEmail)) {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 

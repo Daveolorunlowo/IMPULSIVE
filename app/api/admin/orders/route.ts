@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withSupabase } from '@supabase/server';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'orders@wearimpulsive.site';
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site';
 
 /**
  * GET /api/admin/orders
