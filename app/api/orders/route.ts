@@ -141,7 +141,7 @@ export const POST = async (req: Request) => {
     console.error('[POST /api/orders]', message, err.response?.data);
     return NextResponse.json({ error: message, details: err.response?.data }, { status: 500 });
   }
-});
+};
 
 /**
  * GET /api/orders

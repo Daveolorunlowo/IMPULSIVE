@@ -43,4 +43,4 @@ export const GET = async (req: Request) => {
     console.error('[GET /api/checkout/verify]', message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
-});
+};
