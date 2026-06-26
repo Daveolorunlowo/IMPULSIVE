@@ -3,8 +3,8 @@ import { withSupabase } from '@supabase/server';
 
 // Helper to check admin access
 const isAdmin = (email: string | undefined | null) => {
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site';
-  return process.env.NODE_ENV === 'development' || email === adminEmail;
+  const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site').toLowerCase();
+  return process.env.NODE_ENV === 'development' || email?.toLowerCase() === adminEmail;
 };
 
 export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {

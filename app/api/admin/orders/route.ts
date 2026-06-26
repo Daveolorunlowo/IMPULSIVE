@@ -10,8 +10,10 @@ const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive
 export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const userEmail = (ctx.userClaims as any)?.email;
+    const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site').toLowerCase();
+    
     // Security Check: Only allow the configured admin email (or allow all in local dev)
-    if (userEmail !== ADMIN_EMAIL && process.env.NODE_ENV !== 'development') {
+    if (userEmail?.toLowerCase() !== adminEmail && process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 
@@ -65,7 +67,10 @@ export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
 export const PATCH = withSupabase({ auth: 'user' }, async (req, ctx) => {
   try {
     const userEmail = (ctx.userClaims as any)?.email;
-    if (userEmail !== ADMIN_EMAIL && process.env.NODE_ENV !== 'development') {
+    const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site').toLowerCase();
+    
+    // Security Check
+    if (userEmail?.toLowerCase() !== adminEmail && process.env.NODE_ENV !== 'development') {
       return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
     }
 

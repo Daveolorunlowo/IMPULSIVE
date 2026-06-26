@@ -35,8 +35,8 @@ export default function AdminDashboardPage() {
   const [promoError, setPromoError] = useState('');
 
   // Use NEXT_PUBLIC_ADMIN_EMAIL for client-side check. Default to orders@wearimpulsive.site
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site';
-  const isAdmin = process.env.NODE_ENV === 'development' || user?.email === adminEmail;
+  const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'orders@wearimpulsive.site').toLowerCase();
+  const isAdmin = process.env.NODE_ENV === 'development' || user?.email?.toLowerCase() === adminEmail;
 
   useEffect(() => {
     if (!isAuthenticated) return;
