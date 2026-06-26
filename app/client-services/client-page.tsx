@@ -216,7 +216,7 @@ export default function ClientServicesContent() {
                           To begin a return claim, contact our stylist concierge service directly, quoting your Order Reference ID.
                         </p>
                         <a 
-                          href="mailto:concierge@impulsive.com" 
+                          href="mailto:wearimpulsive@gmail.com" 
                           className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-bloodred hover:text-white transition-colors group pt-2"
                         >
                           Send Email to Concierge <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />

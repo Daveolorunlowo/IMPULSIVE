@@ -315,7 +315,9 @@ export default function Navbar() {
             <div className="mt-auto pt-12 border-t border-stone/20 flex flex-wrap justify-between items-end gap-6">
               <div>
                 <p className="text-[10px] uppercase tracking-widest text-alabaster/40 mb-4">Inquiries</p>
-                <p className="text-sm hover:text-bloodred transition-colors cursor-pointer">concierge@impulsive.com</p>
+                <p className="text-sm hover:text-bloodred transition-colors cursor-pointer">
+                  <a href="mailto:wearimpulsive@gmail.com">wearimpulsive@gmail.com</a>
+                </p>
               </div>
 
               <div className="flex flex-col items-start sm:items-end">
