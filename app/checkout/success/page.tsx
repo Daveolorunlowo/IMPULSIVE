@@ -11,11 +11,59 @@ function SuccessContent() {
   const { clearCart } = useCart();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId') || searchParams.get('reference');
+  const reference = searchParams.get('reference');
+
+  const [isVerifying, setIsVerifying] = React.useState(!!reference);
+  const [verifyFailed, setVerifyFailed] = React.useState(false);
 
   useEffect(() => {
     // Clear cart on successful checkout land
     clearCart();
-  }, [clearCart]);
+
+    if (reference) {
+      fetch(`/api/checkout/verify?reference=${reference}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            setVerifyFailed(true);
+          }
+          setIsVerifying(false);
+        })
+        .catch(() => {
+          setVerifyFailed(true);
+          setIsVerifying(false);
+        });
+    }
+  }, [clearCart, reference]);
+
+  if (isVerifying) {
+    return (
+      <div className="max-w-xl w-full text-center space-y-8 flex flex-col items-center">
+        <div className="w-16 h-16 border-4 border-bloodred border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-[10px] uppercase tracking-[0.4em] font-bold text-alabaster/60">Verifying Payment...</p>
+      </div>
+    );
+  }
+
+  if (verifyFailed) {
+    return (
+      <div className="max-w-xl w-full text-center space-y-8 flex flex-col items-center">
+        <div className="w-16 h-16 bg-bloodred/20 rounded-full flex items-center justify-center border border-bloodred/30">
+          <span className="text-bloodred text-2xl font-bold">!</span>
+        </div>
+        <div className="space-y-4">
+          <h1 className="text-4xl md:text-5xl font-serif text-alabaster leading-tight">Verification Failed</h1>
+          <p className="text-alabaster/40 text-[10px] uppercase tracking-[0.2em] font-light max-w-md">We could not confirm your payment. If you have been charged, please contact client services with reference <span className="font-mono text-bloodred font-bold">{reference}</span>.</p>
+        </div>
+        <Link 
+          href="/checkout" 
+          className="w-full bg-charcoal border border-white/10 hover:border-bloodred hover:text-bloodred text-alabaster py-4 uppercase tracking-[0.3em] text-[10px] font-bold transition-all"
+        >
+          Return to Checkout
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-xl w-full text-center space-y-12">

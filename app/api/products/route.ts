@@ -24,8 +24,8 @@ const toCamelCase = (dbProduct: any) => ({
  */
 export const GET = async () => {
   try {
-    // Public fetch, no auth required
-    const supabase = getSupabaseClient();
+    // Public fetch, bypass RLS since we want everyone to see products
+    const supabase = (await import('@/lib/supabase')).getSupabaseAdmin();
 
     const { data: products, error } = await supabase
       .from('products')

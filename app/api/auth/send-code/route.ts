@@ -181,7 +181,7 @@ export async function POST(request: Request) {
     if (!response.ok) {
       console.error('Resend API Error:', data);
       return NextResponse.json(
-        { error: 'Failed to dispatch email via Resend' },
+        { error: `Resend Error: ${data.message || 'Failed to dispatch'}` },
         { status: 500 }
       );
     }

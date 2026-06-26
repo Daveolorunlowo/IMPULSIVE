@@ -107,6 +107,12 @@ export const useAuth = create<AuthStore>()(
         const { error } = await supabase.auth.updateUser({ password });
         
         if (error) {
+          // If the user already had this password set, Supabase throws an error.
+          // Since they are already verified via OTP, we can safely ignore this.
+          if (error.message === 'New password should be different from the old password.') {
+            get().trackActivity('Password Kept Same');
+            return;
+          }
           console.error('[AUTH] Supabase setPassword failed:', error.message);
           throw error;
         }

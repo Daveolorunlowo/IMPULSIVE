@@ -36,6 +36,7 @@ export default function ShopPage() {
                     ? 'bg-bloodred border-bloodred text-alabaster shadow-lg shadow-bloodred/20' 
                     : 'border-alabaster/20 text-alabaster/40 hover:border-bloodred hover:text-bloodred'
                 }`}
+                suppressHydrationWarning
               >
                 {cat}
               </button>

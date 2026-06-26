@@ -243,8 +243,9 @@ export default function Footer() {
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={newsletterStatus === 'loading'}
                 className="bg-transparent text-sm w-full outline-none placeholder:text-alabaster/10 [&:-webkit-autofill]:[-webkit-box-shadow:0_0_0_50px_#000_inset] [&:-webkit-autofill]:[-webkit-text-fill-color:#FFF]"
+                suppressHydrationWarning
               />
-              <button type="submit" disabled={newsletterStatus === 'loading'} className="text-[10px] uppercase tracking-widest font-semibold text-bloodred hover:text-alabaster transition-colors shrink-0 disabled:opacity-50">
+              <button type="submit" disabled={newsletterStatus === 'loading'} className="text-[10px] uppercase tracking-widest font-semibold text-bloodred hover:text-alabaster transition-colors shrink-0 disabled:opacity-50" suppressHydrationWarning>
                 {newsletterStatus === 'loading' ? 'Joining...' : 'Subscribe'}
               </button>
             </form>

@@ -134,6 +134,7 @@ export default function Navbar() {
             <button 
               onClick={() => setIsCommandPaletteOpen(true)}
               className="hidden xl:flex items-center gap-3 bg-stone/10 border border-stone/20 rounded-full pl-4 pr-12 py-2.5 text-[9px] uppercase tracking-widest font-bold text-alabaster/40 hover:border-bloodred transition-all cursor-pointer"
+              suppressHydrationWarning
             >
               <Search size={14} strokeWidth={1.5} className="text-stone" />
               <span>Search [Ctrl+K]</span>

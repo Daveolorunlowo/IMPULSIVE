@@ -302,11 +302,13 @@ export default function HomeClient() {
               type="email" 
               placeholder="ENTER EMAIL ADDRESS" 
               className="bg-transparent border border-alabaster/20 focus:border-bloodred transition-colors text-alabaster placeholder:text-stone px-8 py-5 outline-none text-[10px] uppercase tracking-[0.2em] text-center sm:text-left w-full" 
+              suppressHydrationWarning
             />
             <button 
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
               className="bg-alabaster text-charcoal border border-alabaster px-10 py-5 uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-bloodred hover:text-alabaster hover:border-bloodred transition-all w-full sm:w-auto mt-4 sm:mt-0"
+              suppressHydrationWarning
             >
               Join Now
             </button>

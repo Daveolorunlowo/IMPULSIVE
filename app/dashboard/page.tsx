@@ -324,8 +324,8 @@ export default function DashboardPage() {
                           key={sz}
                           onClick={() => handleUpdateSize(sz)}
                           className={`w-12 h-12 flex items-center justify-center text-sm font-light transition-all ${preferredSize === sz
-                              ? 'bg-alabaster text-charcoal shadow-lg shadow-alabaster/20'
-                              : 'border border-white/10 text-alabaster/60 hover:border-alabaster hover:text-alabaster'
+                            ? 'bg-alabaster text-charcoal shadow-lg shadow-alabaster/20'
+                            : 'border border-white/10 text-alabaster/60 hover:border-alabaster hover:text-alabaster'
                             }`}
                         >
                           {sz}

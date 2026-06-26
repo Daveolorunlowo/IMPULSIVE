@@ -33,6 +33,22 @@ export class PaymentService {
   }
 
   /**
+   * Verifies a transaction with Paystack
+   */
+  static async verifyTransaction(reference: string) {
+    const response = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: {
+          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`
+        }
+      }
+    );
+
+    return response.data;
+  }
+
+  /**
    * Verifies the authenticity of a Paystack Webhook signature
    */
   static verifyWebhookSignature(payload: string, signature: string): boolean {

@@ -102,6 +102,7 @@ export default function CheckoutPage() {
   }, [mounted, user]);
 
   const [errors, setErrors] = useState<Partial<ContactDetails>>({});
+  const [generalError, setGeneralError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   /* ── Mounted check loading state ── */
@@ -210,18 +211,20 @@ export default function CheckoutPage() {
       });
 
       if (!response.ok) {
-        throw new Error('API Request Failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to initialize payment.');
       }
 
       const data = await response.json();
       if (data.paymentUrl) {
         window.location.href = data.paymentUrl;
       } else {
-        router.push(`/checkout/success?orderId=${generatedOrderId}`);
+        throw new Error('Payment URL missing from response.');
       }
-    } catch (err) {
-      console.warn('Backend order creation failed, proceeding with Sandbox simulation:', err);
-      router.push(`/checkout/success?orderId=${generatedOrderId}`);
+    } catch (err: any) {
+      console.error('Checkout failed:', err);
+      setGeneralError(err.message);
+      setIsProcessing(false);
     }
   };
 
@@ -380,6 +383,11 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Pay button */}
+                {generalError && (
+                  <div className="text-bloodred text-[10px] uppercase tracking-widest text-center">
+                    {generalError}
+                  </div>
+                )}
                 <button
                   onClick={handleCheckout}
                   disabled={isProcessing}
