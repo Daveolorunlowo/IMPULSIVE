@@ -153,15 +153,17 @@ export default function HomeClient() {
 
       {/* Slide 3: Featured Products Slideshow with Parallax */}
       <section className="h-screen w-full snap-start snap-always relative flex items-center justify-center overflow-hidden bg-charcoal">
-        <AnimatePresence mode="wait">
-          <motion.div 
-            key={currentSlide}
-            className="absolute inset-0 w-full h-full"
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1.05, x: mousePosition.x, y: mousePosition.y }}
-            exit={{ opacity: 0, scale: 1 }}
-            transition={{ opacity: { duration: 0.8 }, scale: { duration: 1.5 }, x: { type: "spring", stiffness: 50 }, y: { type: "spring", stiffness: 50 } }}
-          >
+        {featuredProducts.length > 0 ? (
+          <>
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key={currentSlide}
+                className="absolute inset-0 w-full h-full"
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ opacity: 1, scale: 1.05, x: mousePosition.x, y: mousePosition.y }}
+                exit={{ opacity: 0, scale: 1 }}
+                transition={{ opacity: { duration: 0.8 }, scale: { duration: 1.5 }, x: { type: "spring", stiffness: 50 }, y: { type: "spring", stiffness: 50 } }}
+              >
             <Image 
               src={featuredProducts[currentSlide].mainImage}
               alt={featuredProducts[currentSlide].name}
@@ -241,6 +243,13 @@ export default function HomeClient() {
             />
           ))}
         </div>
+          </>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-charcoal">
+            <div className="w-16 h-16 border-t-2 border-bloodred border-solid rounded-full animate-spin mb-8" />
+            <p className="text-[10px] uppercase tracking-[0.4em] text-alabaster/50 font-bold animate-pulse">Syncing Archive...</p>
+          </div>
+        )}
       </section>
 
       {/* Slide 4: Transition / Breather */}

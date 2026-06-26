@@ -18,6 +18,12 @@ export default function Navbar() {
   const { products } = useProducts();
   const [isOpen, setIsOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = React.useCallback((node: HTMLInputElement | null) => {
     if (node) {
@@ -108,7 +114,7 @@ export default function Navbar() {
               className="flex items-center group z-10"
             >
               <Logo 
-                variant="light" 
+                variant="red" 
                 className="h-7 sm:h-8 md:h-12 lg:h-14 w-auto transition-all duration-500 group-hover:scale-110"
               />
             </Link>
@@ -121,7 +127,7 @@ export default function Navbar() {
               className="hidden md:block text-[10px] uppercase tracking-widest font-bold text-alabaster/60 hover:text-bloodred transition-colors w-8 text-center"
               suppressHydrationWarning
             >
-              {currency}
+              {mounted ? currency : 'USD'}
             </button>
 
             {/* ksome-style Search Input Trigger (Desktop) */}
@@ -143,7 +149,9 @@ export default function Navbar() {
             
             {/* Auth Action */}
             <div className="hidden sm:block">
-              {isAuthenticated ? (
+              {!mounted ? (
+                <div className="w-12 h-4" /> // placeholder
+              ) : isAuthenticated ? (
                 <div className="flex items-center gap-4">
                   <Link 
                     href="/dashboard"
@@ -170,7 +178,7 @@ export default function Navbar() {
               aria-label="Wishlist"
             >
               <Heart size={20} strokeWidth={1.5} />
-              {wishlistItems.length > 0 && (
+              {mounted && wishlistItems.length > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-bloodred text-alabaster text-[8px] flex items-center justify-center rounded-full font-bold">
                   {wishlistItems.length}
                 </span>
@@ -185,7 +193,7 @@ export default function Navbar() {
               title="Track Order Status"
             >
               <Truck size={20} strokeWidth={1.5} />
-              {unreadOrdersCount > 0 && (
+              {mounted && unreadOrdersCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-bloodred text-alabaster text-[8px] flex items-center justify-center rounded-full font-bold animate-pulse">
                   {unreadOrdersCount}
                 </span>
@@ -197,7 +205,7 @@ export default function Navbar() {
               className="relative group text-alabaster/60 hover:text-bloodred transition-colors"
             >
               <ShoppingBag size={20} strokeWidth={1.5} />
-              {itemCount > 0 && (
+              {mounted && itemCount > 0 && (
                 <span className="absolute -top-2 -right-2 w-4 h-4 bg-bloodred text-alabaster text-[8px] flex items-center justify-center rounded-full font-bold">
                   {itemCount}
                 </span>
@@ -219,7 +227,7 @@ export default function Navbar() {
           >
             <div className="flex justify-between items-center mb-12">
               <Logo 
-                variant="light" 
+                variant="red" 
                 className="h-14 w-auto"
               />
               <button onClick={() => setIsOpen(false)} className="hover:text-bloodred transition-colors" aria-label="Close menu">

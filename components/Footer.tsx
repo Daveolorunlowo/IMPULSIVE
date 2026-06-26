@@ -196,7 +196,7 @@ export default function Footer() {
           <div className="lg:col-span-1 space-y-8">
             <Link href="/" className="inline-block">
               <Logo 
-                variant="light" 
+                variant="red" 
                 className="h-12 w-auto"
               />
             </Link>
