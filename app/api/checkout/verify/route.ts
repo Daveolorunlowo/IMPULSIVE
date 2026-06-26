@@ -6,7 +6,7 @@ import { PaymentService } from '@/services/payment.service';
  * GET /api/checkout/verify
  * Verifies a Paystack transaction and updates the order status.
  */
-export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
+export const GET = async (req: Request) => {
   try {
     const { searchParams } = new URL(req.url);
     const reference = searchParams.get('reference');
@@ -15,7 +15,7 @@ export const GET = withSupabase({ auth: 'user' }, async (req, ctx) => {
       return NextResponse.json({ error: 'MISSING_REFERENCE' }, { status: 400 });
     }
 
-    const supabase = ctx.supabaseAdmin as any;
+    const supabase = (await import('@/lib/supabase')).getSupabaseAdmin();
 
     // Verify with Paystack
     const paystackData = await PaymentService.verifyTransaction(reference);

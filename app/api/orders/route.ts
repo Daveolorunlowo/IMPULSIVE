@@ -9,15 +9,20 @@ import { calculateShipping } from '@/lib/utils';
  * Creates a pending order, atomically decrements stock, and
  * returns a Paystack payment URL.
  */
-export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
+export const POST = async (req: Request) => {
   try {
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+
     const { customerId, email, items, totalPrice, currency = 'USD', promoCode, shippingAddress } = await req.json();
 
     if (!customerId || !email || !items?.length || totalPrice === undefined) {
       return NextResponse.json({ error: 'MISSING_REQUIRED_FIELDS' }, { status: 400 });
     }
 
-    const supabase = ctx.supabaseAdmin as any;
+    const supabase = (await import('@/lib/supabase')).getSupabaseAdmin();
 
     // ── 1. TIMED DROP WINDOW CHECK ────────────────────────────────────────
     const { data: activeDrop } = await supabase
@@ -131,10 +136,10 @@ export const POST = withSupabase({ auth: 'user' }, async (req, ctx) => {
       paymentUrl: payment.data.authorization_url,
       reference,
     });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'INTERNAL_SERVER_ERROR';
-    console.error('[POST /api/orders]', message);
-    return NextResponse.json({ error: message }, { status: 500 });
+  } catch (err: any) {
+    const message = err.response?.data?.message || err.message || 'INTERNAL_SERVER_ERROR';
+    console.error('[POST /api/orders]', message, err.response?.data);
+    return NextResponse.json({ error: message, details: err.response?.data }, { status: 500 });
   }
 });
 

@@ -211,8 +211,11 @@ export default function CheckoutPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to initialize payment.');
+        let errorData: any = {};
+        try {
+          errorData = await response.json();
+        } catch(e) {}
+        throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
       const data = await response.json();
