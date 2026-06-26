@@ -43,8 +43,8 @@ export default function ShopPage() {
           </div>
         </header>
 
-        {/* Product Grid - Clean 3-Column */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-32">
+        {/* Product Grid - Clean 4-Column */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-8 md:gap-x-12 gap-y-16 md:gap-y-24">
           <AnimatePresence mode="popLayout">
             {filteredProducts.map((product, index) => (
               <motion.div

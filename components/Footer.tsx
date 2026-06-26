@@ -487,19 +487,6 @@ export default function Footer() {
                   <div className="space-y-8 text-alabaster">
                     <div className="flex justify-between items-center border-b border-stone/30 pb-4">
                       <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-stone">Store Product Catalog</span>
-                      <button 
-                        onClick={() => {
-                          if (confirm('Are you sure you want to reset all products back to default values?')) {
-                            const { resetProducts } = useProducts.getState();
-                            resetProducts();
-                            setEditingProduct({});
-                            alert('All products reset to default.');
-                          }
-                        }}
-                        className="text-[8px] bg-stone/20 border border-stone/30 text-alabaster/60 hover:text-bloodred px-3 py-1.5 uppercase tracking-widest font-semibold transition-all"
-                      >
-                        Reset Defaults
-                      </button>
                     </div>
 
                     <div className="space-y-8">

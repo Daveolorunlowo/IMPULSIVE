@@ -104,9 +104,9 @@ export default function ProductCard({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute inset-x-0 bottom-0 bg-charcoal/95 backdrop-blur-md p-6 flex flex-col gap-4 z-10 border-t border-bloodred/30"
+              className="absolute inset-x-0 bottom-0 bg-charcoal/95 backdrop-blur-md p-4 sm:p-6 flex flex-col gap-4 z-10 border-t border-bloodred/30"
             >
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2">
                 <div className="flex gap-2">
                   {colors.map((color) => (
                     <button
