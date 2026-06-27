@@ -284,13 +284,13 @@ export default function Footer() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-charcoal/90 backdrop-blur-xl flex items-center justify-center p-6"
+            className="fixed inset-0 z-[100] bg-charcoal/90 backdrop-blur-xl flex items-center justify-center p-0 md:p-6"
           >
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-stone/20 border border-stone/30 w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col"
+              className="bg-[#111] border border-stone/30 w-full h-full max-w-none max-h-none overflow-hidden flex flex-col shadow-2xl"
             >
               <div className="p-8 border-b border-stone/30 flex justify-between items-center flex-wrap gap-4">
                 <div className="flex items-center gap-4">

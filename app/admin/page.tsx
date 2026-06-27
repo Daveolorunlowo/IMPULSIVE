@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrency } from '@/store/useCurrency';
 import { useRouter } from 'next/navigation';
-import { Package, Loader2, ChevronDown, Check, Tag, Plus, Trash2, KeyRound, LogOut } from 'lucide-react';
+import { Package, Loader2, ChevronDown, Check, Tag, Plus, Trash2, KeyRound, LogOut, Shirt, Edit2, Save, X } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type AdminTab = 'orders' | 'promos';
+type AdminTab = 'orders' | 'promos' | 'products';
 
 const calculateTotalItems = (items: any[]) => items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
@@ -19,16 +19,26 @@ export default function AdminDashboardPage() {
 
   // Orders State
   const [orders, setOrders] = useState<any[]>([]);
-  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   // Promos State
   const [promos, setPromos] = useState<any[]>([]);
-  const [loadingPromos, setLoadingPromos] = useState(true);
+  const [loadingPromos, setLoadingPromos] = useState(false);
   const [newPromoCode, setNewPromoCode] = useState('');
   const [newPromoDiscount, setNewPromoDiscount] = useState('10');
   const [creatingPromo, setCreatingPromo] = useState(false);
   const [promoError, setPromoError] = useState('');
+
+  // Products State
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [productForm, setProductForm] = useState({
+    id: '', slug: '', name: '', category: 'Signature', price: 0, description: '', mainImage: '', hoverImage: '', sizes: '', colors: '', details: '', status: 'New Drop'
+  });
+  const [savingProduct, setSavingProduct] = useState(false);
 
   const [isAuthenticatedAdmin, setIsAuthenticatedAdmin] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
@@ -40,6 +50,7 @@ export default function AdminDashboardPage() {
       setIsAuthenticatedAdmin(true);
       fetchAllOrders(savedPassword);
       fetchAllPromos(savedPassword);
+      fetchAllProducts();
     }
   }, []);
 
@@ -60,6 +71,7 @@ export default function AdminDashboardPage() {
         const data = await res.json();
         setOrders(data.orders || []);
         fetchAllPromos(adminPasswordInput);
+        fetchAllProducts();
       } else {
         setLoginError('Incorrect password');
       }
@@ -105,6 +117,21 @@ export default function AdminDashboardPage() {
       console.error('[Admin] Failed to fetch promos:', err);
     } finally {
       setLoadingPromos(false);
+    }
+  }
+
+  async function fetchAllProducts() {
+    try {
+      setLoadingProducts(true);
+      const res = await fetch('/api/products');
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data.products || []);
+      }
+    } catch (err) {
+      console.error('[Admin] Failed to fetch products:', err);
+    } finally {
+      setLoadingProducts(false);
     }
   }
 
@@ -190,6 +217,59 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleSaveProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingProduct(true);
+    try {
+      const password = sessionStorage.getItem('adminPassword') || '';
+      const method = editingProduct ? 'PATCH' : 'POST';
+      
+      const payload = {
+        ...productForm,
+        sizes: productForm.sizes.split(',').map((s: string) => s.trim()).filter(Boolean),
+        details: productForm.details.split(',').map((s: string) => s.trim()).filter(Boolean),
+        colors: productForm.colors.split(',').map((s: string) => {
+          const parts = s.split(':');
+          return { name: parts[0]?.trim() || '', hex: parts[1]?.trim() || '#000000' };
+        }).filter((c: any) => c.name),
+      };
+
+      const res = await fetch('/api/admin/products', {
+        method,
+        headers: { 'Content-Type': 'application/json', 'x-admin-password': password },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        await fetchAllProducts();
+        setShowProductForm(false);
+        setEditingProduct(null);
+      } else {
+        alert('Failed to save product');
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingProduct(false);
+    }
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+    try {
+      const password = sessionStorage.getItem('adminPassword') || '';
+      const res = await fetch(`/api/admin/products?id=${id}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-password': password }
+      });
+      if (res.ok) {
+        setProducts(prev => prev.filter(p => p.id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (!isAuthenticatedAdmin) {
     return (
       <div className="min-h-screen bg-charcoal text-alabaster flex flex-col items-center justify-center px-6 text-center">
@@ -248,6 +328,14 @@ export default function AdminDashboardPage() {
                 }`}
               >
                 <Tag size={16} className={activeTab === 'promos' ? 'text-bloodred' : ''} /> Discounts
+              </button>
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
+                  activeTab === 'products' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
+                }`}
+              >
+                <Shirt size={16} className={activeTab === 'products' ? 'text-bloodred' : ''} /> Products
               </button>
             </nav>
 
@@ -473,7 +561,173 @@ export default function AdminDashboardPage() {
               </motion.div>
             )}
 
+            {/* PRODUCTS TAB */}
+            {activeTab === 'products' && (
+              <motion.div
+                key="products"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                  <h2 className="text-xl font-serif">Product Management</h2>
+                  {!showProductForm && (
+                    <button 
+                      onClick={() => {
+                        setEditingProduct(null);
+                        setProductForm({ id: '', slug: '', name: '', category: 'Signature', price: 0, description: '', mainImage: '', hoverImage: '', sizes: '', colors: '', details: '', status: 'New Drop' });
+                        setShowProductForm(true);
+                      }}
+                      className="bg-bloodred text-alabaster px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-alabaster hover:text-charcoal transition-all flex items-center gap-2"
+                    >
+                      <Plus size={14} /> Add Product
+                    </button>
+                  )}
+                </div>
+                
+                {showProductForm ? (
+                  <div className="border border-white/10 p-6 bg-white/[0.02]">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-sm uppercase tracking-widest font-bold text-stone">
+                        {editingProduct ? 'Edit Product' : 'Add New Product'}
+                      </h3>
+                      <button onClick={() => setShowProductForm(false)} className="text-stone hover:text-bloodred transition-colors">
+                        <X size={20} />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleSaveProduct} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">ID (e.g. 10)</label>
+                          <input type="text" value={productForm.id} onChange={e => setProductForm({...productForm, id: e.target.value})} disabled={!!editingProduct} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors disabled:opacity-50" required />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Name</label>
+                          <input type="text" value={productForm.name} onChange={e => setProductForm({...productForm, name: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Slug (e.g. basic-tee-black)</label>
+                          <input type="text" value={productForm.slug} onChange={e => setProductForm({...productForm, slug: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Category</label>
+                          <select value={productForm.category} onChange={e => setProductForm({...productForm, category: e.target.value})} className="bg-charcoal border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors">
+                            <option value="Signature">Signature</option>
+                            <option value="Archive">Archive</option>
+                            <option value="Essentials">Essentials</option>
+                          </select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Price (USD)</label>
+                          <input type="number" step="0.01" value={productForm.price} onChange={e => setProductForm({...productForm, price: parseFloat(e.target.value)})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Status Label (e.g. New Drop)</label>
+                          <input type="text" value={productForm.status} onChange={e => setProductForm({...productForm, status: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Description</label>
+                        <textarea rows={3} value={productForm.description} onChange={e => setProductForm({...productForm, description: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors resize-none" required />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Main Image URL</label>
+                          <input type="text" value={productForm.mainImage} onChange={e => setProductForm({...productForm, mainImage: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Hover Image URL</label>
+                          <input type="text" value={productForm.hoverImage} onChange={e => setProductForm({...productForm, hoverImage: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Sizes (Comma separated e.g. S, M, L)</label>
+                        <input type="text" value={productForm.sizes} onChange={e => setProductForm({...productForm, sizes: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Colors (Format: Name:#Hex, e.g. Red:#800000, Black:#000000)</label>
+                        <input type="text" value={productForm.colors} onChange={e => setProductForm({...productForm, colors: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Details (Comma separated bullet points)</label>
+                        <textarea rows={2} value={productForm.details} onChange={e => setProductForm({...productForm, details: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors resize-none" required />
+                      </div>
+
+                      <div className="pt-4 border-t border-white/10 flex justify-end gap-4">
+                        <button type="button" onClick={() => setShowProductForm(false)} className="px-6 py-3 text-xs font-bold uppercase tracking-widest text-stone hover:text-alabaster transition-colors">Cancel</button>
+                        <button type="submit" disabled={savingProduct} className="bg-bloodred text-alabaster px-8 py-3 text-xs font-bold uppercase tracking-widest hover:bg-alabaster hover:text-charcoal transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                          {savingProduct ? <Loader2 size={16} className="animate-spin" /> : <><Save size={16} /> Save Product</>}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {loadingProducts ? (
+                      <div className="col-span-full py-20 flex justify-center"><Loader2 size={24} className="animate-spin text-bloodred" /></div>
+                    ) : products.length === 0 ? (
+                      <div className="col-span-full py-20 text-center"><p className="text-xs text-alabaster/40 font-light">No products found.</p></div>
+                    ) : (
+                      products.map((product) => (
+                        <div key={product.id} className="border border-white/10 bg-white/[0.02] flex flex-col group overflow-hidden">
+                          <div className="relative h-48 bg-stone/5 overflow-hidden">
+                            <img src={product.mainImage} alt={product.name} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
+                            <div className="absolute top-2 right-2 flex gap-2">
+                              <button 
+                                onClick={() => {
+                                  setEditingProduct(product);
+                                  setProductForm({
+                                    id: product.id,
+                                    slug: product.slug,
+                                    name: product.name,
+                                    category: product.category,
+                                    price: product.price,
+                                    description: product.description || '',
+                                    mainImage: product.mainImage || '',
+                                    hoverImage: product.hoverImage || '',
+                                    sizes: product.sizes?.join(', ') || '',
+                                    colors: product.colors?.map((c: any) => `${c.name}:${c.hex}`).join(', ') || '',
+                                    details: product.details?.join(', ') || '',
+                                    status: product.status || ''
+                                  });
+                                  setShowProductForm(true);
+                                }}
+                                className="bg-charcoal/80 text-alabaster p-2 hover:bg-bloodred hover:text-alabaster transition-colors backdrop-blur-sm"
+                                title="Edit"
+                              ><Edit2 size={14} /></button>
+                              <button 
+                                onClick={() => handleDeleteProduct(product.id)}
+                                className="bg-charcoal/80 text-stone p-2 hover:bg-bloodred hover:text-alabaster transition-colors backdrop-blur-sm"
+                                title="Delete"
+                              ><Trash2 size={14} /></button>
+                            </div>
+                          </div>
+                          <div className="p-4 flex-1 flex flex-col">
+                            <div className="text-[8px] uppercase tracking-widest text-stone mb-1 font-bold">{product.category} • ID: {product.id}</div>
+                            <h3 className="font-serif text-lg truncate mb-1">{product.name}</h3>
+                            <div className="text-sm font-light text-alabaster/80 mb-4">${product.price}</div>
+                            <div className="mt-auto text-[9px] uppercase tracking-widest text-stone truncate">
+                              Status: {product.status || 'Active'}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
           </AnimatePresence>
+
         </main>
       </div>
     </div>
