@@ -11,7 +11,8 @@ export class PaymentService {
   /**
    * Initializes a transaction with Paystack
    */
-  static async initializeTransaction(email: string, amount: number, reference: string, currency: string = 'USD') {
+  static async initializeTransaction(email: string, amount: number, reference: string, currency: string = 'USD', callbackUrl?: string) {
+    const url = callbackUrl || `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/checkout/success`;
     const response = await axios.post(
       'https://api.paystack.co/transaction/initialize',
       {
@@ -19,7 +20,7 @@ export class PaymentService {
         amount: Math.round(amount * 100), // Convert to kobo/cents
         reference,
         currency: currency.toUpperCase(),
-        callback_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`
+        callback_url: url
       },
       {
         headers: {

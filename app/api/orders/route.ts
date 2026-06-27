@@ -129,7 +129,9 @@ export const POST = async (req: Request) => {
     );
 
     // ── 5. INITIALISE PAYMENT ─────────────────────────────────────────────
-    const payment = await PaymentService.initializeTransaction(email, totalPrice, reference, currency);
+    const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const callbackUrl = `${origin}/checkout/success`;
+    const payment = await PaymentService.initializeTransaction(email, totalPrice, reference, currency, callbackUrl);
 
     return NextResponse.json({
       orderId: order.id,
