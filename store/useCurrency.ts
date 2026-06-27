@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type Currency = 'USD' | 'NGN';
+type Currency = 'NGN';
 
 interface CurrencyState {
   currency: Currency;
@@ -11,31 +11,23 @@ interface CurrencyState {
   convertPrice: (priceInUSD: number) => number;
 }
 
-const NGN_RATE = 1500; // Estimated exchange rate for NGN to USD
+const NGN_RATE = 1500; // Multiplier used since DB prices are small numbers
 
 export const useCurrency = create<CurrencyState>()(
   persist(
     (set, get) => ({
-      currency: 'USD',
-      setCurrency: (currency) => set({ currency }),
-      toggleCurrency: () => set((state) => ({ currency: state.currency === 'USD' ? 'NGN' : 'USD' })),
+      currency: 'NGN',
+      setCurrency: (currency) => set({ currency: 'NGN' }),
+      toggleCurrency: () => {}, // Currency is locked to Naira
       formatPrice: (priceInUSD) => {
-        const { currency } = get();
-        if (currency === 'NGN') {
-          return `₦${Math.round(priceInUSD * NGN_RATE).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
-        }
-        return `$${priceInUSD.toFixed(2)}`;
+        return `₦${Math.round(priceInUSD * NGN_RATE).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
       },
       convertPrice: (priceInUSD) => {
-        const { currency } = get();
-        if (currency === 'NGN') {
-          return priceInUSD * NGN_RATE;
-        }
-        return priceInUSD;
+        return priceInUSD * NGN_RATE;
       }
     }),
     {
-      name: 'impulsive-currency-storage-v3',
+      name: 'impulsive-currency-storage-v4',
     }
   )
 );

@@ -122,14 +122,6 @@ export default function Navbar() {
 
           {/* Right Actions */}
           <div className="flex items-center justify-end gap-3 sm:gap-4 md:gap-8">
-            <button 
-              onClick={toggleCurrency}
-              className="hidden md:block text-[10px] uppercase tracking-widest font-bold text-alabaster/60 hover:text-bloodred transition-colors w-8 text-center"
-              suppressHydrationWarning
-            >
-              {mounted ? currency : 'USD'}
-            </button>
-
             {/* ksome-style Search Input Trigger (Desktop) */}
             <button 
               onClick={() => setIsCommandPaletteOpen(true)}
@@ -319,18 +311,6 @@ export default function Navbar() {
                 <p className="text-sm hover:text-bloodred transition-colors cursor-pointer">
                   <a href="mailto:wearimpulsive@gmail.com">wearimpulsive@gmail.com</a>
                 </p>
-              </div>
-
-              <div className="flex flex-col items-start sm:items-end">
-                <p className="text-[10px] uppercase tracking-widest text-alabaster/40 mb-4">Currency</p>
-                <button 
-                  onClick={toggleCurrency}
-                  className="bg-stone/10 border border-stone/20 hover:border-bloodred/50 px-4 py-2 text-[10px] font-bold uppercase tracking-widest text-alabaster transition-all flex items-center gap-2"
-                  suppressHydrationWarning
-                >
-                  <span>{currency}</span>
-                  <span className="text-[8px] opacity-40">Change</span>
-                </button>
               </div>
 
               {isAuthenticated && (
