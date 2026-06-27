@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrency } from '@/store/useCurrency';
 import { useRouter } from 'next/navigation';
-import { Package, Loader2, ChevronDown, Check, Tag, Plus, Trash2, KeyRound, LogOut, Shirt, Edit2, Save, X } from 'lucide-react';
+import { Package, Loader2, ChevronDown, Check, Tag, Plus, Trash2, KeyRound, LogOut, Shirt, Edit2, Save, X, Image as ImageIcon, UploadCloud } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -39,6 +39,8 @@ export default function AdminDashboardPage() {
     id: '', slug: '', name: '', category: 'Signature', price: 0, description: '', mainImage: '', hoverImage: '', sizes: '', colors: '', details: '', status: 'New Drop'
   });
   const [savingProduct, setSavingProduct] = useState(false);
+  const [uploadingMainImage, setUploadingMainImage] = useState(false);
+  const [uploadingHoverImage, setUploadingHoverImage] = useState(false);
 
   const [isAuthenticatedAdmin, setIsAuthenticatedAdmin] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
@@ -214,6 +216,42 @@ export default function AdminDashboardPage() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'main' | 'hover') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (type === 'main') setUploadingMainImage(true);
+    else setUploadingHoverImage(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const password = sessionStorage.getItem('adminPassword') || '';
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'x-admin-password': password },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setProductForm(prev => ({
+          ...prev,
+          [type === 'main' ? 'mainImage' : 'hoverImage']: data.url
+        }));
+      } else {
+        alert(data.error || 'Failed to upload image');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Network error uploading image');
+    } finally {
+      if (type === 'main') setUploadingMainImage(false);
+      else setUploadingHoverImage(false);
     }
   };
 
@@ -637,12 +675,57 @@ export default function AdminDashboardPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Main Image URL</label>
-                          <input type="text" value={productForm.mainImage} onChange={e => setProductForm({...productForm, mainImage: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Main Image</label>
+                          <div className="relative group border border-white/20 border-dashed hover:border-bloodred transition-colors h-32 flex flex-col items-center justify-center bg-white/[0.02] cursor-pointer overflow-hidden">
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={e => handleImageUpload(e, 'main')}
+                              className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                            />
+                            {uploadingMainImage ? (
+                              <Loader2 className="animate-spin text-bloodred" size={24} />
+                            ) : productForm.mainImage ? (
+                              <img src={productForm.mainImage} alt="Main" className="absolute inset-0 w-full h-full object-cover" />
+                            ) : (
+                              <div className="flex flex-col items-center text-stone group-hover:text-bloodred transition-colors">
+                                <UploadCloud size={24} className="mb-2" />
+                                <span className="text-[10px] uppercase tracking-widest font-bold">Upload Image</span>
+                              </div>
+                            )}
+                            {productForm.mainImage && !uploadingMainImage && (
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-0">
+                                <span className="text-[10px] uppercase tracking-widest font-bold text-white">Change Image</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
+
                         <div className="space-y-2">
-                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Hover Image URL</label>
-                          <input type="text" value={productForm.hoverImage} onChange={e => setProductForm({...productForm, hoverImage: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Hover Image</label>
+                          <div className="relative group border border-white/20 border-dashed hover:border-bloodred transition-colors h-32 flex flex-col items-center justify-center bg-white/[0.02] cursor-pointer overflow-hidden">
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={e => handleImageUpload(e, 'hover')}
+                              className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                            />
+                            {uploadingHoverImage ? (
+                              <Loader2 className="animate-spin text-bloodred" size={24} />
+                            ) : productForm.hoverImage ? (
+                              <img src={productForm.hoverImage} alt="Hover" className="absolute inset-0 w-full h-full object-cover" />
+                            ) : (
+                              <div className="flex flex-col items-center text-stone group-hover:text-bloodred transition-colors">
+                                <UploadCloud size={24} className="mb-2" />
+                                <span className="text-[10px] uppercase tracking-widest font-bold">Upload Hover</span>
+                              </div>
+                            )}
+                            {productForm.hoverImage && !uploadingHoverImage && (
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-0">
+                                <span className="text-[10px] uppercase tracking-widest font-bold text-white">Change Image</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
