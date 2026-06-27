@@ -36,7 +36,7 @@ export const POST = async (req: Request) => {
       description: body.description,
       main_image: body.mainImage,
       hover_image: body.hoverImage,
-      images: body.images || [],
+      images: [body.mainImage, body.hoverImage].filter(Boolean),
       details: body.details || [],
       sizes: body.sizes || [],
       colors: body.colors || [],
@@ -88,7 +88,9 @@ export const PATCH = async (req: Request) => {
     if (updates.description !== undefined) updateData.description = updates.description;
     if (updates.mainImage !== undefined) updateData.main_image = updates.mainImage;
     if (updates.hoverImage !== undefined) updateData.hover_image = updates.hoverImage;
-    if (updates.images !== undefined) updateData.images = updates.images;
+    if (updates.mainImage !== undefined || updates.hoverImage !== undefined) {
+      updateData.images = [updates.mainImage, updates.hoverImage].filter(Boolean);
+    }
     if (updates.details !== undefined) updateData.details = updates.details;
     if (updates.sizes !== undefined) updateData.sizes = updates.sizes;
     if (updates.colors !== undefined) updateData.colors = updates.colors;

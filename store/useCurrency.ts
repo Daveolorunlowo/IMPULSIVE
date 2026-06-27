@@ -7,11 +7,11 @@ interface CurrencyState {
   currency: Currency;
   setCurrency: (c: Currency) => void;
   toggleCurrency: () => void;
-  formatPrice: (priceInUSD: number) => string;
-  convertPrice: (priceInUSD: number) => number;
+  formatPrice: (price: number) => string;
+  convertPrice: (price: number) => number;
 }
 
-const NGN_RATE = 1500; // Multiplier used since DB prices are small numbers
+// Currency store for NGN
 
 export const useCurrency = create<CurrencyState>()(
   persist(
@@ -19,11 +19,11 @@ export const useCurrency = create<CurrencyState>()(
       currency: 'NGN',
       setCurrency: (currency) => set({ currency: 'NGN' }),
       toggleCurrency: () => {}, // Currency is locked to Naira
-      formatPrice: (priceInUSD) => {
-        return `₦${Math.round(priceInUSD * NGN_RATE).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
+      formatPrice: (price) => {
+        return `₦${Math.round(price).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
       },
-      convertPrice: (priceInUSD) => {
-        return priceInUSD * NGN_RATE;
+      convertPrice: (price) => {
+        return price;
       }
     }),
     {

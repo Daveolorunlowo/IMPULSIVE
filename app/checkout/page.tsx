@@ -93,7 +93,7 @@ export default function CheckoutPage() {
     email: user?.email ?? ''
   });
 
-  const shippingFeeUSD = calculateShipping(details.state, 'USD');
+  const shippingFee = calculateShipping(details.state);
 
   useEffect(() => {
     if (mounted && user) {
@@ -179,7 +179,7 @@ export default function CheckoutPage() {
         selectedColor: item.selectedColor,
         customText: item.customText
       })),
-      totalPrice: convert(totalPrice() - getDiscountAmount() + shippingFeeUSD),
+      totalPrice: convert(totalPrice() - getDiscountAmount() + shippingFee),
       currency: currentCurrency,
     };
 
@@ -196,7 +196,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           customerId: user.id,
           email: details.email,
-          totalPrice: convert(totalPrice() - getDiscountAmount() + shippingFeeUSD),
+          totalPrice: convert(totalPrice() - getDiscountAmount() + shippingFee),
           currency: currentCurrency,
           promoCode: useCart.getState().promoCode,
           shippingAddress: details,
@@ -399,7 +399,7 @@ export default function CheckoutPage() {
                   {isProcessing ? (
                     <><Loader2 size={16} className="animate-spin" /> Initializing Payment...</>
                   ) : (
-                    <><CreditCard size={16} /> Complete Order · {formatPrice(totalPrice() - getDiscountAmount() + shippingFeeUSD)}</>
+                    <><CreditCard size={16} /> Complete Order · {formatPrice(totalPrice() - getDiscountAmount() + shippingFee)}</>
                   )}
                 </button>
 
@@ -445,14 +445,14 @@ export default function CheckoutPage() {
                 <span>Shipping</span>
                 <span>
                   {details.state.trim()
-                    ? formatPrice(shippingFeeUSD)
+                    ? formatPrice(shippingFee)
                     : 'Calculated at payment'}
                 </span>
               </div>
               <div className="flex justify-between items-center pt-3 border-t border-charcoal/8">
                 <span className="text-sm uppercase tracking-[0.3em] font-bold text-charcoal">Total</span>
                 <span className="text-2xl font-serif text-charcoal">
-                  {formatPrice(totalPrice() - getDiscountAmount() + shippingFeeUSD)}
+                  {formatPrice(totalPrice() - getDiscountAmount() + shippingFee)}
                 </span>
               </div>
             </div>

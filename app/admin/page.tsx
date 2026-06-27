@@ -659,7 +659,7 @@ export default function AdminDashboardPage() {
                           </select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Price (USD)</label>
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Price (NGN)</label>
                           <input type="number" step="0.01" value={productForm.price} onChange={e => setProductForm({...productForm, price: parseFloat(e.target.value)})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
                         </div>
                         <div className="space-y-2">

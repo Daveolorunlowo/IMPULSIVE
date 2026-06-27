@@ -19,12 +19,8 @@ export default function TrackClient() {
   const { getOrderById, markOrderAsRead } = useOrders();
   const { formatPrice } = useCurrency();
   
-  const formatOrderPrice = (amount: number, orderCurrency?: 'USD' | 'NGN') => {
-    const currencyToUse = orderCurrency || (amount > 1000 ? 'NGN' : 'USD');
-    if (currencyToUse === 'NGN') {
-      return `₦${Math.round(amount).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
-    }
-    return `$${amount.toFixed(2)}`;
+  const formatOrderPrice = (amount: number, orderCurrency?: string) => {
+    return `₦${Math.round(amount).toLocaleString('en-NG', { minimumFractionDigits: 0 })}`;
   };
 
   const [orderCode, setOrderCode] = useState('');

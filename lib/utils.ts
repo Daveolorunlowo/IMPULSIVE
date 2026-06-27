@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function calculateShipping(stateName: string, currency: 'USD' | 'NGN'): number {
+export function calculateShipping(stateName: string): number {
   if (!stateName) return 0;
   
   const stateNormalized = stateName.trim().toLowerCase();
@@ -21,8 +21,5 @@ export function calculateShipping(stateName: string, currency: 'USD' | 'NGN'): n
     feeNGN = 6000;
   }
 
-  if (currency === 'USD') {
-    return feeNGN / 1500; // NGN_RATE is 1500
-  }
   return feeNGN;
 }

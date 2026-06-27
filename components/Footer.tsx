@@ -404,7 +404,7 @@ export default function Footer() {
                             </div>
                             <div>
                               <span className="text-[8px] uppercase tracking-widest text-stone font-bold block mb-1">VALUE</span>
-                              <span className="text-xs font-bold text-bloodred font-serif">${order.totalPrice.toFixed(2)}</span>
+                              <span className="text-xs font-bold text-bloodred font-serif">₦{order.totalPrice.toLocaleString('en-NG')}</span>
                             </div>
                           </div>
 
@@ -503,7 +503,7 @@ export default function Footer() {
                               <span className="text-[8px] uppercase tracking-widest text-stone font-bold">{product.category} ID: {product.id}</span>
                               <h4 className="font-serif text-lg text-alabaster">{product.name}</h4>
                               <p className="text-[10px] text-stone uppercase tracking-widest">
-                                Sizes: {product.sizes.join(', ')} · Price: ${product.price}
+                                Sizes: {product.sizes.join(', ')} · Price: ₦{product.price.toLocaleString('en-NG')}
                               </p>
                             </div>
                           </div>
@@ -527,7 +527,7 @@ export default function Footer() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Price (USD)</label>
+                                  <label className="block text-[8px] uppercase tracking-widest text-stone mb-1.5">Price (NGN)</label>
                                   <input 
                                     type="number"
                                     value={getProductVal(product, 'price')}

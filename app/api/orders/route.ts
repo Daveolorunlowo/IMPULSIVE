@@ -16,7 +16,7 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const { customerId, email, items, totalPrice, currency = 'USD', promoCode, shippingAddress } = await req.json();
+    const { customerId, email, items, totalPrice, currency = 'NGN', promoCode, shippingAddress } = await req.json();
 
     if (!customerId || !email || !items?.length || totalPrice === undefined) {
       return NextResponse.json({ error: 'MISSING_REQUIRED_FIELDS' }, { status: 400 });
@@ -56,7 +56,7 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ error: 'FAILED_TO_VERIFY_PRODUCTS' }, { status: 500 });
     }
 
-    let expectedTotalPriceUSD = 0;
+    let expectedTotalPrice = 0;
     for (const item of items) {
       const dbProduct = dbProducts.find((p: any) => p.id === (item.productId || item.variantId));
       if (!dbProduct) {
@@ -64,18 +64,17 @@ export const POST = async (req: Request) => {
       }
       
       const isCustomized = !!item.customText;
-      const expectedItemPriceUSD = dbProduct.price + (isCustomized ? 10 : 0);
-      expectedTotalPriceUSD += expectedItemPriceUSD * item.quantity;
+      const expectedItemPrice = dbProduct.price + (isCustomized ? 15000 : 0);
+      expectedTotalPrice += expectedItemPrice * item.quantity;
     }
 
     const uppercaseCode = promoCode?.toUpperCase()?.trim();
     if (uppercaseCode === 'INSTINCT' || uppercaseCode === 'ARCHIVE10') {
-      expectedTotalPriceUSD = expectedTotalPriceUSD * 0.90;
+      expectedTotalPrice = expectedTotalPrice * 0.90;
     }
 
-    const NGN_RATE = 1500;
-    const shippingFee = calculateShipping(shippingAddress?.state || '', currency as 'USD' | 'NGN');
-    const finalExpectedPrice = (currency === 'NGN' ? expectedTotalPriceUSD * NGN_RATE : expectedTotalPriceUSD) + shippingFee;
+    const shippingFee = calculateShipping(shippingAddress?.state || '');
+    const finalExpectedPrice = expectedTotalPrice + shippingFee;
 
     if (Math.abs(totalPrice - finalExpectedPrice) > 0.01) {
       console.error(`[POST /api/orders] PRICE_TAMPERING_DETECTED: Expected ${finalExpectedPrice}, got ${totalPrice}`);

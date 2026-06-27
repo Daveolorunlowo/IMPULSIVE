@@ -16,6 +16,48 @@ export default function HomeClient() {
   const [cursorPosition, setCursorPosition] = useState({ x: -100, y: -100 });
   const [isHovering, setIsHovering] = useState(false);
 
+  // Newsletter State
+  const [email, setEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterMsg, setNewsletterMsg] = useState('');
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setNewsletterStatus('loading');
+    setNewsletterMsg('');
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setNewsletterStatus('error');
+        if (data.error === 'ALREADY_SUBSCRIBED') {
+          setNewsletterMsg('You are already in the club.');
+        } else if (data.error === 'DISPOSABLE_EMAIL') {
+          setNewsletterMsg('Please use a real email address.');
+        } else if (data.error === 'TOO_MANY_REQUESTS') {
+          setNewsletterMsg('Too many attempts. Try again later.');
+        } else {
+          setNewsletterMsg(data.error || 'Something went wrong.');
+        }
+      } else {
+        setNewsletterStatus('success');
+        setNewsletterMsg('Welcome to the Inner Circle.');
+        setEmail('');
+      }
+    } catch (err) {
+      setNewsletterStatus('error');
+      setNewsletterMsg('Network error. Please try again.');
+    }
+  };
+
   // Smooth cursor setup
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -295,24 +337,39 @@ export default function HomeClient() {
           <p className="text-alabaster/60 mb-12 text-sm md:text-base leading-relaxed max-w-lg mx-auto font-light">
             Sign up to get early access to new releases, limited drops, and special events.
           </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-0 w-full max-w-lg mx-auto">
+          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row justify-center items-stretch gap-3 sm:gap-0 w-full max-w-lg mx-auto">
             <input 
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
               type="email" 
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
               placeholder="ENTER EMAIL ADDRESS" 
-              className="bg-transparent border border-alabaster/20 focus:border-bloodred transition-colors text-alabaster placeholder:text-stone px-8 py-5 outline-none text-[10px] uppercase tracking-[0.2em] text-center sm:text-left w-full" 
+              className="bg-alabaster/5 backdrop-blur-md border border-alabaster/30 focus:border-bloodred focus:bg-alabaster/10 transition-all text-alabaster placeholder:text-alabaster/60 px-8 py-5 outline-none text-[10px] uppercase tracking-[0.2em] text-center sm:text-left w-full disabled:opacity-50" 
               suppressHydrationWarning
             />
             <button 
+              type="submit"
+              disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
-              className="bg-alabaster text-charcoal border border-alabaster px-10 py-5 uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-bloodred hover:text-alabaster hover:border-bloodred transition-all w-full sm:w-auto mt-4 sm:mt-0"
+              className="bg-alabaster text-charcoal border border-alabaster px-10 py-5 uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-bloodred hover:text-alabaster hover:border-bloodred transition-all w-full sm:w-auto flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
               suppressHydrationWarning
             >
-              Join Now
+              {newsletterStatus === 'loading' ? 'Joining...' : newsletterStatus === 'success' ? 'Joined' : 'Join Now'}
             </button>
-          </div>
+          </form>
+          {newsletterMsg && (
+            <motion.p 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`mt-6 text-[10px] uppercase tracking-[0.2em] font-bold ${newsletterStatus === 'error' ? 'text-bloodred' : 'text-alabaster/60'}`}
+            >
+              {newsletterMsg}
+            </motion.p>
+          )}
         </div>
       </section>
 
