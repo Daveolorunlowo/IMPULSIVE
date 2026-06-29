@@ -12,6 +12,7 @@ export interface Product {
   sizes: string[];
   colors: { name: string; hex: string }[];
   status?: string;
+  stock?: number;
 }
 
 export const products: Product[] = [

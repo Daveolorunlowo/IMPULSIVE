@@ -22,6 +22,7 @@ interface ProductCardProps {
   sizes: string[];
   colors: { name: string; hex: string }[];
   status?: string;
+  stock?: number;
 }
 
 export default function ProductCard({
@@ -34,6 +35,7 @@ export default function ProductCard({
   category,
   sizes,
   colors,
+  stock,
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { addItem } = useCart();
@@ -140,9 +142,10 @@ export default function ProductCard({
               </div>
               <button
                 onClick={handleAddToCart}
-                className="w-full bg-bloodred text-alabaster py-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-alabaster hover:text-charcoal transition-colors"
+                disabled={stock !== undefined && stock === 0}
+                className="w-full bg-bloodred text-alabaster py-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-alabaster hover:text-charcoal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Add To Bag
+                {stock !== undefined && stock === 0 ? 'Out of Stock' : 'Add To Bag'}
               </button>
             </motion.div>
           )}

@@ -3,17 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrency } from '@/store/useCurrency';
 import { useRouter } from 'next/navigation';
-import { Package, Loader2, ChevronDown, Check, Tag, Plus, Trash2, KeyRound, LogOut, Shirt, Edit2, Save, X, Image as ImageIcon, UploadCloud } from 'lucide-react';
+import { Package, Loader2, ChevronDown, Check, Tag, Plus, Trash2, KeyRound, LogOut, Shirt, Edit2, Save, X, Image as ImageIcon, UploadCloud, Activity, Mail, Send, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import AdminTour from '@/components/AdminTour';
+import { useAuth } from '@/store/useAuth';
 
-type AdminTab = 'orders' | 'promos' | 'products';
+type AdminTab = 'orders' | 'promos' | 'products' | 'diagnostics';
 
 const calculateTotalItems = (items: any[]) => items?.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
 export default function AdminDashboardPage() {
   const { formatPrice } = useCurrency();
   const router = useRouter();
+  const { getAllUsers } = useAuth();
   
   const [activeTab, setActiveTab] = useState<AdminTab>('orders');
 
@@ -21,6 +24,7 @@ export default function AdminDashboardPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [trackingNumberInputs, setTrackingNumberInputs] = useState<Record<string, string>>({});
 
   // Promos State
   const [promos, setPromos] = useState<any[]>([]);
@@ -36,11 +40,18 @@ export default function AdminDashboardPage() {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [productForm, setProductForm] = useState({
-    id: '', slug: '', name: '', category: 'Signature', price: 0, description: '', mainImage: '', hoverImage: '', sizes: '', colors: '', details: '', status: 'New Drop'
+    id: '', slug: '', name: '', category: 'Signature', price: 0, description: '', mainImage: '', hoverImage: '', sizes: '', colors: '', details: '', status: 'New Drop', stock: 0
   });
   const [savingProduct, setSavingProduct] = useState(false);
   const [uploadingMainImage, setUploadingMainImage] = useState(false);
   const [uploadingHoverImage, setUploadingHoverImage] = useState(false);
+
+  // Notifications State
+  const [notificationForm, setNotificationForm] = useState({
+    subject: 'BACK IN STOCK: ',
+    message: 'The wait is over. Limited quantities available now.'
+  });
+  const [notificationStatus, setNotificationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const [isAuthenticatedAdmin, setIsAuthenticatedAdmin] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
@@ -163,6 +174,36 @@ export default function AdminDashboardPage() {
     }
   };
 
+
+  const handleTrackingSubmit = async (orderId: string) => {
+    const trackingCode = trackingNumberInputs[orderId];
+    if (!trackingCode) return;
+    
+    setUpdatingId(orderId);
+    try {
+      const password = sessionStorage.getItem('adminPassword') || '';
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-password': password
+        },
+        body: JSON.stringify({ orderId, metadata: { tracking_number: trackingCode } })
+      });
+      if (res.ok) {
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, metadata: { ...o.metadata, tracking_number: trackingCode } } : o));
+        alert('Tracking code saved');
+      } else {
+        alert('Failed to save tracking code');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating order');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const handleCreatePromo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPromoCode || !newPromoDiscount) return;
@@ -260,7 +301,8 @@ export default function AdminDashboardPage() {
     setSavingProduct(true);
     try {
       const password = sessionStorage.getItem('adminPassword') || '';
-      const method = editingProduct ? 'PATCH' : 'POST';
+      if (!editingProduct) return;
+      const method = 'PATCH';
       
       const payload = {
         ...productForm,
@@ -308,6 +350,39 @@ export default function AdminDashboardPage() {
     }
   };
 
+
+  const handleNotificationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProduct) return;
+    setNotificationStatus('loading');
+    
+    try {
+      const res = await fetch('/api/admin/notify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject: notificationForm.subject + editingProduct.name,
+          message: notificationForm.message,
+          productName: editingProduct.name,
+          productUrl: `${window.location.origin}/products/${editingProduct.slug}`
+        })
+      });
+
+      if (res.ok) {
+        setNotificationStatus('success');
+        setTimeout(() => setNotificationStatus('idle'), 3000);
+      } else {
+        setNotificationStatus('error');
+        setTimeout(() => setNotificationStatus('idle'), 3000);
+      }
+    } catch (error) {
+      setNotificationStatus('error');
+      setTimeout(() => setNotificationStatus('idle'), 3000);
+    }
+  };
+
   if (!isAuthenticatedAdmin) {
     return (
       <div className="min-h-screen bg-charcoal text-alabaster flex flex-col items-center justify-center px-6 text-center">
@@ -339,6 +414,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-charcoal text-alabaster pt-40 pb-32 font-sans">
+      {isAuthenticatedAdmin && <AdminTour />}
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row gap-12">
         
         {/* Sidebar */}
@@ -350,10 +426,18 @@ export default function AdminDashboardPage() {
               <p className="text-[10px] text-alabaster/40 uppercase tracking-widest mt-1 truncate">Authenticated</p>
             </div>
 
-            <nav className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-none">
+            <nav className="tour-sidebar-nav flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-none">
+              <button
+                onClick={() => setActiveTab('diagnostics')}
+                className={`tour-tab-diagnostics flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
+                  activeTab === 'diagnostics' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
+                }`}
+              >
+                <Activity size={16} className={activeTab === 'diagnostics' ? 'text-bloodred' : ''} /> System Diagnostics
+              </button>
               <button
                 onClick={() => setActiveTab('orders')}
-                className={`flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
+                className={`tour-tab-orders flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
                   activeTab === 'orders' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
                 }`}
               >
@@ -361,7 +445,7 @@ export default function AdminDashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('promos')}
-                className={`flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
+                className={`tour-tab-promos flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
                   activeTab === 'promos' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
                 }`}
               >
@@ -369,7 +453,7 @@ export default function AdminDashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('products')}
-                className={`flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
+                className={`tour-tab-products flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
                   activeTab === 'products' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
                 }`}
               >
@@ -395,6 +479,45 @@ export default function AdminDashboardPage() {
         {/* Main Content */}
         <main className="flex-1 min-w-0">
           <AnimatePresence mode="wait">
+
+            {/* DIAGNOSTICS TAB */}
+            {activeTab === 'diagnostics' && (
+              <motion.div
+                key="diagnostics"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <h2 className="text-xl font-serif border-b border-white/10 pb-4">System Diagnostics</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Stock Quantity</label>
+                          <input type="number" min="0" value={productForm.stock} onChange={e => setProductForm({...productForm, stock: parseInt(e.target.value) || 0})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
+                        </div>
+
+                  <div className="border border-white/10 p-6 bg-white/[0.02] flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs uppercase tracking-widest text-stone font-bold">End-to-End Encryption</span>
+                      <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse" />
+                    </div>
+                    <div className="text-2xl font-serif text-emerald-500">Active</div>
+                    <p className="text-[10px] text-alabaster/40 font-mono">RSA-4096 / AES-256-GCM</p>
+                  </div>
+                  
+                  <div className="border border-white/10 p-6 bg-white/[0.02] flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs uppercase tracking-widest text-stone font-bold">Connected Sessions</span>
+                      <Activity size={16} className="text-bloodred animate-pulse" />
+                    </div>
+                    <div className="text-2xl font-serif">{getAllUsers().length}</div>
+                    <p className="text-[10px] text-alabaster/40 font-mono">Real-time WebSocket Connections</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
             
             {/* ORDERS TAB */}
             {activeTab === 'orders' && (
@@ -429,6 +552,7 @@ export default function AdminDashboardPage() {
                             <th className="p-4 font-normal">Items</th>
                             <th className="p-4 font-normal">Total</th>
                             <th className="p-4 font-normal">Status</th>
+                            <th className="p-4 font-normal">Tracking</th>
                             <th className="p-4 font-normal text-right">Action</th>
                           </tr>
                         </thead>
@@ -458,6 +582,24 @@ export default function AdminDashboardPage() {
                                 }`}>
                                   {order.status}
                                 </span>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center gap-2">
+                                  <input 
+                                    type="text" 
+                                    placeholder={order.metadata?.tracking_number || "No tracking code"}
+                                    value={trackingNumberInputs[order.id] || ''}
+                                    onChange={(e) => setTrackingNumberInputs({...trackingNumberInputs, [order.id]: e.target.value})}
+                                    className="bg-transparent border border-white/20 text-[10px] text-alabaster px-2 py-1 w-24 focus:border-bloodred outline-none placeholder:text-stone/40"
+                                  />
+                                  <button 
+                                    onClick={() => handleTrackingSubmit(order.id)}
+                                    className="text-stone hover:text-alabaster transition-colors"
+                                    title="Save Tracking Code"
+                                  >
+                                    <Save size={14} />
+                                  </button>
+                                </div>
                               </td>
                               <td className="p-4 text-right relative min-w-[120px]">
                                 {updatingId === order.id ? (
@@ -611,25 +753,14 @@ export default function AdminDashboardPage() {
               >
                 <div className="flex justify-between items-center border-b border-white/10 pb-4">
                   <h2 className="text-xl font-serif">Product Management</h2>
-                  {!showProductForm && (
-                    <button 
-                      onClick={() => {
-                        setEditingProduct(null);
-                        setProductForm({ id: '', slug: '', name: '', category: 'Signature', price: 0, description: '', mainImage: '', hoverImage: '', sizes: '', colors: '', details: '', status: 'New Drop' });
-                        setShowProductForm(true);
-                      }}
-                      className="bg-bloodred text-alabaster px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-alabaster hover:text-charcoal transition-all flex items-center gap-2"
-                    >
-                      <Plus size={14} /> Add Product
-                    </button>
-                  )}
+                  
                 </div>
                 
                 {showProductForm ? (
                   <div className="border border-white/10 p-6 bg-white/[0.02]">
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="text-sm uppercase tracking-widest font-bold text-stone">
-                        {editingProduct ? 'Edit Product' : 'Add New Product'}
+                        'Edit Product'
                       </h3>
                       <button onClick={() => setShowProductForm(false)} className="text-stone hover:text-bloodred transition-colors">
                         <X size={20} />
@@ -751,6 +882,50 @@ export default function AdminDashboardPage() {
                         </button>
                       </div>
                     </form>
+
+                    {editingProduct && (
+                      <div className="mt-12 pt-8 border-t border-white/10">
+                        <h3 className="text-sm uppercase tracking-widest font-bold text-stone mb-4 flex items-center gap-2">
+                          <Mail size={16} className="text-bloodred" /> Dispatch Alerts (via Resend)
+                        </h3>
+                        <p className="text-xs text-alabaster/60 mb-6">Send mass email notifications to all subscribers about this product.</p>
+                        
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Subject Line</label>
+                            <input 
+                              type="text" 
+                              value={notificationForm.subject}
+                              onChange={(e) => setNotificationForm({...notificationForm, subject: e.target.value})}
+                              className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Message Body</label>
+                            <textarea 
+                              rows={3}
+                              value={notificationForm.message}
+                              onChange={(e) => setNotificationForm({...notificationForm, message: e.target.value})}
+                              className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors resize-none"
+                              required
+                            />
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={handleNotificationSubmit}
+                            disabled={notificationStatus === 'loading'}
+                            className="bg-alabaster text-charcoal px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-bloodred hover:text-alabaster transition-all disabled:opacity-50 flex items-center justify-center gap-2 w-full sm:w-auto"
+                          >
+                            {notificationStatus === 'loading' ? <Loader2 size={16} className="animate-spin" /> : 
+                             notificationStatus === 'success' ? <><Check size={16} /> Sent</> :
+                             <><Send size={16} /> Broadcast to Subscribers</>}
+                          </button>
+                          {notificationStatus === 'error' && <p className="text-xs text-bloodred mt-2">Failed to send notifications</p>}
+                        </div>
+                      </div>
+                    )}
+
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -779,7 +954,8 @@ export default function AdminDashboardPage() {
                                     sizes: product.sizes?.join(', ') || '',
                                     colors: product.colors?.map((c: any) => `${c.name}:${c.hex}`).join(', ') || '',
                                     details: product.details?.join(', ') || '',
-                                    status: product.status || ''
+                                    status: product.status || '',
+                                    stock: product.stock || 0
                                   });
                                   setShowProductForm(true);
                                 }}

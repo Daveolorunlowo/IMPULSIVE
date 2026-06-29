@@ -108,7 +108,18 @@ export const PATCH = async (req: Request) => {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, product: data });
+    if (updates.stock !== undefined) {
+      const { error: variantError } = await supabase
+        .from('variants')
+        .update({ stock_quantity: Number(updates.stock) })
+        .eq('id', id);
+        
+      if (variantError) {
+        console.error('[PATCH /api/admin/products] Variant DB Error:', variantError);
+      }
+    }
+
+    return NextResponse.json({ success: true, product: { ...data, stock: updates.stock } });
   } catch (err: any) {
     console.error('[PATCH /api/admin/products]', err);
     return NextResponse.json({ error: err.message }, { status: 500 });

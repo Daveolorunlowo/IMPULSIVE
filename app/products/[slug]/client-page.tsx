@@ -51,13 +51,6 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
   const productReviews = getReviewsForProduct(productData.slug);
   const averageRating = getAverageRating(productData.slug);
 
-  const getStockForSize = (size: string) => {
-    if (!size) return null;
-    const charCodeSum = size.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    const stock = (charCodeSum % 3) + 1; // Generates a stock number between 1 and 3
-    return stock;
-  };
-
   const calculateAdvisorSize = (e: React.FormEvent) => {
     e.preventDefault();
     const h = parseFloat(height);
@@ -325,7 +318,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 </div>
 
                 {/* FOMO Stock Scarcity Pulser */}
-                {selectedSize && getStockForSize(selectedSize) !== null && (
+                {productData.stock !== undefined && productData.stock <= 3 && productData.stock > 0 && (
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -333,7 +326,19 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                   >
                     <div className="w-2 h-2 rounded-full bg-bloodred animate-ping shadow-[0_0_10px_#800000]" />
                     <span className="text-[10px] uppercase tracking-[0.25em] font-bold">
-                      LOW STOCK ALERT // ONLY {getStockForSize(selectedSize)} PIECES REMAINING IN SIZE {selectedSize}
+                      LOW STOCK ALERT // ONLY {productData.stock} PIECES REMAINING
+                    </span>
+                  </motion.div>
+                )}
+                
+                {productData.stock !== undefined && productData.stock === 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-3 bg-stone/5 border border-stone/10 p-4 rounded-sm text-stone"
+                  >
+                    <span className="text-[10px] uppercase tracking-[0.25em] font-bold">
+                      OUT OF STOCK // SOLD OUT
                     </span>
                   </motion.div>
                 )}
@@ -360,9 +365,10 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 <div className="pt-8">
                   <button 
                     onClick={handleAddToCart}
-                    className="w-full btn-luxury shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all py-6 text-xs"
+                    disabled={productData.stock !== undefined && productData.stock === 0}
+                    className="w-full btn-luxury shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all py-6 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Order
+                    {productData.stock !== undefined && productData.stock === 0 ? 'Out of Stock' : 'Order'}
                   </button>
                   <div className="mt-8 flex justify-between items-center px-2">
                     <div className="flex flex-col items-center gap-2">

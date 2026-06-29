@@ -17,6 +17,7 @@ const toCamelCase = (dbProduct: any) => ({
   sizes: dbProduct.sizes || [],
   colors: dbProduct.colors || [],
   status: dbProduct.status || 'in_stock',
+  stock: dbProduct.variants?.[0]?.stock_quantity ?? 0,
 });
 
 /**
@@ -30,7 +31,7 @@ export const GET = async () => {
 
     const { data: products, error } = await supabase
       .from('products')
-      .select('*')
+      .select('*, variants(*)')
       .order('created_at', { ascending: true });
 
     if (error) {
