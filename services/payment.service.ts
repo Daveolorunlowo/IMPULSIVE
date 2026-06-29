@@ -11,7 +11,7 @@ export class PaymentService {
   /**
    * Initializes a transaction with Paystack
    */
-  static async initializeTransaction(email: string, amount: number, reference: string, currency: string = 'USD', callbackUrl?: string) {
+  static async initializeTransaction(email: string, amount: number, reference: string, currency: string = 'NGN', callbackUrl?: string) {
     const url = callbackUrl || `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/checkout/success`;
     const response = await axios.post(
       'https://api.paystack.co/transaction/initialize',

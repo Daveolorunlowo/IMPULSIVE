@@ -64,6 +64,15 @@ create table if not exists drops (
   created_at timestamptz default now()
 );
 
+-- Promo Codes Table
+create table if not exists promo_codes (
+  id uuid primary key default gen_random_uuid(),
+  code text unique not null,
+  discount_percentage numeric(5, 2) not null check (discount_percentage > 0 and discount_percentage <= 100),
+  is_active boolean default true,
+  created_at timestamptz default now()
+);
+
 -- ── 3. ATOMIC DECREMENT STOCK RPC FUNCTION ────────────────────────────────────
 -- This handles race conditions to ensure stock is only deducted if available.
 create or replace function decrement_stock(variant_uuid text, qty int)

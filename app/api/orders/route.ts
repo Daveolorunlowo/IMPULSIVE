@@ -69,8 +69,16 @@ export const POST = async (req: Request) => {
     }
 
     const uppercaseCode = promoCode?.toUpperCase()?.trim();
-    if (uppercaseCode === 'INSTINCT' || uppercaseCode === 'ARCHIVE10') {
-      expectedTotalPrice = expectedTotalPrice * 0.90;
+    if (uppercaseCode) {
+      const { data: promoData } = await supabase
+        .from('promo_codes')
+        .select('discount_percentage, is_active')
+        .eq('code', uppercaseCode)
+        .single();
+
+      if (promoData && promoData.is_active && promoData.discount_percentage > 0) {
+        expectedTotalPrice = expectedTotalPrice * (1 - promoData.discount_percentage / 100);
+      }
     }
 
     const shippingFee = calculateShipping(shippingAddress?.state || '');
