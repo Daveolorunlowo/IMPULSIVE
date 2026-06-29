@@ -46,7 +46,6 @@ export default function AdminTour({ setActiveTab }: AdminTourProps) {
       target: '.tour-sidebar-nav',
       content: 'Welcome to the Command Center! Let me show you the key sections.',
       placement: 'right',
-      disableBeacon: true,
     },
     {
       target: '.tour-tab-diagnostics',
@@ -100,9 +99,6 @@ export default function AdminTour({ setActiveTab }: AdminTourProps) {
       continuous
       onEvent={handleJoyrideCallback}
       styles={{
-        options: {
-          zIndex: 10000,
-        },
         tooltip: {
           backgroundColor: '#0A0A0A',
           color: '#F9F9F7',
