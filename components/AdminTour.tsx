@@ -1,10 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Joyride, STATUS, Step } from 'react-joyride';
+import { Joyride, STATUS, Step, EVENTS, ACTIONS } from 'react-joyride';
 
-export default function AdminTour() {
+interface AdminTourProps {
+  setActiveTab?: (tab: 'diagnostics' | 'orders' | 'promos' | 'products') => void;
+}
+
+export default function AdminTour({ setActiveTab }: AdminTourProps) {
   const [run, setRun] = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
 
   useEffect(() => {
     const tourCompleted = localStorage.getItem('adminTourCompleted');
@@ -14,41 +19,74 @@ export default function AdminTour() {
   }, []);
 
   const handleJoyrideCallback = (data: any) => {
-    const { status } = data;
+    const { action, index, status, type } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
       localStorage.setItem('adminTourCompleted', 'true');
       setRun(false);
+      return;
+    }
+
+    if (type === EVENTS.STEP_AFTER || type === EVENTS.TARGET_NOT_FOUND) {
+      const nextStepIndex = index + (action === ACTIONS.PREV ? -1 : 1);
+      
+      // Navigate to the correct tab based on the upcoming step
+      if (nextStepIndex === 1 || nextStepIndex === 2) setActiveTab?.('diagnostics');
+      if (nextStepIndex === 3 || nextStepIndex === 4) setActiveTab?.('orders');
+      if (nextStepIndex === 5 || nextStepIndex === 6) setActiveTab?.('promos');
+      if (nextStepIndex === 7 || nextStepIndex === 8) setActiveTab?.('products');
+
+      setStepIndex(nextStepIndex);
     }
   };
 
   const steps: Step[] = [
     {
       target: '.tour-sidebar-nav',
-      content: 'Welcome to the Command Center! This is your control panel for the entire operation. Let me show you around.',
-
+      content: 'Welcome to the Command Center! Let me show you the key sections.',
       placement: 'right',
+      disableBeacon: true,
     },
     {
       target: '.tour-tab-diagnostics',
-      content: 'System Diagnostics: Here you can view real-time traffic, active sessions, and check the database encryption status.',
+      content: 'System Diagnostics: Your control panel for system health.',
       placement: 'right',
+    },
+    {
+      target: '.tour-content-diagnostics',
+      content: 'Here you can view real-time traffic, active sessions, and check the database encryption status.',
+      placement: 'left',
     },
     {
       target: '.tour-tab-orders',
-      content: 'Global Orders: Manage your incoming orders. You can update statuses to "Shipped" and add tracking numbers directly here.',
+      content: 'Global Orders: Manage your incoming orders.',
       placement: 'right',
+    },
+    {
+      target: '.tour-content-orders',
+      content: 'You can update statuses to "Shipped" and add tracking numbers directly here.',
+      placement: 'left',
     },
     {
       target: '.tour-tab-promos',
-      content: 'Discounts: Create and manage FOMO-inducing promo codes. Set percentage discounts and disable old codes.',
+      content: 'Discounts: Create and manage FOMO-inducing promo codes.',
       placement: 'right',
     },
     {
+      target: '.tour-content-promos',
+      content: 'Set percentage discounts and disable old codes easily from this panel.',
+      placement: 'left',
+    },
+    {
       target: '.tour-tab-products',
-      content: 'Products: Control your inventory. You can edit stock quantities for each product and dispatch mass email stock alerts to your subscribers from here.',
+      content: 'Products: Control your inventory.',
       placement: 'right',
+    },
+    {
+      target: '.tour-content-products',
+      content: 'Edit stock quantities for each product and dispatch mass email stock alerts to your subscribers from here.',
+      placement: 'left',
     },
   ];
 
@@ -58,9 +96,13 @@ export default function AdminTour() {
     <Joyride
       steps={steps}
       run={run}
+      stepIndex={stepIndex}
       continuous
       onEvent={handleJoyrideCallback}
       styles={{
+        options: {
+          zIndex: 10000,
+        },
         tooltip: {
           backgroundColor: '#0A0A0A',
           color: '#F9F9F7',

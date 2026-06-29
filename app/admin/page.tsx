@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminTour from '@/components/AdminTour';
 import { useAuth } from '@/store/useAuth';
+import OrderDetailsDrawer from '@/components/admin/OrderDetailsDrawer';
 
 type AdminTab = 'orders' | 'promos' | 'products' | 'diagnostics';
 
@@ -25,6 +26,7 @@ export default function AdminDashboardPage() {
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [trackingNumberInputs, setTrackingNumberInputs] = useState<Record<string, string>>({});
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
 
   // Promos State
   const [promos, setPromos] = useState<any[]>([]);
@@ -414,7 +416,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-charcoal text-alabaster pt-40 pb-32 font-sans">
-      {isAuthenticatedAdmin && <AdminTour />}
+      {isAuthenticatedAdmin && <AdminTour setActiveTab={setActiveTab} />}
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row gap-12">
         
         {/* Sidebar */}
@@ -488,15 +490,11 @@ export default function AdminDashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-6"
+                className="space-y-6 tour-content-diagnostics"
               >
                 <h2 className="text-xl font-serif border-b border-white/10 pb-4">System Diagnostics</h2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Stock Quantity</label>
-                          <input type="number" min="0" value={productForm.stock} onChange={e => setProductForm({...productForm, stock: parseInt(e.target.value) || 0})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
-                        </div>
 
                   <div className="border border-white/10 p-6 bg-white/[0.02] flex flex-col gap-4">
                     <div className="flex items-center justify-between">
@@ -527,7 +525,7 @@ export default function AdminDashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-6"
+                className="space-y-6 tour-content-orders"
               >
                 <h2 className="text-xl font-serif border-b border-white/10 pb-4">Global Orders</h2>
                 
@@ -558,7 +556,11 @@ export default function AdminDashboardPage() {
                         </thead>
                         <tbody>
                           {orders.map((order) => (
-                            <tr key={order.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                            <tr 
+                              key={order.id} 
+                              className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
+                              onClick={() => setSelectedOrder(order)}
+                            >
                               <td className="p-4 font-mono text-[10px] tracking-wider text-alabaster/80">
                                 {order.payment_reference}
                               </td>
@@ -627,6 +629,21 @@ export default function AdminDashboardPage() {
                     </div>
                   )}
                 </div>
+                
+                <OrderDetailsDrawer
+                  order={selectedOrder}
+                  isOpen={!!selectedOrder}
+                  onClose={() => setSelectedOrder(null)}
+                  onUpdateStatus={async (orderId, status) => {
+                    await updateOrderStatus(orderId, status);
+                    setSelectedOrder((prev: any) => prev?.id === orderId ? { ...prev, status } : prev);
+                  }}
+                  onSaveTracking={async (orderId, trackingCode) => {
+                    setTrackingNumberInputs(prev => ({ ...prev, [orderId]: trackingCode }));
+                    await handleTrackingSubmit(orderId);
+                    setSelectedOrder((prev: any) => prev?.id === orderId ? { ...prev, metadata: { ...prev.metadata, tracking_number: trackingCode } } : prev);
+                  }}
+                />
               </motion.div>
             )}
 
@@ -638,7 +655,7 @@ export default function AdminDashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-6"
+                className="space-y-6 tour-content-promos"
               >
                 <div className="flex justify-between items-center border-b border-white/10 pb-4">
                   <h2 className="text-xl font-serif">Marketing & Discounts</h2>
@@ -749,7 +766,7 @@ export default function AdminDashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
-                className="space-y-6"
+                className="space-y-6 tour-content-products"
               >
                 <div className="flex justify-between items-center border-b border-white/10 pb-4">
                   <h2 className="text-xl font-serif">Product Management</h2>
@@ -796,6 +813,10 @@ export default function AdminDashboardPage() {
                         <div className="space-y-2">
                           <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Status Label (e.g. New Drop)</label>
                           <input type="text" value={productForm.status} onChange={e => setProductForm({...productForm, status: e.target.value})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] text-alabaster/40 uppercase tracking-widest block">Stock Quantity</label>
+                          <input type="number" min="0" value={productForm.stock} onChange={e => setProductForm({...productForm, stock: parseInt(e.target.value) || 0})} className="bg-transparent border border-white/20 px-4 py-3 text-sm text-alabaster w-full focus:outline-none focus:border-bloodred transition-colors" required />
                         </div>
                       </div>
 
@@ -972,7 +993,7 @@ export default function AdminDashboardPage() {
                           <div className="p-4 flex-1 flex flex-col">
                             <div className="text-[8px] uppercase tracking-widest text-stone mb-1 font-bold">{product.category} • ID: {product.id}</div>
                             <h3 className="font-serif text-lg truncate mb-1">{product.name}</h3>
-                            <div className="text-sm font-light text-alabaster/80 mb-4">${product.price}</div>
+                            <div className="text-sm font-light text-alabaster/80 mb-4">{formatPrice(product.price)}</div>
                             <div className="mt-auto text-[9px] uppercase tracking-widest text-stone truncate">
                               Status: {product.status || 'Active'}
                             </div>
