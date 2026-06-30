@@ -347,7 +347,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
 
                 {/* Description & Details */}
                 <div className="space-y-6">
-                  <h3 className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold">Composition & Care</h3>
+
                   <p className="text-lg font-light text-charcoal/60 leading-relaxed italic">
                     {productData.description}
                   </p>
