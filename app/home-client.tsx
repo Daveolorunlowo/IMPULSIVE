@@ -210,7 +210,7 @@ export default function HomeClient() {
             <div className="absolute inset-0 bg-charcoal/60" />
             <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-charcoal/80 to-transparent opacity-90" />
             
-            <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 md:px-12 flex items-center h-full">
+            <div className="relative z-10 w-full max-w-[1600px] mx-auto px-8 md:px-24 lg:px-32 flex items-center h-full">
               <motion.div 
                 initial={{ opacity: 0, filter: "blur(10px)", x: -30 }}
                 animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
