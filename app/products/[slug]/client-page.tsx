@@ -292,12 +292,6 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
                     <h3 className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold">Select Size: <span className="text-charcoal">{selectedSize}</span></h3>
-                    <button 
-                      onClick={() => setIsSizeGuideOpen(true)}
-                      className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-semibold underline underline-offset-4 decoration-stone/40 hover:text-bloodred transition-colors"
-                    >
-                      <Ruler size={14} strokeWidth={1.5} /> Size Guide
-                    </button>
                   </div>
                   <div className="flex flex-wrap gap-4">
                     {productData.sizes.map((size) => (
@@ -359,6 +353,36 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                       </li>
                     ))}
                   </ul>
+                </div>
+
+                {/* Inline Size Guide */}
+                <div className="space-y-4 pt-6">
+                  <h3 className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold mb-4">Garment Measurements</h3>
+                  <div className="border border-charcoal/10 text-xs text-charcoal/60 overflow-hidden bg-stone/5">
+                    <div className="grid grid-cols-4 bg-charcoal/5 p-3 font-bold text-[9px] uppercase tracking-widest text-charcoal border-b border-charcoal/10">
+                      <span>Size</span>
+                      <span>Chest</span>
+                      <span>Length</span>
+                      <span>Sleeve</span>
+                    </div>
+                    {[
+                      { s: 'S', c: '25"', l: '24"', sl: '22"' },
+                      { s: 'M', c: '26.5"', l: '25.5"', sl: '23.5"' },
+                      { s: 'L', c: '28"', l: '27"', sl: '25"' },
+                      { s: 'XL', c: '29.5"', l: '28.5"', sl: '26.5"' },
+                      { s: '2XL', c: '31"', l: '30"', sl: '28"' },
+                    ].map((row) => (
+                      <div key={row.s} className="grid grid-cols-4 p-3 border-b border-charcoal/5 last:border-0 hover:bg-charcoal/5 transition-colors">
+                        <span className="font-bold text-charcoal">{row.s}</span>
+                        <span>{row.c}</span>
+                        <span>{row.l}</span>
+                        <span>{row.sl}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[9px] uppercase tracking-widest text-stone leading-relaxed">
+                    * All measurements are shown in inches. Streetwear styles feature an intended boxy, dropped-shoulder silhouette.
+                  </p>
                 </div>
 
                 {/* Add to Cart */}
