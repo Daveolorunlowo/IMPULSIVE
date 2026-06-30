@@ -199,7 +199,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
               <div className="border-b border-stone/10 pb-12">
                 <div className="flex justify-between items-start mb-8">
                   <span className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold">
-                    The {productData.category} Collection
+                    The Collection
                   </span>
                   <div className="flex gap-4">
                     <button 
