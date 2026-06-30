@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useProducts } from '@/store/useProducts';
 import { useCurrency } from '@/store/useCurrency';
 import { motion, AnimatePresence, useSpring } from 'framer-motion';
@@ -127,7 +128,7 @@ export default function HomeClient() {
       </div>
       
       {/* Slide 1: The Hero */}
-      <section className="h-screen w-full snap-start snap-always relative flex items-end justify-center pb-32 overflow-hidden">
+      <section className="h-screen w-full snap-start snap-always relative flex items-center justify-center overflow-hidden">
         <video 
           src="/hero-video.mp4"
           autoPlay
@@ -136,50 +137,43 @@ export default function HomeClient() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/40 to-transparent mix-blend-multiply" />
+        <div className="absolute inset-0 bg-charcoal/40 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/20 to-transparent" />
         
-        {/* Kinetic Marquee */}
-        <div className="absolute top-1/4 left-0 w-full overflow-hidden whitespace-nowrap opacity-10 pointer-events-none -rotate-6 scale-110 z-0">
-          <motion.div 
-            animate={{ x: [0, -1000] }}
-            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-            className="text-[200px] font-display font-bold uppercase text-alabaster flex"
+        {/* Abstract Background Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] md:w-[40vw] md:h-[40vw] bg-bloodred/20 blur-[120px] rounded-full pointer-events-none" />
+
+        <div className="relative z-10 w-full px-6 flex flex-col items-center text-center mt-20">
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+            className="flex flex-col items-center"
           >
-            <span className="mr-8">IMPULSIVE INSTINCT // RAW ARCHIVE //</span>
-            <span className="mr-8">IMPULSIVE INSTINCT // RAW ARCHIVE //</span>
+            <h2 className="text-sm md:text-xl font-sans text-alabaster/80 uppercase tracking-[0.5em] mb-4">
+              Welcome To
+            </h2>
+            <h1 className="text-[14vw] sm:text-[10vw] md:text-[120px] lg:text-[160px] font-display text-alabaster leading-[0.8] tracking-tighter uppercase font-bold drop-shadow-2xl">
+              Wear<br />
+              <span className="text-transparent stroke-text drop-shadow-2xl">Impulsive</span>
+            </h1>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+            className="mt-12"
+          >
+            <Link href="/shop" className="group relative px-8 py-4 bg-alabaster text-charcoal font-bold uppercase tracking-widest text-xs overflow-hidden rounded-sm transition-all hover:bg-transparent border border-alabaster inline-block">
+              <span className="relative z-10 transition-colors duration-500 group-hover:text-alabaster">Explore Collection</span>
+              <div className="absolute inset-0 h-full w-full bg-bloodred translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out z-0" />
+            </Link>
           </motion.div>
         </div>
 
-        <div className="relative z-10 w-full px-6 md:px-12 flex justify-between items-end max-w-[1600px] mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="space-y-4"
-          >
-            <span className="text-[10px] uppercase tracking-[0.4em] text-bloodred font-bold">Volume 01</span>
-            <h1 className="text-[12vw] sm:text-7xl md:text-[140px] font-display text-alabaster leading-[0.85] tracking-tighter uppercase font-bold drop-shadow-2xl">
-              Impulsive<br />
-              <span className="text-transparent stroke-text drop-shadow-2xl">Instinct</span>
-            </h1>
-          </motion.div>
-          
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="hidden md:flex flex-col items-center pb-4"
-          >
-            <span className="text-[10px] text-alabaster uppercase tracking-[0.2em] mb-4 rotate-90 origin-bottom translate-y-12">Scroll</span>
-            <div className="w-[1px] h-24 bg-alabaster/20 overflow-hidden relative">
-               <motion.div 
-                 animate={{ y: [0, 100] }}
-                 transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                 className="w-full h-full bg-alabaster origin-top" 
-               />
-            </div>
-          </motion.div>
-        </div>
+
       </section>
 
       {/* Slide 2: Manifesto / Breather */}
@@ -250,19 +244,26 @@ export default function HomeClient() {
                     <span className="text-[10px] uppercase tracking-widest text-stone block mb-2">Sizes</span>
                     <div className="flex gap-2">
                       {featuredProducts[currentSlide].sizes.map(size => (
-                        <span key={size} className="text-xs font-sans border border-alabaster/20 px-2 py-1">{size}</span>
+                        <Link 
+                          key={size} 
+                          href={`/products/${featuredProducts[currentSlide].slug}`}
+                          className="text-xs font-sans border border-alabaster/20 px-2 py-1 hover:bg-alabaster hover:text-charcoal transition-colors cursor-pointer"
+                        >
+                          {size}
+                        </Link>
                       ))}
                     </div>
                   </div>
                 </div>
 
-                <button 
+                <Link 
+                  href="/shop"
                   onMouseEnter={() => setIsHovering(true)}
                   onMouseLeave={() => setIsHovering(false)}
-                  className="pointer-events-auto bg-bloodred text-alabaster px-12 py-5 uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-alabaster hover:text-charcoal transition-all"
+                  className="pointer-events-auto bg-bloodred text-alabaster px-12 py-5 uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-alabaster hover:text-charcoal transition-all inline-block"
                 >
                   Shop The Look
-                </button>
+                </Link>
               </motion.div>
             </div>
           </motion.div>
@@ -302,8 +303,9 @@ export default function HomeClient() {
             transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
             className="flex text-[100px] md:text-[200px] font-display font-bold uppercase text-charcoal whitespace-nowrap"
           >
-            <span className="mr-8">NO COMPROMISE // JUST DECIDE //</span>
-            <span className="mr-8">NO COMPROMISE // JUST DECIDE //</span>
+            <span className="mr-8">WEAR IMPULSIVE // WEAR IMPULSIVE //</span>
+            <span className="mr-8">WEAR IMPULSIVE // WEAR IMPULSIVE //</span>
+            <span className="mr-8">WEAR IMPULSIVE // WEAR IMPULSIVE //</span>
           </motion.div>
         </div>
         <div className="relative z-10 text-center px-6">

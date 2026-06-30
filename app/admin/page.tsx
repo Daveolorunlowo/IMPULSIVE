@@ -45,6 +45,7 @@ export default function AdminDashboardPage() {
     id: '', slug: '', name: '', category: 'Signature', price: 0, description: '', mainImage: '', hoverImage: '', sizes: '', colors: '', details: '', status: 'New Drop', stock: 0
   });
   const [savingProduct, setSavingProduct] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [uploadingMainImage, setUploadingMainImage] = useState(false);
   const [uploadingHoverImage, setUploadingHoverImage] = useState(false);
 
@@ -336,16 +337,17 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleDeleteProduct = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+  const handleDeleteProduct = async () => {
+    if (!productToDelete) return;
     try {
       const password = sessionStorage.getItem('adminPassword') || '';
-      const res = await fetch(`/api/admin/products?id=${id}`, {
+      const res = await fetch(`/api/admin/products?id=${productToDelete}`, {
         method: 'DELETE',
         headers: { 'x-admin-password': password }
       });
       if (res.ok) {
-        setProducts(prev => prev.filter(p => p.id !== id));
+        setProducts(prev => prev.filter(p => p.id !== productToDelete));
+        setProductToDelete(null);
       }
     } catch (err) {
       console.error(err);
@@ -984,7 +986,7 @@ export default function AdminDashboardPage() {
                                 title="Edit"
                               ><Edit2 size={14} /></button>
                               <button 
-                                onClick={() => handleDeleteProduct(product.id)}
+                                onClick={() => setProductToDelete(product.id)}
                                 className="bg-charcoal/80 text-stone p-2 hover:bg-bloodred hover:text-alabaster transition-colors backdrop-blur-sm"
                                 title="Delete"
                               ><Trash2 size={14} /></button>
@@ -1007,6 +1009,42 @@ export default function AdminDashboardPage() {
             )}
 
           </AnimatePresence>
+
+          {/* Delete Confirmation Modal */}
+          {productToDelete && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/80 backdrop-blur-sm px-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-stone border border-alabaster/10 p-8 max-w-md w-full shadow-2xl relative"
+              >
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-bloodred/20 flex items-center justify-center mb-6 text-bloodred">
+                    <Trash2 size={24} />
+                  </div>
+                  <h3 className="text-xl font-serif text-alabaster mb-2">Delete Product</h3>
+                  <p className="text-sm text-alabaster/60 mb-8 leading-relaxed">
+                    Are you entirely sure you want to permanently delete this product? This action cannot be undone and will remove it from the archive.
+                  </p>
+                  <div className="flex w-full gap-4">
+                    <button
+                      onClick={() => setProductToDelete(null)}
+                      className="flex-1 py-3 px-4 border border-alabaster/20 text-alabaster/60 hover:text-alabaster hover:border-alabaster transition-colors text-xs uppercase tracking-widest font-semibold"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeleteProduct}
+                      className="flex-1 py-3 px-4 bg-bloodred text-alabaster hover:bg-[#600000] transition-colors text-xs uppercase tracking-widest font-semibold"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
 
         </main>
       </div>

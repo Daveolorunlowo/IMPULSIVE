@@ -21,7 +21,7 @@ export const products: Product[] = [
     slug: 'impulsive-mmle-tee-red',
     name: 'IMPULSIVE MMLE TEE',
     category: 'Archive',
-    price: 8.00,
+    price: 12000,
     status: 'New Drop',
     description: 'The highly anticipated IMPULSIVE MMLE TEE. Featuring a bold design and premium heavy-weight cotton. Available exclusively in blood red.',
     mainImage: '/images/impulsive-mmle-tee.jpeg',

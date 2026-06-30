@@ -276,7 +276,7 @@ export default function CheckoutPage() {
       <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-5 gap-16">
 
         {/* ── Left: Form / Review ───────────────────────────────────── */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 order-2 lg:order-1">
           <AnimatePresence mode="wait">
 
             {/* STEP 1 — Contact & Shipping ─────────────────────────── */}
@@ -412,7 +412,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* ── Right: Order summary (sticky) ─────────────────────────── */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 order-1 lg:order-2">
           <div className="sticky top-32 space-y-6">
             <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/50">Order Summary</h3>
 

@@ -76,11 +76,11 @@ export default function Navbar() {
             {/* Left Actions (Mobile) */}
             <div className="flex items-center gap-4 md:hidden">
               {!isHome && (
-                <button onClick={() => router.back()} className="p-2 text-alabaster/60 hover:text-bloodred transition-colors" aria-label="Go back">
+                <button suppressHydrationWarning onClick={() => router.back()} className="p-2 text-alabaster/60 hover:text-bloodred transition-colors" aria-label="Go back">
                   <ArrowLeft size={20} strokeWidth={1.5} />
                 </button>
               )}
-              <button onClick={() => setIsOpen(true)} aria-label="Open menu">
+              <button suppressHydrationWarning onClick={() => setIsOpen(true)} aria-label="Open menu">
                 <Menu size={20} strokeWidth={1.5} />
               </button>
             </div>
@@ -89,6 +89,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-12">
             {!isHome && (
               <button 
+                suppressHydrationWarning
                 onClick={() => router.back()}
                 className="flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] font-semibold text-alabaster/60 hover:text-bloodred transition-colors"
               >
@@ -133,6 +134,7 @@ export default function Navbar() {
             </button>
 
             <button 
+              suppressHydrationWarning
               onClick={() => setIsCommandPaletteOpen(true)}
               className="text-alabaster/60 hover:text-bloodred transition-colors xl:hidden"
               aria-label="Search items"
@@ -194,6 +196,7 @@ export default function Navbar() {
             </Link>
 
             <button 
+              suppressHydrationWarning
               onClick={toggleCart}
               className="relative group text-alabaster/60 hover:text-bloodred transition-colors"
             >
