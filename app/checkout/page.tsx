@@ -76,7 +76,7 @@ const EMPTY_DETAILS: ContactDetails = {
 type Step = 'details' | 'review';
 
 export default function CheckoutPage() {
-  const { items, totalPrice, clearCart, promoCode, getDiscountAmount } = useCart();
+  const { items, totalPrice, clearCart, promoCode, getDiscountAmount, applyPromoCode, removePromoCode } = useCart();
   const { formatPrice, currency } = useCurrency();
   const { user } = useAuth();
   const router = useRouter();
@@ -104,6 +104,30 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<ContactDetails>>({});
   const [generalError, setGeneralError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const [promoInput, setPromoInput] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoMessage, setPromoMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+
+  const handleApplyPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoInput.trim()) return;
+    setPromoLoading(true);
+    setPromoMessage(null);
+    try {
+      const success = await applyPromoCode(promoInput.toUpperCase());
+      if (success) {
+        setPromoMessage({ text: 'Promo applied', type: 'success' });
+        setPromoInput('');
+      } else {
+        setPromoMessage({ text: 'Invalid promo code', type: 'error' });
+      }
+    } catch (err) {
+      setPromoMessage({ text: 'Error applying code', type: 'error' });
+    } finally {
+      setPromoLoading(false);
+    }
+  };
 
   /* ── Mounted check loading state ── */
   if (!mounted) {
@@ -431,6 +455,46 @@ export default function CheckoutPage() {
                 <p className="text-sm font-serif text-charcoal flex-shrink-0">{formatPrice(item.price * item.quantity)}</p>
               </div>
             ))}
+
+            <div className="border-t border-charcoal/8 pt-6 pb-6">
+              {!promoCode ? (
+                <form onSubmit={handleApplyPromo} className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="PROMO CODE"
+                      value={promoInput}
+                      onChange={(e) => setPromoInput(e.target.value)}
+                      className="flex-1 bg-white border border-charcoal/10 px-4 py-3 text-[10px] uppercase tracking-widest text-charcoal outline-none focus:border-charcoal placeholder:text-charcoal/20"
+                    />
+                    <button
+                      type="submit"
+                      disabled={promoLoading || !promoInput.trim()}
+                      className="bg-charcoal text-alabaster px-4 py-3 text-[10px] uppercase tracking-widest font-bold disabled:opacity-50 transition-colors"
+                    >
+                      {promoLoading ? '...' : 'Apply'}
+                    </button>
+                  </div>
+                  {promoMessage && (
+                    <p className={`text-[9px] uppercase tracking-widest ${promoMessage.type === 'error' ? 'text-bloodred' : 'text-green-600'}`}>
+                      {promoMessage.text}
+                    </p>
+                  )}
+                </form>
+              ) : (
+                <div className="flex justify-between items-center bg-charcoal/5 px-4 py-3 border border-charcoal/10">
+                  <span className="text-[10px] uppercase tracking-widest font-bold text-charcoal">
+                    Code: {promoCode}
+                  </span>
+                  <button 
+                    onClick={(e) => { e.preventDefault(); removePromoCode(); setPromoMessage(null); }}
+                    className="text-[9px] uppercase tracking-widest text-bloodred hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="border-t border-charcoal/8 pt-6 space-y-3">
               <div className="flex justify-between text-[11px] text-charcoal/40 uppercase tracking-widest">
