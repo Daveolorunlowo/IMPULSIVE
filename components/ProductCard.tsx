@@ -154,7 +154,7 @@ export default function ProductCard({
 
       {/* Product Info - Luxury Centered */}
       <Link href={`/products/${slug}`} className="flex flex-col items-center text-center space-y-2 mt-8">
-        <span className="text-[9px] uppercase tracking-[0.3em] text-stone font-semibold">{category}</span>
+
         <h3 className="text-xl font-serif text-alabaster group-hover:text-bloodred transition-colors duration-500">
           {name}
         </h3>

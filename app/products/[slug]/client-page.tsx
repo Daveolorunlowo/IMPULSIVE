@@ -525,7 +525,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
               <div className="flex justify-between items-center mb-12 pb-6 border-b border-bloodred/20">
                 <div>
                   <h2 className="text-3xl font-serif text-alabaster">Sizing Hub</h2>
-                  <span className="text-[9px] uppercase tracking-widest text-stone font-bold">INSTINCT FIT ARCHIVE // COLLECTION 01</span>
+
                 </div>
                 <button 
                   onClick={() => setIsSizeGuideOpen(false)} 
@@ -539,53 +539,26 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
               <div className="space-y-6 mb-12">
                 <h3 className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold mb-4">Garment Measurements</h3>
                 <div className="border border-alabaster/10 text-xs text-alabaster/60 overflow-hidden bg-stone/20">
-                  {productData.slug.includes('long-sleeve') ? (
-                    <>
-                      <div className="grid grid-cols-4 bg-alabaster/5 p-3 font-bold text-[9px] uppercase tracking-widest text-stone border-b border-alabaster/10">
-                        <span>Size</span>
-                        <span>Chest</span>
-                        <span>Length</span>
-                        <span>Sleeve</span>
-                      </div>
-                      {[
-                        { s: 'S', c: '25"', l: '24"', sl: '22"' },
-                        { s: 'M', c: '26.5"', l: '25.5"', sl: '23.5"' },
-                        { s: 'L', c: '28"', l: '27"', sl: '25"' },
-                        { s: 'XL', c: '29.5"', l: '28.5"', sl: '26.5"' },
-                        { s: '2XL', c: '31"', l: '30"', sl: '28"' },
-                      ].map((row) => (
-                        <div key={row.s} className="grid grid-cols-4 p-3 border-b border-alabaster/5 last:border-0 hover:bg-alabaster/5 transition-colors">
-                          <span className="font-bold text-alabaster">{row.s}</span>
-                          <span>{row.c}</span>
-                          <span>{row.l}</span>
-                          <span>{row.sl}</span>
-                        </div>
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      <div className="grid grid-cols-4 bg-alabaster/5 p-3 font-bold text-[9px] uppercase tracking-widest text-stone border-b border-alabaster/10">
-                        <span>Size</span>
-                        <span>Chest</span>
-                        <span>Shoulder</span>
-                        <span>Length</span>
-                      </div>
-                      {[
-                        { s: 'XS', c: '46"', sh: '20"', l: '26"' },
-                        { s: 'S', c: '48"', sh: '21"', l: '27"' },
-                        { s: 'M', c: '50"', sh: '22"', l: '28"' },
-                        { s: 'L', c: '52"', sh: '23"', l: '29"' },
-                        { s: 'XL', c: '54"', sh: '24"', l: '30"' },
-                      ].map((row) => (
-                        <div key={row.s} className="grid grid-cols-4 p-3 border-b border-alabaster/5 last:border-0 hover:bg-alabaster/5 transition-colors">
-                          <span className="font-bold text-alabaster">{row.s}</span>
-                          <span>{row.c}</span>
-                          <span>{row.sh}</span>
-                          <span>{row.l}</span>
-                        </div>
-                      ))}
-                    </>
-                  )}
+                  <div className="grid grid-cols-4 bg-alabaster/5 p-3 font-bold text-[9px] uppercase tracking-widest text-stone border-b border-alabaster/10">
+                    <span>Size</span>
+                    <span>Chest</span>
+                    <span>Length</span>
+                    <span>Sleeve</span>
+                  </div>
+                  {[
+                    { s: 'S', c: '25"', l: '24"', sl: '22"' },
+                    { s: 'M', c: '26.5"', l: '25.5"', sl: '23.5"' },
+                    { s: 'L', c: '28"', l: '27"', sl: '25"' },
+                    { s: 'XL', c: '29.5"', l: '28.5"', sl: '26.5"' },
+                    { s: '2XL', c: '31"', l: '30"', sl: '28"' },
+                  ].map((row) => (
+                    <div key={row.s} className="grid grid-cols-4 p-3 border-b border-alabaster/5 last:border-0 hover:bg-alabaster/5 transition-colors">
+                      <span className="font-bold text-alabaster">{row.s}</span>
+                      <span>{row.c}</span>
+                      <span>{row.l}</span>
+                      <span>{row.sl}</span>
+                    </div>
+                  ))}
                 </div>
                 <p className="text-[9px] uppercase tracking-widest text-stone leading-relaxed">
                   * All measurements are shown in inches. Streetwear styles feature an intended boxy, dropped-shoulder silhouette.
