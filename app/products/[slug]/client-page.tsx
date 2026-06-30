@@ -381,7 +381,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                     ))}
                   </div>
                   <p className="text-[9px] uppercase tracking-widest text-stone leading-relaxed">
-                    * All measurements are shown in inches. Streetwear styles feature an intended boxy, dropped-shoulder silhouette.
+                    ALL MEASUREMENTS ARE IN INCHES AND ARE TRUE TO SIZE
                   </p>
                 </div>
 
@@ -585,7 +585,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                   ))}
                 </div>
                 <p className="text-[9px] uppercase tracking-widest text-stone leading-relaxed">
-                  * All measurements are shown in inches. Streetwear styles feature an intended boxy, dropped-shoulder silhouette.
+                  ALL MEASUREMENTS ARE IN INCHES AND ARE TRUE TO SIZE
                 </p>
               </div>
 
