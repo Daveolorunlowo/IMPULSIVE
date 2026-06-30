@@ -438,7 +438,7 @@ export default function CheckoutPage() {
 
         {/* ── Right: Order summary (sticky) ─────────────────────────── */}
         <div className="w-full md:w-[320px] lg:w-[400px] order-1 md:order-2 flex-shrink-0 z-20">
-          <div className="sticky top-20 md:top-32 space-y-6 bg-alabaster/95 backdrop-blur-sm p-4 md:p-0 border-b border-charcoal/10 md:border-none shadow-sm md:shadow-none max-h-[40vh] md:max-h-none overflow-y-auto md:overflow-visible">
+          <div className="sticky top-20 md:top-32 space-y-6 bg-white p-6 md:p-8 lg:p-10 border-b border-charcoal/10 md:border md:border-charcoal/10 shadow-sm max-h-[40vh] md:max-h-none overflow-y-auto md:overflow-visible">
             <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/50">Order Summary</h3>
 
             {items.map(item => (
