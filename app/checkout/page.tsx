@@ -10,7 +10,8 @@ import { getSupabaseClient } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight, ShieldCheck, Truck, CreditCard,
-  Loader2, User, MapPin, Phone, Mail, Globe, ArrowLeft
+  Loader2, User, MapPin, Phone, Mail, Globe, ArrowLeft,
+  Tag, X
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -458,41 +459,64 @@ export default function CheckoutPage() {
 
             <div className="border-t border-charcoal/8 pt-6 pb-6">
               {!promoCode ? (
-                <form onSubmit={handleApplyPromo} className="space-y-2">
-                  <div className="flex gap-2">
+                <form onSubmit={handleApplyPromo} className="space-y-3">
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                      <Tag size={14} className="text-charcoal/30 group-focus-within:text-bloodred transition-colors" />
+                    </div>
                     <input
                       type="text"
-                      placeholder="PROMO CODE"
+                      placeholder="ENTER PROMO CODE"
                       value={promoInput}
                       onChange={(e) => setPromoInput(e.target.value)}
-                      className="flex-1 bg-white border border-charcoal/10 px-4 py-3 text-[10px] uppercase tracking-widest text-charcoal outline-none focus:border-charcoal placeholder:text-charcoal/20"
+                      className="w-full bg-white border border-charcoal/10 pl-10 pr-24 py-4 text-[10px] uppercase tracking-widest text-charcoal outline-none focus:border-bloodred/40 transition-all placeholder:text-charcoal/20 shadow-sm"
                     />
-                    <button
-                      type="submit"
-                      disabled={promoLoading || !promoInput.trim()}
-                      className="bg-charcoal text-alabaster px-4 py-3 text-[10px] uppercase tracking-widest font-bold disabled:opacity-50 transition-colors"
-                    >
-                      {promoLoading ? '...' : 'Apply'}
-                    </button>
+                    <div className="absolute inset-y-1.5 right-1.5 flex items-center">
+                      <button
+                        type="submit"
+                        disabled={promoLoading || !promoInput.trim()}
+                        className="bg-charcoal text-alabaster px-4 h-full text-[9px] uppercase tracking-[0.2em] font-bold disabled:opacity-30 disabled:bg-charcoal/50 hover:bg-bloodred transition-all"
+                      >
+                        {promoLoading ? <Loader2 size={12} className="animate-spin" /> : 'Apply'}
+                      </button>
+                    </div>
                   </div>
-                  {promoMessage && (
-                    <p className={`text-[9px] uppercase tracking-widest ${promoMessage.type === 'error' ? 'text-bloodred' : 'text-green-600'}`}>
-                      {promoMessage.text}
-                    </p>
-                  )}
+                  <AnimatePresence>
+                    {promoMessage && (
+                      <motion.p 
+                        initial={{ opacity: 0, y: -5 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        exit={{ opacity: 0 }}
+                        className={`text-[9px] uppercase tracking-widest flex items-center gap-1.5 ${promoMessage.type === 'error' ? 'text-bloodred' : 'text-green-600'}`}
+                      >
+                        {promoMessage.type === 'error' ? <X size={10} /> : <Tag size={10} />}
+                        {promoMessage.text}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                 </form>
               ) : (
-                <div className="flex justify-between items-center bg-charcoal/5 px-4 py-3 border border-charcoal/10">
-                  <span className="text-[10px] uppercase tracking-widest font-bold text-charcoal">
-                    Code: {promoCode}
-                  </span>
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex justify-between items-center bg-bloodred/5 border border-bloodred/20 px-5 py-4 relative overflow-hidden group"
+                >
+                  <div className="absolute inset-0 bg-bloodred/5 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
+                  <div className="relative z-10 flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-bloodred/10 flex items-center justify-center">
+                      <Tag size={12} className="text-bloodred" />
+                    </div>
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-bloodred">
+                      {promoCode}
+                    </span>
+                  </div>
                   <button 
                     onClick={(e) => { e.preventDefault(); removePromoCode(); setPromoMessage(null); }}
-                    className="text-[9px] uppercase tracking-widest text-bloodred hover:underline"
+                    className="relative z-10 text-[9px] uppercase tracking-widest text-charcoal/40 hover:text-bloodred transition-colors flex items-center gap-1"
                   >
-                    Remove
+                    Remove <X size={10} />
                   </button>
-                </div>
+                </motion.div>
               )}
             </div>
 
