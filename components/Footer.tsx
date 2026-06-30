@@ -67,7 +67,7 @@ export default function Footer() {
               <Link href="/shop" className="hover:text-bloodred transition-colors">The Collection</Link>
               <Link href="/lookbook" className="hover:text-bloodred transition-colors">Archive</Link>
 
-              <Link href="/contact" className="hover:text-bloodred transition-colors">Contact</Link>
+              <a href="mailto:wearimpulsive@gmail.com" className="hover:text-bloodred transition-colors">Contact</a>
             </div>
           </div>
 

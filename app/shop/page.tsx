@@ -5,7 +5,7 @@ import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/store/useProducts';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const categories = ['All', 'Signature', 'Archive', 'Essentials'];
+const categories = ['All'];
 
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState('All');

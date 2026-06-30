@@ -273,10 +273,10 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-5 gap-16">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row gap-12 md:gap-8 lg:gap-16">
 
         {/* ── Left: Form / Review ───────────────────────────────────── */}
-        <div className="lg:col-span-3 order-2 lg:order-1">
+        <div className="flex-1 order-2 md:order-1 min-w-0">
           <AnimatePresence mode="wait">
 
             {/* STEP 1 — Contact & Shipping ─────────────────────────── */}
@@ -412,8 +412,8 @@ export default function CheckoutPage() {
         </div>
 
         {/* ── Right: Order summary (sticky) ─────────────────────────── */}
-        <div className="lg:col-span-2 order-1 lg:order-2">
-          <div className="sticky top-32 space-y-6">
+        <div className="w-full md:w-[320px] lg:w-[400px] order-1 md:order-2 flex-shrink-0 z-20">
+          <div className="sticky top-20 md:top-32 space-y-6 bg-alabaster/95 backdrop-blur-sm p-4 md:p-0 border-b border-charcoal/10 md:border-none shadow-sm md:shadow-none max-h-[40vh] md:max-h-none overflow-y-auto md:overflow-visible">
             <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/50">Order Summary</h3>
 
             {items.map(item => (
