@@ -32,8 +32,8 @@ interface OrderDetailsDrawerProps {
   order: Order | null;
   isOpen: boolean;
   onClose: () => void;
-  onUpdateStatus: (orderId: string, status: string) => Promise<void>;
-  onSaveTracking: (orderId: string, trackingCode: string) => Promise<void>;
+  onUpdateStatus?: (orderId: string, status: string) => Promise<void>;
+  onSaveTracking?: (orderId: string, trackingCode: string) => Promise<void>;
 }
 
 export default function OrderDetailsDrawer({
@@ -58,12 +58,14 @@ export default function OrderDetailsDrawer({
   if (!order) return null;
 
   const handleStatusChange = async (newStatus: string) => {
+    if (!onUpdateStatus) return;
     setIsUpdatingStatus(true);
     await onUpdateStatus(order.id, newStatus);
     setIsUpdatingStatus(false);
   };
 
   const handleTrackingSubmit = async () => {
+    if (!onSaveTracking) return;
     setIsSavingTracking(true);
     await onSaveTracking(order.id, trackingCode);
     setIsSavingTracking(false);
@@ -186,41 +188,29 @@ export default function OrderDetailsDrawer({
 
               {/* Shipment Status */}
               <div>
-                <h4 className="text-[10px] uppercase tracking-widest text-stone font-bold mb-4">Shipment Status:</h4>
+                <h4 className="text-[10px] uppercase tracking-widest text-stone font-bold mb-4">Shipment Status</h4>
                 <div className="grid grid-cols-2 gap-2">
                   {statuses.map((status) => (
-                    <button
+                    <div
                       key={status.value}
-                      onClick={() => handleStatusChange(status.value)}
-                      disabled={isUpdatingStatus}
-                      className={`py-3 px-2 text-[10px] uppercase tracking-widest font-bold transition-all border ${
+                      className={`py-3 px-2 text-[10px] uppercase tracking-widest font-bold transition-all border text-center ${
                         isActiveStatus(status.value) 
                           ? 'bg-bloodred text-white border-bloodred' 
-                          : 'bg-[#111] text-stone border-transparent hover:border-white/10'
+                          : 'bg-[#111] text-stone border-transparent'
                       }`}
                     >
                       {status.label}
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>
 
               {/* Tracking Code */}
               <div className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="ENTER TRACKING CODE (E.G. TRK-830219)"
-                  value={trackingCode}
-                  onChange={(e) => setTrackingCode(e.target.value)}
-                  className="w-full bg-[#111] border border-white/10 text-alabaster px-4 py-4 outline-none focus:border-bloodred transition-colors text-[10px] uppercase tracking-[0.1em] placeholder:text-stone/40"
-                />
-                <button
-                  onClick={handleTrackingSubmit}
-                  disabled={isSavingTracking || !trackingCode || trackingCode === order.metadata?.tracking_number}
-                  className="w-full bg-[#1a1a1a] hover:bg-[#222] border border-transparent text-alabaster py-4 text-[10px] uppercase tracking-widest font-bold transition-all disabled:opacity-50 flex justify-center items-center gap-2"
-                >
-                  {isSavingTracking ? <Loader2 size={14} className="animate-spin" /> : 'Save Tracking Code'}
-                </button>
+                <h4 className="text-[10px] uppercase tracking-widest text-stone font-bold mb-4">Tracking Code</h4>
+                <div className="w-full bg-[#111] border border-white/10 text-alabaster px-4 py-4 text-[10px] uppercase tracking-[0.1em]">
+                  {order.metadata?.tracking_number || "NO TRACKING CODE PROVIDED"}
+                </div>
               </div>
 
             </div>

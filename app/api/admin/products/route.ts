@@ -54,7 +54,17 @@ export const POST = async (req: Request) => {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, product: data });
+    if (body.stock !== undefined) {
+      const { error: variantError } = await supabase
+        .from('variants')
+        .upsert([{ id: body.id, stock_quantity: Number(body.stock) }]);
+        
+      if (variantError) {
+        console.error('[POST /api/admin/products] Variant DB Error:', variantError);
+      }
+    }
+
+    return NextResponse.json({ success: true, product: { ...data, stock: body.stock } });
   } catch (err: any) {
     console.error('[POST /api/admin/products]', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -111,8 +121,7 @@ export const PATCH = async (req: Request) => {
     if (updates.stock !== undefined) {
       const { error: variantError } = await supabase
         .from('variants')
-        .update({ stock_quantity: Number(updates.stock) })
-        .eq('id', id);
+        .upsert({ id: id, stock_quantity: Number(updates.stock) });
         
       if (variantError) {
         console.error('[PATCH /api/admin/products] Variant DB Error:', variantError);

@@ -17,7 +17,9 @@ const toCamelCase = (dbProduct: any) => ({
   sizes: dbProduct.sizes || [],
   colors: dbProduct.colors || [],
   status: dbProduct.status || 'in_stock',
-  stock: dbProduct.variants?.[0]?.stock_quantity ?? 0,
+  stock: Array.isArray(dbProduct.variants) 
+    ? (dbProduct.variants[0]?.stock_quantity ?? 0) 
+    : (dbProduct.variants?.stock_quantity ?? 0),
 });
 
 /**

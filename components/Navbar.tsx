@@ -48,7 +48,7 @@ export default function Navbar() {
   const navLinks = [
     { name: 'Shop', href: '/shop' },
     { name: 'Lookbook', href: '/lookbook' },
-    { name: 'Philosophy', href: '/philosophy' },
+
   ];
 
   // Sizing/Search Command Palette Keyboard Shortcut Listener [Ctrl + K]

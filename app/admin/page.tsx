@@ -305,7 +305,9 @@ export default function AdminDashboardPage() {
     try {
       const password = sessionStorage.getItem('adminPassword') || '';
       if (!editingProduct) return;
-      const method = 'PATCH';
+      
+      const isNewProduct = Object.keys(editingProduct).length === 0;
+      const method = isNewProduct ? 'POST' : 'PATCH';
       
       const payload = {
         ...productForm,
@@ -432,36 +434,12 @@ export default function AdminDashboardPage() {
 
             <nav className="tour-sidebar-nav flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-4 md:pb-0 scrollbar-none">
               <button
-                onClick={() => setActiveTab('diagnostics')}
-                className={`tour-tab-diagnostics flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
-                  activeTab === 'diagnostics' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
-                }`}
-              >
-                <Activity size={16} className={activeTab === 'diagnostics' ? 'text-bloodred' : ''} /> System Diagnostics
-              </button>
-              <button
                 onClick={() => setActiveTab('orders')}
                 className={`tour-tab-orders flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
                   activeTab === 'orders' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
                 }`}
               >
                 <Package size={16} className={activeTab === 'orders' ? 'text-bloodred' : ''} /> Global Orders
-              </button>
-              <button
-                onClick={() => setActiveTab('promos')}
-                className={`tour-tab-promos flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
-                  activeTab === 'promos' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
-                }`}
-              >
-                <Tag size={16} className={activeTab === 'promos' ? 'text-bloodred' : ''} /> Discounts
-              </button>
-              <button
-                onClick={() => setActiveTab('products')}
-                className={`tour-tab-products flex items-center gap-4 px-4 py-3 text-xs uppercase tracking-widest font-bold transition-all whitespace-nowrap ${
-                  activeTab === 'products' ? 'bg-white/10 text-alabaster' : 'text-alabaster/40 hover:bg-white/5 hover:text-alabaster'
-                }`}
-              >
-                <Shirt size={16} className={activeTab === 'products' ? 'text-bloodred' : ''} /> Products
               </button>
             </nav>
 
@@ -553,7 +531,6 @@ export default function AdminDashboardPage() {
                             <th className="p-4 font-normal">Total</th>
                             <th className="p-4 font-normal">Status</th>
                             <th className="p-4 font-normal">Tracking</th>
-                            <th className="p-4 font-normal text-right">Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -587,43 +564,10 @@ export default function AdminDashboardPage() {
                                   {order.status}
                                 </span>
                               </td>
-                              <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                  <input 
-                                    type="text" 
-                                    placeholder={order.metadata?.tracking_number || "No tracking code"}
-                                    value={trackingNumberInputs[order.id] || ''}
-                                    onChange={(e) => setTrackingNumberInputs({...trackingNumberInputs, [order.id]: e.target.value})}
-                                    className="bg-transparent border border-white/20 text-[10px] text-alabaster px-2 py-1 w-24 focus:border-bloodred outline-none placeholder:text-stone/40"
-                                  />
-                                  <button 
-                                    onClick={() => handleTrackingSubmit(order.id)}
-                                    className="text-stone hover:text-alabaster transition-colors"
-                                    title="Save Tracking Code"
-                                  >
-                                    <Save size={14} />
-                                  </button>
-                                </div>
+                              <td className="p-4 text-[10px] text-alabaster/50">
+                                {order.metadata?.tracking_number || "No tracking code"}
                               </td>
-                              <td className="p-4 text-right relative min-w-[120px]">
-                                {updatingId === order.id ? (
-                                  <Loader2 size={16} className="animate-spin text-stone inline-block" />
-                                ) : (
-                                  <div className="relative inline-block">
-                                    <select
-                                      className="appearance-none bg-transparent border border-white/20 text-[10px] uppercase tracking-widest text-alabaster py-2 pl-3 pr-8 cursor-pointer hover:border-bloodred transition-colors focus:outline-none"
-                                      value={order.status}
-                                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                                    >
-                                      <option value="pending" className="bg-charcoal text-alabaster">Pending</option>
-                                      <option value="paid" className="bg-charcoal text-alabaster">Paid</option>
-                                      <option value="shipped" className="bg-charcoal text-alabaster">Shipped</option>
-                                      <option value="delivered" className="bg-charcoal text-alabaster">Delivered</option>
-                                    </select>
-                                    <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone pointer-events-none" />
-                                  </div>
-                                )}
-                              </td>
+
                             </tr>
                           ))}
                         </tbody>
@@ -636,15 +580,6 @@ export default function AdminDashboardPage() {
                   order={selectedOrder}
                   isOpen={!!selectedOrder}
                   onClose={() => setSelectedOrder(null)}
-                  onUpdateStatus={async (orderId, status) => {
-                    await updateOrderStatus(orderId, status);
-                    setSelectedOrder((prev: any) => prev?.id === orderId ? { ...prev, status } : prev);
-                  }}
-                  onSaveTracking={async (orderId, trackingCode) => {
-                    setTrackingNumberInputs(prev => ({ ...prev, [orderId]: trackingCode }));
-                    await handleTrackingSubmit(orderId);
-                    setSelectedOrder((prev: any) => prev?.id === orderId ? { ...prev, metadata: { ...prev.metadata, tracking_number: trackingCode } } : prev);
-                  }}
                 />
               </motion.div>
             )}
@@ -772,7 +707,19 @@ export default function AdminDashboardPage() {
               >
                 <div className="flex justify-between items-center border-b border-white/10 pb-4">
                   <h2 className="text-xl font-serif">Product Management</h2>
-                  
+                  <button 
+                    onClick={() => {
+                      setEditingProduct({});
+                      setProductForm({
+                        id: `IMP-P-${Math.floor(Math.random() * 1000)}`,
+                        slug: '', name: '', category: 'Signature', price: 0, description: '', mainImage: '', hoverImage: '', sizes: '', colors: '', details: '', status: 'New Drop', stock: 0
+                      });
+                      setShowProductForm(true);
+                    }}
+                    className="bg-bloodred text-alabaster px-4 py-2 text-[10px] uppercase tracking-widest font-bold hover:bg-alabaster hover:text-charcoal transition-colors"
+                  >
+                    + Add Product
+                  </button>
                 </div>
                 
                 {showProductForm ? (
