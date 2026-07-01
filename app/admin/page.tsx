@@ -207,6 +207,28 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // Drawer-compatible tracking handler: receives (orderId, trackingCode) directly
+  const handleDrawerTrackingSubmit = async (orderId: string, trackingCode: string) => {
+    const password = sessionStorage.getItem('adminPassword') || '';
+    const res = await fetch('/api/admin/orders', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-password': password
+      },
+      body: JSON.stringify({ orderId, metadata: { tracking_number: trackingCode } })
+    });
+    if (res.ok) {
+      setOrders(prev => prev.map(o =>
+        o.id === orderId ? { ...o, metadata: { ...o.metadata, tracking_number: trackingCode } } : o
+      ));
+      // Also update selectedOrder so the drawer reflects the new tracking code instantly
+      setSelectedOrder((prev: any) => prev ? { ...prev, metadata: { ...prev.metadata, tracking_number: trackingCode } } : prev);
+    } else {
+      throw new Error('Failed to save tracking code');
+    }
+  };
+
   const handleCreatePromo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPromoCode || !newPromoDiscount) return;
@@ -507,7 +529,7 @@ export default function AdminDashboardPage() {
                 transition={{ duration: 0.3 }}
                 className="space-y-6 tour-content-orders"
               >
-                <h2 className="text-xl font-serif border-b border-white/10 pb-4">Global Orders</h2>
+                <h2 className="text-xl font-serif border-b border-white/10 pb-4 text-white">Global Orders</h2>
                 
                 <div className="border border-white/10 bg-white/[0.02]">
                   {loadingOrders ? (
@@ -540,16 +562,16 @@ export default function AdminDashboardPage() {
                               className="border-b border-white/5 hover:bg-white/5 transition-colors cursor-pointer"
                               onClick={() => setSelectedOrder(order)}
                             >
-                              <td className="p-4 font-mono text-[10px] tracking-wider text-alabaster/80">
+                              <td className="p-4 font-mono text-[10px] tracking-wider text-white font-semibold">
                                 {order.payment_reference}
                               </td>
-                              <td className="p-4 text-[10px] text-alabaster/50">
+                              <td className="p-4 text-[10px] text-zinc-300">
                                 {new Date(order.created_at).toLocaleDateString()}
                               </td>
                               <td className="p-4 text-xs font-light text-alabaster">
                                 {order.metadata?.email || 'N/A'}
                               </td>
-                              <td className="p-4 text-[10px] text-stone">
+                              <td className="p-4 text-[10px] text-zinc-300 font-semibold">
                                 {calculateTotalItems(order.order_items)}
                               </td>
                               <td className="p-4 text-xs text-alabaster">
@@ -564,7 +586,7 @@ export default function AdminDashboardPage() {
                                   {order.status}
                                 </span>
                               </td>
-                              <td className="p-4 text-[10px] text-alabaster/50">
+                              <td className="p-4 text-[10px] text-zinc-400">
                                 {order.metadata?.tracking_number || "No tracking code"}
                               </td>
 
@@ -580,6 +602,12 @@ export default function AdminDashboardPage() {
                   order={selectedOrder}
                   isOpen={!!selectedOrder}
                   onClose={() => setSelectedOrder(null)}
+                  onUpdateStatus={async (orderId, status) => {
+                    await updateOrderStatus(orderId, status);
+                    // Sync selected order status in the drawer
+                    setSelectedOrder((prev: any) => prev ? { ...prev, status } : prev);
+                  }}
+                  onSaveTracking={handleDrawerTrackingSubmit}
                 />
               </motion.div>
             )}
