@@ -30,7 +30,7 @@ interface Order {
   metadata?: {
     email?: string;
     tracking_number?: string;
-    shipping_address?: any;
+    shippingAddress?: any;
     name?: string;
   };
   order_items: OrderItem[];
@@ -95,7 +95,7 @@ export default function OrderDetailsDrawer({
     return order.status === statusValue;
   };
 
-  const address = order.metadata?.shipping_address;
+  const address = order.metadata?.shippingAddress;
   const formattedAddress = address
     ? (typeof address === 'string' ? address : `${address.address || ''}, ${address.city || ''}, ${address.state || ''}, ${address.country || ''}`.replace(/^[,\s]+|[,\s]+$/g, '').replace(/,\s*,/g, ','))
     : 'ADDRESS NOT PROVIDED';
@@ -148,12 +148,12 @@ export default function OrderDetailsDrawer({
                 <div>
                   <h4 className="text-[9px] uppercase tracking-widest text-bloodred font-bold mb-2">Client</h4>
                   <p className="text-sm text-white font-serif">
-                    {order.metadata?.name || `${order.metadata?.shipping_address?.firstName || ''} ${order.metadata?.shipping_address?.lastName || ''}`.trim() || 'Customer'}
+                    {order.metadata?.name || `${order.metadata?.shippingAddress?.firstName || ''} ${order.metadata?.shippingAddress?.lastName || ''}`.trim() || 'Customer'}
                   </p>
                   <p className="text-xs font-mono text-zinc-400 mt-1 break-all flex flex-col gap-1">
-                    <span>{order.metadata?.email || order.metadata?.shipping_address?.email || 'N/A'}</span>
-                    {order.metadata?.shipping_address?.phone && (
-                      <span>{order.metadata?.shipping_address?.phone}</span>
+                    <span>{order.metadata?.email || order.metadata?.shippingAddress?.email || 'N/A'}</span>
+                    {order.metadata?.shippingAddress?.phone && (
+                      <span>{order.metadata?.shippingAddress?.phone}</span>
                     )}
                   </p>
                 </div>

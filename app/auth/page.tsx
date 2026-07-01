@@ -4,12 +4,13 @@ import React, { useState, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/store/useAuth';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Mail, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, ShieldCheck, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 
 function AuthPageInner() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [code, setCode] = useState('');
   
   // Steps for signup flow
@@ -190,13 +191,20 @@ function AuthPageInner() {
               <div className="relative">
                 <ShieldCheck className="absolute left-6 top-1/2 -translate-y-1/2 text-alabaster/40" size={18} />
                 <input 
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   placeholder="PASSWORD"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs uppercase tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-alabaster/40 hover:text-alabaster transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               
               {error && <p className="text-bloodred text-[10px] uppercase tracking-widest text-center">{error}</p>}
@@ -322,13 +330,20 @@ function AuthPageInner() {
                 <ShieldCheck className="absolute left-6 top-1/2 -translate-y-1/2 text-alabaster/40" size={18} />
                 <input 
                   ref={passwordInputRef}
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   placeholder="CREATE A PASSWORD"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs uppercase tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-alabaster/40 hover:text-alabaster transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
 
               {error && <p className="text-bloodred text-[10px] uppercase tracking-widest text-center">{error}</p>}

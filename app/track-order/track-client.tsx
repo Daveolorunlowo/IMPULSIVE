@@ -26,6 +26,7 @@ export default function TrackClient() {
   const [orderCode, setOrderCode] = useState('');
   const [searchedOrder, setSearchedOrder] = useState<Order | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Auto-fill order code if passed in URL query
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function TrackClient() {
     }
   }, [searchParams]);
 
-  const handleTrack = (code: string) => {
+  const handleTrack = async (code: string) => {
     setErrorMsg('');
     setSearchedOrder(null);
     const cleanedCode = code.trim().toUpperCase();
@@ -46,12 +47,20 @@ export default function TrackClient() {
       return;
     }
 
-    const order = getOrderById(cleanedCode);
-    if (order) {
-      setSearchedOrder(order);
-      markOrderAsRead(order.id);
-    } else {
-      setErrorMsg('No order found matching that reference. Please check and try again.');
+    setIsSearching(true);
+    try {
+      const res = await fetch(`/api/track?code=${encodeURIComponent(cleanedCode)}`);
+      const data = await res.json();
+      
+      if (!res.ok) {
+        setErrorMsg(data.error === 'ORDER_NOT_FOUND' ? 'No order found matching that reference. Please check and try again.' : 'An error occurred while tracking. Please try again later.');
+      } else {
+        setSearchedOrder(data);
+      }
+    } catch (err) {
+      setErrorMsg('Network error. Unable to reach tracking systems.');
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -87,9 +96,10 @@ export default function TrackClient() {
             </div>
             <button
               onClick={() => handleTrack(orderCode)}
-              className="bg-bloodred hover:bg-alabaster hover:text-charcoal px-10 py-4 uppercase tracking-[0.2em] text-[10px] font-bold transition-all"
+              disabled={isSearching}
+              className="bg-bloodred hover:bg-alabaster hover:text-charcoal px-10 py-4 uppercase tracking-[0.2em] text-[10px] font-bold transition-all disabled:opacity-50"
             >
-              Track Package
+              {isSearching ? 'Searching...' : 'Track Package'}
             </button>
           </div>
           {errorMsg && (
@@ -243,7 +253,7 @@ export default function TrackClient() {
 
             </motion.div>
           ) : (
-            searchParams.get('code') && !errorMsg ? (
+            (searchParams.get('code') || isSearching) && !errorMsg ? (
               <div className="py-20 text-center text-stone">Searching tracking systems...</div>
             ) : null
           )}
