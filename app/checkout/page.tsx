@@ -269,9 +269,9 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen pt-32 pb-20 bg-[#F8F8F6]">
+    <div className="h-screen w-full overflow-hidden pt-28 pb-8 bg-[#F8F8F6] flex flex-col">
       {/* ── Step indicator ────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12">
+      <div className="max-w-7xl mx-auto w-full px-6 md:px-12 mb-8 flex-shrink-0">
         <div className="flex items-center gap-4">
           {(['details', 'review'] as Step[]).map((s, i) => (
             <React.Fragment key={s}>
@@ -298,10 +298,10 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col md:flex-row gap-12 md:gap-8 lg:gap-16">
+      <div className="max-w-7xl mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row gap-8 lg:gap-16 flex-1 min-h-0">
 
         {/* ── Left: Form / Review ───────────────────────────────────── */}
-        <div className="flex-1 order-2 md:order-1 min-w-0">
+        <div className="flex-1 order-2 md:order-1 min-w-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pr-2 pb-24 md:pb-12">
           <AnimatePresence mode="wait">
 
             {/* STEP 1 — Contact & Shipping ─────────────────────────── */}
@@ -437,8 +437,8 @@ export default function CheckoutPage() {
         </div>
 
         {/* ── Right: Order summary (sticky) ─────────────────────────── */}
-        <div className="w-full md:w-[320px] lg:w-[400px] order-1 md:order-2 flex-shrink-0 z-20">
-          <div className="sticky top-20 md:top-32 space-y-6 bg-white p-6 md:p-8 lg:p-10 border-b border-charcoal/10 md:border md:border-charcoal/10 shadow-sm max-h-[40vh] md:max-h-none overflow-y-auto md:overflow-visible">
+        <div className="w-full md:w-[320px] lg:w-[400px] order-1 md:order-2 flex-shrink-0 z-20 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pb-12">
+          <div className="space-y-6 bg-white p-6 md:p-8 lg:p-10 border border-charcoal/10 shadow-sm h-full md:h-auto">
             <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/50">Order Summary</h3>
 
             {items.map(item => (
