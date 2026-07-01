@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withSupabase } from '@supabase/server';
 import { PaymentService } from '@/services/payment.service';
+import { OrderService } from '@/services/order.service';
 
 /**
  * GET /api/checkout/verify
@@ -24,18 +25,8 @@ export const GET = async (req: Request) => {
       return NextResponse.json({ error: 'PAYMENT_NOT_SUCCESSFUL', details: paystackData.data }, { status: 400 });
     }
 
-    // Update the order in the database
-    const { data: order, error } = await supabase
-      .from('orders')
-      .update({ status: 'paid' })
-      .eq('payment_reference', reference)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('[GET /api/checkout/verify] DB Error:', error.message);
-      return NextResponse.json({ error: 'FAILED_TO_UPDATE_ORDER' }, { status: 500 });
-    }
+    // Idempotently fulfill the order
+    const order = await OrderService.fulfillOrder(reference, supabase);
 
     return NextResponse.json({ success: true, order });
   } catch (err: unknown) {
