@@ -11,13 +11,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShieldCheck, Truck, CreditCard,
   Loader2, User, MapPin, Phone, Mail,
-  Tag, X
+  Tag, X, ArrowLeft
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { calculateShipping } from '@/lib/utils';
 
-/* ── Field component defined OUTSIDE the page to keep a stable reference ── */
+/* ── Minimalist Field Component ── */
 interface FieldProps {
   label: string;
   field: keyof ContactDetails;
@@ -33,25 +33,25 @@ interface FieldProps {
 function Field({ label, field, type = 'text', icon: Icon, placeholder, half = false, value, error, onChange }: FieldProps) {
   return (
     <div className={half ? 'col-span-1' : 'col-span-2'}>
-      <label className="block text-[9px] uppercase tracking-[0.3em] font-bold text-charcoal/50 mb-2">
+      <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-charcoal/40 mb-1.5 ml-1">
         {label}
       </label>
-      <div className="relative">
-        <Icon size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-stone/40" />
+      <div className="relative group">
+        <Icon size={14} className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${error ? 'text-bloodred' : 'text-charcoal/20 group-focus-within:text-charcoal'}`} />
         <input
           type={type}
           value={value}
           onChange={onChange(field)}
           placeholder={placeholder}
-          className={`w-full pl-10 pr-4 py-4 bg-white border text-charcoal text-[11px] uppercase tracking-widest outline-none transition-all placeholder:text-charcoal/20 ${
+          className={`w-full pl-10 pr-4 py-3.5 bg-transparent border-b-2 text-charcoal text-[11px] font-medium outline-none transition-all placeholder:text-charcoal/10 ${
             error
-              ? 'border-bloodred/60 focus:border-bloodred'
-              : 'border-charcoal/10 focus:border-charcoal'
+              ? 'border-bloodred/40 focus:border-bloodred'
+              : 'border-charcoal/5 focus:border-charcoal'
           }`}
         />
       </div>
       {error && (
-        <p className="text-[9px] text-bloodred mt-1 uppercase tracking-widest">{error}</p>
+        <p className="text-[9px] text-bloodred mt-1 font-semibold tracking-wide ml-1">{error}</p>
       )}
     </div>
   );
@@ -127,9 +127,8 @@ export default function CheckoutPage() {
   /* ── Mounted check loading state ── */
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#F8F8F6] pt-40 flex flex-col items-center justify-center">
-        <Loader2 className="animate-spin text-charcoal mb-4" size={24} />
-        <span className="text-[10px] uppercase tracking-[0.3em] text-charcoal/40 font-bold">Securing checkout session...</span>
+      <div className="h-screen w-full bg-[#E5E5E2] flex items-center justify-center">
+        <Loader2 className="animate-spin text-charcoal" size={24} />
       </div>
     );
   }
@@ -247,9 +246,9 @@ export default function CheckoutPage() {
   /* ── Empty cart state ─────────────────────────────────────────────── */
   if (items.length === 0) {
     return (
-      <div className="min-h-screen pt-40 flex flex-col items-center justify-center px-6 bg-alabaster">
-        <h1 className="text-4xl font-serif text-charcoal mb-8">Your bag is empty.</h1>
-        <Link href="/shop" className="btn-luxury px-12 py-4 text-xs uppercase tracking-widest">
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-[#E5E5E2]">
+        <h1 className="text-3xl font-serif text-charcoal mb-6">Your bag is empty.</h1>
+        <Link href="/shop" className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/50 hover:text-charcoal transition-colors border-b border-charcoal pb-1">
           Return to Archive
         </Link>
       </div>
@@ -257,169 +256,157 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="h-screen w-full overflow-hidden pt-28 pb-8 bg-[#F8F8F6] flex flex-col">
-      <div className="max-w-7xl mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row gap-8 lg:gap-16 flex-1 min-h-0">
+    <div className="h-screen w-full bg-[#E5E5E2] flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
+      {/* Decorative background blur */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-bloodred/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-charcoal/5 rounded-full blur-[100px] pointer-events-none" />
 
+      {/* Main Centered Floating Card */}
+      <div className="w-full max-w-[1000px] bg-white shadow-2xl rounded-2xl flex flex-col md:flex-row overflow-hidden max-h-full relative z-10">
+        
         {/* ── Left: Form ───────────────────────────────────── */}
-        <div className="flex-1 order-2 md:order-1 min-w-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pr-2 pb-24 md:pb-12">
-          <div className="space-y-10">
-            <div>
-              <h2 className="text-2xl font-serif text-charcoal mb-6 flex items-center gap-3">
-                <User size={20} strokeWidth={1} /> Shipping Details
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Full Name" field="fullName" icon={User} placeholder="David Osei" value={details.fullName} error={errors.fullName} onChange={set} />
-                <Field label="Email Address" field="email" type="email" icon={Mail} placeholder="you@email.com" value={details.email} error={errors.email} onChange={set} />
-                <Field label="Phone Number" field="phone" type="tel" icon={Phone} placeholder="+234 900 000 0000" value={details.phone} error={errors.phone} onChange={set} />
-                
-                <div className="col-span-2 pt-4">
-                  <Field label="Delivery Address" field="address" icon={MapPin} placeholder="12 Instinct Ave" value={details.address} error={errors.address} onChange={set} />
-                </div>
-                <Field label="City" field="city" icon={MapPin} placeholder="Lagos" half value={details.city} error={errors.city} onChange={set} />
-                <Field label="State / Province" field="state" icon={MapPin} placeholder="Lagos State" half value={details.state} error={errors.state} onChange={set} />
+        <div className="flex-[3] p-8 md:p-12 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          
+          <Link href="/cart" className="inline-flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] font-bold text-charcoal/40 hover:text-charcoal transition-colors mb-10">
+            <ArrowLeft size={12} /> Back to Cart
+          </Link>
+
+          <h2 className="text-3xl font-serif text-charcoal mb-8 tracking-tight">Checkout</h2>
+          
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-6">
+              <Field label="Full Name" field="fullName" icon={User} placeholder="David Osei" value={details.fullName} error={errors.fullName} onChange={set} />
+              <Field label="Email Address" field="email" type="email" icon={Mail} placeholder="you@email.com" value={details.email} error={errors.email} onChange={set} />
+              <Field label="Phone Number" field="phone" type="tel" icon={Phone} placeholder="+234 900 000 0000" value={details.phone} error={errors.phone} onChange={set} />
+              
+              <div className="col-span-2 pt-2">
+                <Field label="Delivery Address" field="address" icon={MapPin} placeholder="12 Instinct Ave" value={details.address} error={errors.address} onChange={set} />
               </div>
+              <Field label="City" field="city" icon={MapPin} placeholder="Lagos" half value={details.city} error={errors.city} onChange={set} />
+              <Field label="State / Province" field="state" icon={MapPin} placeholder="Lagos State" half value={details.state} error={errors.state} onChange={set} />
             </div>
           </div>
         </div>
 
         {/* ── Right: Order summary & Pay Button ─────────────────────────── */}
-        <div className="w-full md:w-[320px] lg:w-[400px] order-1 md:order-2 flex-shrink-0 z-20 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pb-12">
-          <div className="space-y-6 bg-white p-6 md:p-8 lg:p-10 border border-charcoal/10 shadow-sm h-full md:h-auto">
-            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/50">Order Summary</h3>
+        <div className="flex-[2] bg-[#F9F9F8] border-l border-charcoal/5 p-8 md:p-12 flex flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          
+          <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/40 mb-6">Order Summary</h3>
 
+          <div className="flex-1 space-y-5">
             {items.map(item => (
               <div key={item.id} className="flex gap-4 items-center">
-                <div className="relative w-16 h-20 flex-shrink-0 bg-charcoal/5">
+                <div className="relative w-14 h-16 flex-shrink-0 bg-white rounded-md overflow-hidden border border-charcoal/5">
                   <Image src={item.image} alt={item.name} fill className="object-cover" />
-                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-charcoal text-alabaster rounded-full text-[9px] flex items-center justify-center font-bold">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-charcoal text-alabaster rounded-full text-[8px] flex items-center justify-center font-bold">
                     {item.quantity}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[11px] font-bold uppercase tracking-widest text-charcoal truncate">{item.name}</p>
-                  <p className="text-[10px] text-charcoal/40 uppercase tracking-widest">{item.selectedSize}</p>
+                  <p className="text-[9px] text-charcoal/40 uppercase tracking-widest mt-0.5">{item.selectedSize}</p>
                 </div>
-                <p className="text-sm font-serif text-charcoal flex-shrink-0">{formatPrice(item.price * item.quantity)}</p>
+                <p className="text-xs font-serif text-charcoal flex-shrink-0">{formatPrice(item.price * item.quantity)}</p>
               </div>
             ))}
+          </div>
 
-            <div className="border-t border-charcoal/8 pt-6 pb-6">
-              {!promoCode ? (
-                <form onSubmit={handleApplyPromo} className="space-y-3">
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                      <Tag size={14} className="text-charcoal/30 group-focus-within:text-bloodred transition-colors" />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="ENTER PROMO CODE"
-                      value={promoInput}
-                      onChange={(e) => setPromoInput(e.target.value)}
-                      className="w-full bg-white border border-charcoal/10 pl-10 pr-24 py-4 text-[10px] uppercase tracking-widest text-charcoal outline-none focus:border-bloodred/40 transition-all placeholder:text-charcoal/20 shadow-sm"
-                    />
-                    <div className="absolute inset-y-1.5 right-1.5 flex items-center">
-                      <button
-                        type="submit"
-                        disabled={promoLoading || !promoInput.trim()}
-                        className="bg-charcoal text-alabaster px-4 h-full text-[9px] uppercase tracking-[0.2em] font-bold disabled:opacity-30 disabled:bg-charcoal/50 hover:bg-bloodred transition-all"
-                      >
-                        {promoLoading ? <Loader2 size={12} className="animate-spin" /> : 'Apply'}
-                      </button>
-                    </div>
-                  </div>
-                  <AnimatePresence>
-                    {promoMessage && (
-                      <motion.p 
-                        initial={{ opacity: 0, y: -5 }} 
-                        animate={{ opacity: 1, y: 0 }} 
-                        exit={{ opacity: 0 }}
-                        className={`text-[9px] uppercase tracking-widest flex items-center gap-1.5 ${promoMessage.type === 'error' ? 'text-bloodred' : 'text-green-600'}`}
-                      >
-                        {promoMessage.type === 'error' ? <X size={10} /> : <Tag size={10} />}
-                        {promoMessage.text}
-                      </motion.p>
-                    )}
-                  </AnimatePresence>
-                </form>
-              ) : (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex justify-between items-center bg-bloodred/5 border border-bloodred/20 px-5 py-4 relative overflow-hidden group"
+          <div className="mt-8 pt-6 border-t border-charcoal/5">
+            {!promoCode ? (
+              <form onSubmit={handleApplyPromo} className="mb-6 relative">
+                <input
+                  type="text"
+                  placeholder="Promo Code"
+                  value={promoInput}
+                  onChange={(e) => setPromoInput(e.target.value)}
+                  className="w-full bg-white border border-charcoal/10 rounded-full pl-5 pr-20 py-3 text-[10px] uppercase tracking-widest text-charcoal outline-none focus:border-bloodred/40 transition-all placeholder:text-charcoal/20"
+                />
+                <button
+                  type="submit"
+                  disabled={promoLoading || !promoInput.trim()}
+                  className="absolute right-1 top-1 bottom-1 bg-charcoal text-alabaster px-4 rounded-full text-[9px] uppercase tracking-[0.2em] font-bold disabled:opacity-30 hover:bg-bloodred transition-all"
                 >
-                  <div className="absolute inset-0 bg-bloodred/5 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
-                  <div className="relative z-10 flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-bloodred/10 flex items-center justify-center">
-                      <Tag size={12} className="text-bloodred" />
-                    </div>
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-bloodred">
-                      {promoCode}
-                    </span>
-                  </div>
-                  <button 
-                    onClick={(e) => { e.preventDefault(); removePromoCode(); setPromoMessage(null); }}
-                    className="relative z-10 text-[9px] uppercase tracking-widest text-charcoal/40 hover:text-bloodred transition-colors flex items-center gap-1"
-                  >
-                    Remove <X size={10} />
-                  </button>
-                </motion.div>
-              )}
-            </div>
+                  {promoLoading ? <Loader2 size={12} className="animate-spin mx-auto" /> : 'Apply'}
+                </button>
+                <AnimatePresence>
+                  {promoMessage && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                      className={`text-[9px] uppercase tracking-widest flex items-center gap-1.5 mt-2 ml-4 ${promoMessage.type === 'error' ? 'text-bloodred' : 'text-green-600'}`}
+                    >
+                      {promoMessage.type === 'error' ? <X size={10} /> : <Tag size={10} />}
+                      {promoMessage.text}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </form>
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}
+                className="mb-6 flex justify-between items-center bg-bloodred/5 border border-bloodred/10 rounded-full px-5 py-3"
+              >
+                <div className="flex items-center gap-2">
+                  <Tag size={12} className="text-bloodred" />
+                  <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-bloodred">{promoCode}</span>
+                </div>
+                <button 
+                  onClick={(e) => { e.preventDefault(); removePromoCode(); setPromoMessage(null); }}
+                  className="text-[9px] uppercase tracking-widest text-charcoal/40 hover:text-bloodred transition-colors flex items-center gap-1"
+                >
+                  Remove <X size={10} />
+                </button>
+              </motion.div>
+            )}
 
-            <div className="border-t border-charcoal/8 pt-6 space-y-3">
-              <div className="flex justify-between text-[11px] text-charcoal/40 uppercase tracking-widest">
+            <div className="space-y-2">
+              <div className="flex justify-between text-[10px] text-charcoal/40 uppercase tracking-widest font-medium">
                 <span>Subtotal</span><span>{formatPrice(totalPrice())}</span>
               </div>
               {promoCode && (
-                <div className="flex justify-between text-[11px] text-bloodred uppercase tracking-widest">
-                  <span>Discount ({promoCode})</span><span>-{formatPrice(getDiscountAmount())}</span>
+                <div className="flex justify-between text-[10px] text-bloodred uppercase tracking-widest font-medium">
+                  <span>Discount</span><span>-{formatPrice(getDiscountAmount())}</span>
                 </div>
               )}
-              <div className="flex justify-between text-[11px] text-charcoal/40 uppercase tracking-widest">
+              <div className="flex justify-between text-[10px] text-charcoal/40 uppercase tracking-widest font-medium">
                 <span>Shipping</span>
-                <span>
-                  {details.state.trim()
-                    ? formatPrice(shippingFee)
-                    : 'Calculated at payment'}
-                </span>
+                <span>{details.state.trim() ? formatPrice(shippingFee) : 'Calculated next'}</span>
               </div>
-              <div className="flex justify-between items-center pt-3 border-t border-charcoal/8">
-                <span className="text-sm uppercase tracking-[0.3em] font-bold text-charcoal">Total</span>
+              <div className="flex justify-between items-end pt-4 mt-4 border-t border-charcoal/5">
+                <span className="text-xs uppercase tracking-[0.2em] font-bold text-charcoal">Total</span>
                 <span className="text-2xl font-serif text-charcoal">
                   {formatPrice(totalPrice() - getDiscountAmount() + shippingFee)}
                 </span>
               </div>
             </div>
 
-            {/* Pay button */}
             {generalError && (
-              <div className="text-bloodred text-[10px] uppercase tracking-widest text-center pt-4">
+              <div className="text-bloodred text-[10px] uppercase tracking-widest text-center mt-6 font-bold">
                 {generalError}
               </div>
             )}
+            
             <button
               onClick={handleCheckout}
               disabled={isProcessing}
-              className="w-full mt-6 bg-bloodred hover:bg-charcoal text-alabaster py-6 flex items-center justify-center gap-4 transition-all group text-[10px] uppercase tracking-[0.4em] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-6 bg-charcoal hover:bg-bloodred text-alabaster py-5 rounded-xl flex items-center justify-center gap-3 transition-all group text-[10px] uppercase tracking-[0.3em] font-bold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-charcoal/10 hover:shadow-bloodred/20"
             >
               {isProcessing ? (
                 <><Loader2 size={16} className="animate-spin" /> Processing...</>
               ) : (
-                <><CreditCard size={16} /> Complete Order · {formatPrice(totalPrice() - getDiscountAmount() + shippingFee)}</>
+                <><CreditCard size={14} /> Pay {formatPrice(totalPrice() - getDiscountAmount() + shippingFee)}</>
               )}
             </button>
 
-            <div className="space-y-4 pt-6 border-t border-charcoal/8 mt-6">
-              {[
-                { icon: ShieldCheck, text: 'Secure encrypted checkout' },
-                { icon: Truck, text: 'Global express shipping' },
-              ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-3 text-[10px] text-charcoal/40 uppercase tracking-widest">
-                  <Icon size={14} strokeWidth={1.5} className="text-bloodred flex-shrink-0" />
-                  {text}
-                </div>
-              ))}
+            <div className="flex justify-center items-center gap-4 mt-6">
+              <div className="flex items-center gap-1.5 text-[8px] text-charcoal/30 uppercase tracking-widest font-bold">
+                <ShieldCheck size={12} /> Encrypted
+              </div>
+              <div className="w-1 h-1 rounded-full bg-charcoal/10" />
+              <div className="flex items-center gap-1.5 text-[8px] text-charcoal/30 uppercase tracking-widest font-bold">
+                <Truck size={12} /> Global
+              </div>
             </div>
+            
           </div>
         </div>
 
