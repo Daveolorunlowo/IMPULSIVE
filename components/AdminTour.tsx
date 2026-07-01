@@ -32,10 +32,7 @@ export default function AdminTour({ setActiveTab }: AdminTourProps) {
       const nextStepIndex = index + (action === ACTIONS.PREV ? -1 : 1);
       
       // Navigate to the correct tab based on the upcoming step
-      if (nextStepIndex === 1 || nextStepIndex === 2) setActiveTab?.('diagnostics');
-      if (nextStepIndex === 3 || nextStepIndex === 4) setActiveTab?.('orders');
-      if (nextStepIndex === 5 || nextStepIndex === 6) setActiveTab?.('promos');
-      if (nextStepIndex === 7 || nextStepIndex === 8) setActiveTab?.('products');
+      setActiveTab?.('orders');
 
       setStepIndex(nextStepIndex);
     }
@@ -44,47 +41,17 @@ export default function AdminTour({ setActiveTab }: AdminTourProps) {
   const steps: Step[] = [
     {
       target: '.tour-sidebar-nav',
-      content: 'Welcome to the Command Center! Let me show you the key sections.',
+      content: 'Welcome to the Command Center! Let me show you how to process incoming orders.',
       placement: 'right',
-    },
-    {
-      target: '.tour-tab-diagnostics',
-      content: 'System Diagnostics: Your control panel for system health.',
-      placement: 'right',
-    },
-    {
-      target: '.tour-content-diagnostics',
-      content: 'Here you can view real-time traffic, active sessions, and check the database encryption status.',
-      placement: 'left',
     },
     {
       target: '.tour-tab-orders',
-      content: 'Global Orders: Manage your incoming orders.',
+      content: 'Global Orders: This tab contains all customer purchases.',
       placement: 'right',
     },
     {
       target: '.tour-content-orders',
-      content: 'You can update statuses to "Shipped" and add tracking numbers directly here.',
-      placement: 'left',
-    },
-    {
-      target: '.tour-tab-promos',
-      content: 'Discounts: Create and manage FOMO-inducing promo codes.',
-      placement: 'right',
-    },
-    {
-      target: '.tour-content-promos',
-      content: 'Set percentage discounts and disable old codes easily from this panel.',
-      placement: 'left',
-    },
-    {
-      target: '.tour-tab-products',
-      content: 'Products: Control your inventory.',
-      placement: 'right',
-    },
-    {
-      target: '.tour-content-products',
-      content: 'Edit stock quantities for each product and dispatch mass email stock alerts to your subscribers from here.',
+      content: 'Click on any order to view details and update its shipment status. (Note: Tracking codes are now automatically generated and emailed to the client upon payment!)',
       placement: 'left',
     },
   ];
