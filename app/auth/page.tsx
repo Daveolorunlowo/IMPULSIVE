@@ -184,7 +184,7 @@ function AuthPageInner() {
                   placeholder="EMAIL ADDRESS"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs uppercase tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
+                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
                 />
               </div>
 
@@ -196,7 +196,7 @@ function AuthPageInner() {
                   placeholder="PASSWORD"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs uppercase tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
+                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
                 />
                 <button
                   type="button"
@@ -249,7 +249,7 @@ function AuthPageInner() {
                   placeholder="EMAIL ADDRESS"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs uppercase tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
+                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
                 />
               </div>
               
@@ -288,7 +288,7 @@ function AuthPageInner() {
                   placeholder="6-DIGIT CODE"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs uppercase tracking-widest placeholder:text-alabaster/20 text-center shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
+                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs tracking-widest placeholder:text-alabaster/20 text-center shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
                 />
               </div>
 
@@ -335,7 +335,7 @@ function AuthPageInner() {
                   placeholder="CREATE A PASSWORD"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs uppercase tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
+                  className="w-full bg-stone/40 border border-stone/50 focus:border-bloodred text-alabaster px-16 py-6 outline-none transition-all text-xs tracking-widest placeholder:text-alabaster/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] focus:shadow-[0_0_15px_rgba(255,0,0,0.1)]"
                 />
                 <button
                   type="button"

@@ -371,7 +371,7 @@ export default function Navbar() {
                   placeholder="SEARCH ITEMS (e.g. Tee, Signature)..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-charcoal border border-bloodred/20 pl-14 pr-6 py-4 text-xs font-semibold uppercase tracking-widest text-alabaster placeholder:text-stone/30 focus:outline-none focus:border-bloodred transition-all"
+                  className="w-full bg-charcoal border border-bloodred/20 pl-14 pr-6 py-4 text-xs font-semibold tracking-widest text-alabaster placeholder:text-stone/30 focus:outline-none focus:border-bloodred transition-all"
                 />
               </div>
 

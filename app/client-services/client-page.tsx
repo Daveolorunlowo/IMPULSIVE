@@ -280,7 +280,7 @@ export default function ClientServicesContent() {
                               placeholder="e.g. 178" 
                               value={height}
                               onChange={(e) => setHeight(e.target.value)}
-                              className="w-full bg-[#111111] border border-white/10 px-4 py-4 text-xs tracking-widest font-semibold text-alabaster focus:outline-none focus:border-bloodred focus:ring-1 focus:ring-bloodred uppercase rounded-sm"
+                              className="w-full bg-[#111111] border border-white/10 px-4 py-4 text-xs tracking-widest font-semibold text-alabaster focus:outline-none focus:border-bloodred focus:ring-1 focus:ring-bloodred rounded-sm"
                               required
                             />
                           </div>
@@ -291,7 +291,7 @@ export default function ClientServicesContent() {
                               placeholder="e.g. 74" 
                               value={weight}
                               onChange={(e) => setWeight(e.target.value)}
-                              className="w-full bg-[#111111] border border-white/10 px-4 py-4 text-xs tracking-widest font-semibold text-alabaster focus:outline-none focus:border-bloodred focus:ring-1 focus:ring-bloodred uppercase rounded-sm"
+                              className="w-full bg-[#111111] border border-white/10 px-4 py-4 text-xs tracking-widest font-semibold text-alabaster focus:outline-none focus:border-bloodred focus:ring-1 focus:ring-bloodred rounded-sm"
                               required
                             />
                           </div>

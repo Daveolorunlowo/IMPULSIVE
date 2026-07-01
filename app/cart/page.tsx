@@ -209,10 +209,10 @@ export default function CartPage() {
                   <div className="flex gap-2">
                     <input 
                       type="text" 
-                      placeholder="ENTER PROMO CODE" 
+                      placeholder="Enter promo code" 
                       value={promoInput}
                       onChange={(e) => setPromoInput(e.target.value)}
-                      className={`flex-1 bg-alabaster border px-4 py-3 text-[10px] tracking-widest font-semibold text-charcoal focus:outline-none uppercase placeholder:text-stone/30 ${
+                      className={`flex-1 bg-alabaster border px-4 py-3 text-[10px] tracking-widest font-semibold text-charcoal focus:outline-none placeholder:text-stone/30 ${
                         promoError ? "border-bloodred text-bloodred" : "border-stone/20 focus:border-charcoal"
                       }`}
                     />

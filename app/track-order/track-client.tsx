@@ -88,7 +88,7 @@ export default function TrackClient() {
                 placeholder="ENTER ORDER REFERENCE (E.G. IMP-12345)"
                 value={orderCode}
                 onChange={(e) => setOrderCode(e.target.value)}
-                className="w-full bg-stone/10 border border-white/10 text-alabaster placeholder:text-stone/40 px-12 py-4 outline-none focus:border-bloodred transition-colors text-[10px] uppercase tracking-[0.2em] font-semibold"
+                className="w-full bg-stone/10 border border-white/10 text-alabaster placeholder:text-stone/40 px-12 py-4 outline-none focus:border-bloodred transition-colors text-[10px] tracking-[0.2em] font-semibold"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleTrack(orderCode);
                 }}
