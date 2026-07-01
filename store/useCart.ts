@@ -17,6 +17,7 @@ interface CartState {
   isOpen: boolean;
   promoCode: string | null;
   discountRate: number;
+  lastUpdated: number;
   addItem: (product: Omit<CartItem, 'quantity'>) => void;
   removeItem: (cartItemId: string) => void;
   updateQuantity: (cartItemId: string, quantity: number) => void;
@@ -37,6 +38,7 @@ export const useCart = create<CartState>()(
       isOpen: false,
       promoCode: null,
       discountRate: 0,
+      lastUpdated: 0,
       addItem: (product) =>
         set((state) => {
           // Generate a unique ID for the cart item based on product ID, size, color, and customText
@@ -56,7 +58,8 @@ export const useCart = create<CartState>()(
           setTimeout(() => get().pushToCloud(), 0);
           return { 
             items: [...state.items, { ...product, quantity: 1 }], 
-            isOpen: true 
+            isOpen: true,
+            lastUpdated: Date.now()
           };
         }),
       removeItem: (cartItemId) =>
@@ -65,7 +68,8 @@ export const useCart = create<CartState>()(
           return {
             items: state.items.filter((item) => 
               `${item.id}-${item.selectedSize}-${item.selectedColor.name}-${item.customText || ''}` !== cartItemId
-            )
+            ),
+            lastUpdated: Date.now()
           };
         }),
       updateQuantity: (cartItemId, quantity) =>
@@ -76,12 +80,13 @@ export const useCart = create<CartState>()(
               `${item.id}-${item.selectedSize}-${item.selectedColor.name}-${item.customText || ''}` === cartItemId
                 ? { ...item, quantity: Math.max(1, quantity) }
                 : item
-            )
+            ),
+            lastUpdated: Date.now()
           };
         }),
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
       clearCart: () => {
-        set({ items: [], promoCode: null, discountRate: 0 });
+        set({ items: [], promoCode: null, discountRate: 0, lastUpdated: Date.now() });
         setTimeout(() => get().pushToCloud(), 0);
       },
       totalPrice: () => {
@@ -133,9 +138,15 @@ export const useCart = create<CartState>()(
           if (res.ok) {
             const data = await res.json();
             if (data.success && data.items) {
-              // Merge cloud items with local items, or overwrite
-              // For simplicity, we overwrite local if cloud has items, unless local has items and cloud is empty
               const localItems = get().items;
+              const localUpdateAge = Date.now() - get().lastUpdated;
+              
+              // If local state was updated in the last 10 seconds, it's likely more accurate than what we just fetched (due to race conditions like clearCart)
+              if (localUpdateAge < 10000) {
+                await get().pushToCloud();
+                return;
+              }
+
               if (data.items.length > 0) {
                 set({ items: data.items });
               } else if (localItems.length > 0) {
