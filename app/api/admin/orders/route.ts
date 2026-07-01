@@ -80,12 +80,16 @@ export const PATCH = async (req: Request) => {
 
     const supabase = getSupabaseAdmin();
 
-    const { data: updatedOrder, error } = await supabase
-      .from('orders')
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq('id', orderId)
-      .select()
-      .single();
+    let query = supabase.from('orders').update({ status });
+    
+    // Support matching by payment_reference (IMP-XXXX) or database UUID
+    if (orderId.startsWith('IMP-')) {
+      query = query.eq('payment_reference', orderId);
+    } else {
+      query = query.eq('id', orderId);
+    }
+
+    const { data: updatedOrder, error } = await query.select().single();
 
     if (error) {
       console.error('[Admin PATCH /orders]', error.message);
