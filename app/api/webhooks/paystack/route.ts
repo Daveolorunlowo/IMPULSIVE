@@ -26,14 +26,29 @@ export const POST = withSupabase({ auth: 'none' }, async (req, ctx) => {
 
     const supabase = ctx.supabaseAdmin as any;
 
+    // 1. Fetch existing metadata so we don't overwrite shipping info
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('metadata')
+      .eq('payment_reference', reference)
+      .single();
+
+    const trackingCode = `IMP-TRK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const newMetadata = { ...(existingOrder?.metadata || {}), tracking_number: trackingCode };
+
     // Use ctx.supabaseAdmin to bypass RLS and mark as paid, returning the updated order with items
     const { data: order, error } = await supabase
       .from('orders')
-      .update({ status: 'paid', updated_at: new Date().toISOString() })
+      .update({ 
+        status: 'paid', 
+        updated_at: new Date().toISOString(),
+        metadata: newMetadata
+      })
       .eq('payment_reference', reference)
       .select(`
         id,
         total_price,
+        metadata,
         order_items (
           quantity,
           unit_price,

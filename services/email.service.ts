@@ -9,7 +9,8 @@ export class EmailService {
       return;
     }
 
-    const { id, total_price, order_items } = orderData;
+    const { id, total_price, order_items, metadata } = orderData;
+    const trackingCode = metadata?.tracking_number;
 
     // Generate items HTML list
     const itemsHtml = order_items && order_items.length > 0
@@ -54,6 +55,13 @@ export class EmailService {
                 <div style="font-size: 10px; color: #8E8E8E; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px;">Order ID</div>
                 <div style="font-size: 13px; font-family: monospace; color: #F9F9F7;">${id}</div>
               </div>
+
+              ${trackingCode ? `
+              <div style="margin-bottom: 25px;">
+                <div style="font-size: 10px; color: #8E8E8E; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px;">Tracking Code</div>
+                <div style="font-size: 14px; font-family: monospace; color: #F9F9F7; background: #1A1A1A; display: inline-block; padding: 6px 12px; border: 1px dashed #800000;">${trackingCode}</div>
+              </div>
+              ` : ''}
 
               <div style="margin-bottom: 30px;">
                 ${itemsHtml}
