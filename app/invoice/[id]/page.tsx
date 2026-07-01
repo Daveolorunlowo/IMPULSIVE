@@ -1,7 +1,6 @@
 import React from 'react';
-import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { notFound } from 'next/navigation';
-import { format } from 'date-fns';
 
 export default async function InvoicePage({ params }: { params: { id: string } }) {
   const supabase = getSupabaseAdmin();
@@ -62,7 +61,7 @@ export default async function InvoicePage({ params }: { params: { id: string } }
             <p className="text-sm font-bold uppercase tracking-widest mb-1">Invoice No.</p>
             <p className="text-xl">{order.payment_reference}</p>
             <p className="text-sm mt-4 font-bold uppercase tracking-widest">Date Issued</p>
-            <p className="text-sm">{format(new Date(order.created_at), 'MMM dd, yyyy')}</p>
+            <p className="text-sm">{new Date(order.created_at).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}</p>
           </div>
         </div>
 
