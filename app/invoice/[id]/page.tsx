@@ -2,7 +2,8 @@ import React from 'react';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { notFound } from 'next/navigation';
 
-export default async function InvoicePage({ params }: { params: { id: string } }) {
+export default async function InvoicePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = getSupabaseAdmin();
 
   const { data: order } = await supabase
@@ -26,7 +27,7 @@ export default async function InvoicePage({ params }: { params: { id: string } }
         )
       )
     `)
-    .eq('payment_reference', params.id)
+    .eq('payment_reference', id)
     .single();
 
   if (!order) {
