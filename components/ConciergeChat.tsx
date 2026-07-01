@@ -197,10 +197,10 @@ export default function ConciergeChat() {
             >
               <input
                 type="text"
-                placeholder="ASK ABOUT STYLING OR FIT..."
+                placeholder="Ask about styling or fit..."
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                className="flex-1 bg-[#111111] border border-white/10 text-alabaster placeholder:text-stone/30 px-4 py-3 outline-none focus:border-bloodred transition-colors text-[10px] uppercase tracking-[0.2em] font-semibold"
+                className="flex-1 bg-[#111111] border border-white/10 text-alabaster placeholder:text-stone/30 px-4 py-3 outline-none focus:border-bloodred transition-colors text-[10px] font-semibold"
               />
               <button
                 type="submit"
