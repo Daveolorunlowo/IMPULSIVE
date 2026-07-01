@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2, Check, Truck } from 'lucide-react';
+import { X, Loader2, Check, Truck, Printer, Clock } from 'lucide-react';
 import { useCurrency } from '@/store/useCurrency';
 
 interface OrderItem {
@@ -32,6 +32,7 @@ interface Order {
     tracking_number?: string;
     shippingAddress?: any;
     name?: string;
+    status_history?: { status: string; date: string }[];
   };
   order_items: OrderItem[];
 }
@@ -124,12 +125,20 @@ export default function OrderDetailsDrawer({
                 <p className="text-[9px] uppercase tracking-widest text-zinc-400 font-bold">Order Details</p>
                 <p className="text-xs font-mono text-white mt-0.5">{order.payment_reference}</p>
               </div>
-              <button
-                onClick={onClose}
-                className="p-2 text-stone hover:text-white transition-colors"
-              >
-                <X size={24} />
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => window.open(`/invoice/${order.payment_reference}`, '_blank')}
+                  className="px-3 py-1.5 text-[10px] uppercase tracking-widest font-bold border border-white/20 hover:border-bloodred hover:text-bloodred transition-colors flex items-center gap-2 text-white"
+                >
+                  <Printer size={12} /> Print Invoice
+                </button>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-stone hover:text-white transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
             </div>
 
             {/* Content */}
@@ -266,6 +275,28 @@ export default function OrderDetailsDrawer({
                 </div>
               </div>
 
+              {/* Audit Timeline */}
+              {order.metadata?.status_history && order.metadata.status_history.length > 0 && (
+                <div>
+                  <h4 className="text-[9px] uppercase tracking-widest text-bloodred font-bold mb-4 flex items-center gap-2">
+                    <Clock size={12} /> Audit Timeline
+                  </h4>
+                  <div className="space-y-4 pl-2 border-l border-white/10 ml-2">
+                    {order.metadata.status_history.map((event, idx) => (
+                      <div key={idx} className="relative pl-6">
+                        {/* Timeline dot */}
+                        <div className="absolute left-[-5px] top-1 w-2.5 h-2.5 bg-bloodred rounded-full border border-[#050505]"></div>
+                        <p className="text-xs font-bold uppercase text-white tracking-widest mb-0.5">
+                          {event.status === 'paid' ? 'Order Placed (Paid)' : event.status}
+                        </p>
+                        <p className="text-[10px] text-zinc-500 font-mono">
+                          {new Date(event.date).toLocaleString('en-GB')}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </>

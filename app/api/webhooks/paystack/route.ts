@@ -34,7 +34,14 @@ export const POST = withSupabase({ auth: 'none' }, async (req, ctx) => {
       .single();
 
     const trackingCode = `IMP-TRK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-    const newMetadata = { ...(existingOrder?.metadata || {}), tracking_number: trackingCode };
+    const newMetadata = { 
+      ...(existingOrder?.metadata || {}), 
+      tracking_number: trackingCode,
+      status_history: [
+        ...(existingOrder?.metadata?.status_history || []),
+        { status: 'paid', date: new Date().toISOString() }
+      ]
+    };
 
     // Use ctx.supabaseAdmin to bypass RLS and mark as paid, returning the updated order with items
     const { data: order, error } = await supabase

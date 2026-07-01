@@ -80,16 +80,40 @@ export const PATCH = async (req: Request) => {
 
     const supabase = getSupabaseAdmin();
 
-    let query = supabase.from('orders').update({ status });
+    // First fetch existing metadata
+    let selectQuery = supabase.from('orders').select('metadata');
+    if (orderId.startsWith('IMP-')) {
+      selectQuery = selectQuery.eq('payment_reference', orderId);
+    } else {
+      selectQuery = selectQuery.eq('id', orderId);
+    }
+    
+    const { data: existingOrder, error: fetchError } = await selectQuery.single();
+
+    if (fetchError) {
+      console.error('[Admin PATCH /orders fetch]', fetchError.message);
+      return NextResponse.json({ error: 'ORDER_NOT_FOUND' }, { status: 404 });
+    }
+
+    const newHistoryEvent = { status, date: new Date().toISOString() };
+    const newMetadata = { 
+      ...(existingOrder?.metadata || {}), 
+      status_history: [
+        ...(existingOrder?.metadata?.status_history || []), 
+        newHistoryEvent
+      ] 
+    };
+
+    let updateQuery = supabase.from('orders').update({ status, metadata: newMetadata });
     
     // Support matching by payment_reference (IMP-XXXX) or database UUID
     if (orderId.startsWith('IMP-')) {
-      query = query.eq('payment_reference', orderId);
+      updateQuery = updateQuery.eq('payment_reference', orderId);
     } else {
-      query = query.eq('id', orderId);
+      updateQuery = updateQuery.eq('id', orderId);
     }
 
-    const { data: updatedOrder, error } = await query.select().single();
+    const { data: updatedOrder, error } = await updateQuery.select().single();
 
     if (error) {
       console.error('[Admin PATCH /orders]', error.message);

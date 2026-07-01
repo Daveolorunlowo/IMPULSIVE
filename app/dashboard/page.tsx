@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/store/useAuth';
 import { useCurrency } from '@/store/useCurrency';
 import { useRouter } from 'next/navigation';
-import { LogOut, Package, Heart, ChevronRight, Loader2, LayoutGrid, Settings as SettingsIcon, Copy, Check } from 'lucide-react';
+import { LogOut, Package, Heart, ChevronRight, Loader2, LayoutGrid, Settings as SettingsIcon, Copy, Check, ChevronDown, ChevronUp, Clock, Printer } from 'lucide-react';
 import Link from 'next/link';
 import { getSupabaseClient } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [copied, setCopied] = useState(false);
   const [dbOrders, setDbOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -269,13 +270,15 @@ export default function DashboardPage() {
                         displayStatus = 'Shipped';
                       }
 
+                      const isExpanded = expandedOrder === order.id;
+
                       return (
-                        <Link
-                          key={order.id}
-                          href={`/track-order?code=${order.payment_reference}`}
-                          className="block group"
-                        >
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white/5 hover:bg-white/10 transition-all border border-white/5 hover:border-white/20 gap-6">
+                        <div key={order.id} className="block group border border-white/5 bg-white/5 transition-all hover:border-white/20">
+                          {/* Main Order Header (Clickable) */}
+                          <div 
+                            onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
+                            className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 cursor-pointer gap-6"
+                          >
                             <div className="flex items-center gap-6">
                               <div className="hidden sm:flex bg-charcoal p-4 border border-white/10 group-hover:border-bloodred/40 transition-colors">
                                 <Package size={20} className="text-alabaster/60" />
@@ -289,12 +292,103 @@ export default function DashboardPage() {
                             </div>
                             <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-4 sm:gap-2">
                               <p className="text-lg font-serif text-alabaster">{formatPrice(order.total_price)}</p>
-                              <p className={`text-[9px] uppercase tracking-widest px-2 py-1 border ${statusColor}`}>
-                                {displayStatus}
-                              </p>
+                              <div className="flex items-center gap-4">
+                                <p className={`text-[9px] uppercase tracking-widest px-2 py-1 border ${statusColor}`}>
+                                  {displayStatus}
+                                </p>
+                                {isExpanded ? <ChevronUp size={16} className="text-stone" /> : <ChevronDown size={16} className="text-stone" />}
+                              </div>
                             </div>
                           </div>
-                        </Link>
+
+                          {/* Expanded Details */}
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="overflow-hidden border-t border-white/5 bg-[#0a0a0a]"
+                              >
+                                <div className="p-6 space-y-8">
+                                  {/* Top Actions */}
+                                  <div className="flex flex-wrap gap-4">
+                                    <Link
+                                      href={`/track-order?code=${order.payment_reference}`}
+                                      className="px-4 py-2 text-[10px] uppercase tracking-widest font-bold bg-white/5 hover:bg-white/10 transition-colors flex items-center gap-2 text-white border border-white/10"
+                                    >
+                                      <Package size={12} /> Live Tracking
+                                    </Link>
+                                    <button
+                                      onClick={() => window.open(`/invoice/${order.payment_reference}`, '_blank')}
+                                      className="px-4 py-2 text-[10px] uppercase tracking-widest font-bold border border-white/20 hover:border-bloodred hover:text-bloodred transition-colors flex items-center gap-2 text-white"
+                                    >
+                                      <Printer size={12} /> Download Receipt
+                                    </button>
+                                  </div>
+
+                                  {/* Details Grid */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* Left Col: Items & Shipping */}
+                                    <div className="space-y-6">
+                                      <div>
+                                        <h4 className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold mb-3">Line Items</h4>
+                                        <div className="space-y-3">
+                                          {order.order_items?.map((item: any, i: number) => (
+                                            <div key={i} className="flex justify-between items-center text-xs font-mono">
+                                              <span className="text-zinc-300">
+                                                {item.quantity}x {item.variants?.products?.name || 'Item'}
+                                                {(item.variants?.size || item.variants?.color) && (
+                                                  <span className="text-zinc-500 ml-2">
+                                                    ({[item.variants?.size, item.variants?.color].filter(Boolean).join(', ')})
+                                                  </span>
+                                                )}
+                                              </span>
+                                              <span className="text-zinc-400">{formatPrice(item.unit_price * item.quantity)}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+
+                                      {order.metadata?.shippingAddress && (
+                                        <div>
+                                          <h4 className="text-[9px] uppercase tracking-widest text-zinc-500 font-bold mb-2">Shipping Address</h4>
+                                          <p className="text-xs font-mono text-zinc-400 leading-relaxed">
+                                            {order.metadata.shippingAddress.address}<br />
+                                            {order.metadata.shippingAddress.city}, {order.metadata.shippingAddress.state}<br />
+                                            {order.metadata.shippingAddress.country}
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Right Col: Audit Timeline */}
+                                    {order.metadata?.status_history && order.metadata.status_history.length > 0 && (
+                                      <div>
+                                        <h4 className="text-[9px] uppercase tracking-widest text-bloodred font-bold mb-4 flex items-center gap-2">
+                                          <Clock size={12} /> Audit Timeline
+                                        </h4>
+                                        <div className="space-y-4 pl-2 border-l border-white/10 ml-2">
+                                          {order.metadata.status_history.map((event: any, idx: number) => (
+                                            <div key={idx} className="relative pl-6">
+                                              <div className="absolute left-[-5px] top-1 w-2.5 h-2.5 bg-bloodred rounded-full border border-[#050505]"></div>
+                                              <p className="text-xs font-bold uppercase text-white tracking-widest mb-0.5">
+                                                {event.status === 'paid' ? 'Order Placed (Paid)' : event.status}
+                                              </p>
+                                              <p className="text-[10px] text-zinc-500 font-mono">
+                                                {new Date(event.date).toLocaleString('en-GB')}
+                                              </p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
                       );
                     })}
                   </div>
