@@ -9,8 +9,8 @@ import { useRouter } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ChevronRight, ShieldCheck, Truck, CreditCard,
-  Loader2, User, MapPin, Phone, Mail, Globe, ArrowLeft,
+  ShieldCheck, Truck, CreditCard,
+  Loader2, User, MapPin, Phone, Mail,
   Tag, X
 } from 'lucide-react';
 import Image from 'next/image';
@@ -58,23 +58,18 @@ function Field({ label, field, type = 'text', icon: Icon, placeholder, half = fa
 }
 
 interface ContactDetails {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   email: string;
   phone: string;
   address: string;
   city: string;
   state: string;
-  country: string;
 }
 
 const EMPTY_DETAILS: ContactDetails = {
-  firstName: '', lastName: '', email: '',
-  phone: '', address: '', city: '',
-  state: '', country: ''
+  fullName: '', email: '',
+  phone: '', address: '', city: '', state: ''
 };
-
-type Step = 'details' | 'review';
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart, promoCode, getDiscountAmount, applyPromoCode, removePromoCode } = useCart();
@@ -88,7 +83,6 @@ export default function CheckoutPage() {
     setMounted(true);
   }, []);
 
-  const [step, setStep] = useState<Step>('details');
   const [details, setDetails] = useState<ContactDetails>({
     ...EMPTY_DETAILS,
     email: user?.email ?? ''
@@ -149,8 +143,7 @@ export default function CheckoutPage() {
 
   const validate = (): boolean => {
     const required: (keyof ContactDetails)[] = [
-      'firstName', 'lastName', 'email', 'phone',
-      'address', 'city', 'state', 'country'
+      'fullName', 'email', 'phone', 'address', 'city', 'state'
     ];
     const newErrors: Partial<ContactDetails> = {};
     required.forEach(f => {
@@ -162,14 +155,11 @@ export default function CheckoutPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleContinue = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) setStep('review');
-  };
-
   const handleCheckout = async () => {
+    if (!validate()) return;
     if (!user) return;
     setIsProcessing(true);
+    setGeneralError('');
 
     let token = '';
     try {
@@ -183,17 +173,16 @@ export default function CheckoutPage() {
     }
 
     const generatedOrderId = `IMP-${Date.now()}-${Math.floor(Math.random() * 9999).toString().padStart(4, '0')}`;
-
     const currentCurrency = useCurrency.getState().currency;
     const convert = useCurrency.getState().convertPrice;
 
     const localOrderData = {
       id: generatedOrderId,
       email: details.email,
-      fullName: `${details.firstName} ${details.lastName}`,
+      fullName: details.fullName,
       address: details.address,
       city: details.city,
-      country: details.country,
+      country: 'Nigeria',
       items: items.map(item => ({
         id: item.id,
         name: item.name,
@@ -208,7 +197,6 @@ export default function CheckoutPage() {
       currency: currentCurrency,
     };
 
-    // Save order locally first so it can be managed by staff and tracked by client
     createOrder(localOrderData);
 
     try {
@@ -224,7 +212,7 @@ export default function CheckoutPage() {
           totalPrice: convert(totalPrice() - getDiscountAmount() + shippingFee),
           currency: currentCurrency,
           promoCode: useCart.getState().promoCode,
-          shippingAddress: details,
+          shippingAddress: { ...details, country: 'Nigeria' },
           items: items.map(item => ({
             variantId: item.id,
             productId: item.id,
@@ -270,173 +258,31 @@ export default function CheckoutPage() {
 
   return (
     <div className="h-screen w-full overflow-hidden pt-28 pb-8 bg-[#F8F8F6] flex flex-col">
-      {/* ── Step indicator ────────────────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto w-full px-6 md:px-12 mb-8 flex-shrink-0">
-        <div className="flex items-center gap-4">
-          {(['details', 'review'] as Step[]).map((s, i) => (
-            <React.Fragment key={s}>
-              <button
-                onClick={() => s === 'details' && setStep('details')}
-                className={`flex items-center gap-3 group ${step === s ? 'cursor-default' : 'cursor-pointer'}`}
-              >
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all ${
-                  step === s
-                    ? 'bg-charcoal border-charcoal text-alabaster'
-                    : i < (['details', 'review'] as Step[]).indexOf(step)
-                      ? 'bg-bloodred border-bloodred text-alabaster'
-                      : 'border-charcoal/20 text-charcoal/30'
-                }`}>{i + 1}</div>
-                <span className={`text-[10px] uppercase tracking-[0.3em] font-bold transition-colors ${
-                  step === s ? 'text-charcoal' : 'text-charcoal/30'
-                }`}>
-                  {s === 'details' ? 'Contact & Shipping' : 'Review & Pay'}
-                </span>
-              </button>
-              {i === 0 && <div className="flex-1 h-px bg-charcoal/10 max-w-16" />}
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row gap-8 lg:gap-16 flex-1 min-h-0">
 
-        {/* ── Left: Form / Review ───────────────────────────────────── */}
+        {/* ── Left: Form ───────────────────────────────────── */}
         <div className="flex-1 order-2 md:order-1 min-w-0 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pr-2 pb-24 md:pb-12">
-          <AnimatePresence mode="wait">
-
-            {/* STEP 1 — Contact & Shipping ─────────────────────────── */}
-            {step === 'details' && (
-              <motion.form
-                key="details"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                onSubmit={handleContinue}
-                className="space-y-10"
-              >
-                {/* Contact */}
-                <div>
-                  <h2 className="text-2xl font-serif text-charcoal mb-6 flex items-center gap-3">
-                    <User size={20} strokeWidth={1} /> Contact Information
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="First Name" field="firstName" icon={User} placeholder="David" half value={details.firstName} error={errors.firstName} onChange={set} />
-                    <Field label="Last Name" field="lastName" icon={User} placeholder="Osei" half value={details.lastName} error={errors.lastName} onChange={set} />
-                    <Field label="Email Address" field="email" type="email" icon={Mail} placeholder="you@email.com" value={details.email} error={errors.email} onChange={set} />
-                    <Field label="Phone Number" field="phone" type="tel" icon={Phone} placeholder="+234 900 000 0000" value={details.phone} error={errors.phone} onChange={set} />
-                  </div>
+          <div className="space-y-10">
+            <div>
+              <h2 className="text-2xl font-serif text-charcoal mb-6 flex items-center gap-3">
+                <User size={20} strokeWidth={1} /> Shipping Details
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Full Name" field="fullName" icon={User} placeholder="David Osei" value={details.fullName} error={errors.fullName} onChange={set} />
+                <Field label="Email Address" field="email" type="email" icon={Mail} placeholder="you@email.com" value={details.email} error={errors.email} onChange={set} />
+                <Field label="Phone Number" field="phone" type="tel" icon={Phone} placeholder="+234 900 000 0000" value={details.phone} error={errors.phone} onChange={set} />
+                
+                <div className="col-span-2 pt-4">
+                  <Field label="Delivery Address" field="address" icon={MapPin} placeholder="12 Instinct Ave" value={details.address} error={errors.address} onChange={set} />
                 </div>
-
-                {/* Shipping */}
-                <div>
-                  <h2 className="text-2xl font-serif text-charcoal mb-6 flex items-center gap-3">
-                    <MapPin size={20} strokeWidth={1} /> Shipping Address
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="Street Address" field="address" icon={MapPin} placeholder="12 Instinct Ave" value={details.address} error={errors.address} onChange={set} />
-                    <Field label="City" field="city" icon={MapPin} placeholder="Lagos" half value={details.city} error={errors.city} onChange={set} />
-                    <Field label="State / Province" field="state" icon={MapPin} placeholder="Lagos State" half value={details.state} error={errors.state} onChange={set} />
-                    <Field label="Country" field="country" icon={Globe} placeholder="Nigeria" value={details.country} error={errors.country} onChange={set} />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-charcoal text-alabaster py-5 flex items-center justify-center gap-4 hover:bg-bloodred transition-all group text-[10px] uppercase tracking-[0.4em] font-bold"
-                >
-                  Continue to Review
-                  <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-              </motion.form>
-            )}
-
-            {/* STEP 2 — Review & Pay ───────────────────────────────── */}
-            {step === 'review' && (
-              <motion.div
-                key="review"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="space-y-10"
-              >
-                <button
-                  onClick={() => setStep('details')}
-                  className="flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-charcoal/40 hover:text-charcoal transition-colors"
-                >
-                  <ArrowLeft size={14} /> Edit Details
-                </button>
-
-                {/* Confirmed Details */}
-                <div className="bg-white border border-charcoal/8 p-8 space-y-6">
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-bloodred">Shipping To</h3>
-                  <div className="grid grid-cols-2 gap-6 text-sm">
-                    <div>
-                      <p className="text-[9px] uppercase tracking-widest text-charcoal/40 mb-1">Name</p>
-                      <p className="font-bold text-charcoal">{details.firstName} {details.lastName}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] uppercase tracking-widest text-charcoal/40 mb-1">Contact</p>
-                      <p className="font-bold text-charcoal">{details.phone}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-[9px] uppercase tracking-widest text-charcoal/40 mb-1">Address</p>
-                      <p className="font-bold text-charcoal">
-                        {details.address}, {details.city}, {details.state}, {details.country}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-[9px] uppercase tracking-widest text-charcoal/40 mb-1">Email</p>
-                      <p className="font-bold text-charcoal">{details.email}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Cart items */}
-                <div className="space-y-6">
-                  <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/50">Order Items</h3>
-                  {items.map(item => (
-                    <div key={item.id} className="flex gap-5 items-center bg-white border border-charcoal/8 p-4">
-                      <div className="relative w-16 h-20 flex-shrink-0 bg-charcoal/5">
-                        <Image src={item.image} alt={item.name} fill className="object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold uppercase tracking-widest text-charcoal truncate">{item.name}</p>
-                        <p className="text-[10px] text-charcoal/40 uppercase tracking-widest mt-1">
-                          {item.selectedSize} · {item.selectedColor.name} · Qty {item.quantity}
-                        </p>
-                      </div>
-                      <p className="text-sm font-serif text-bloodred flex-shrink-0">{formatPrice(item.price * item.quantity)}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Pay button */}
-                {generalError && (
-                  <div className="text-bloodred text-[10px] uppercase tracking-widest text-center">
-                    {generalError}
-                  </div>
-                )}
-                <button
-                  onClick={handleCheckout}
-                  disabled={isProcessing}
-                  className="w-full bg-bloodred hover:bg-charcoal text-alabaster py-6 flex items-center justify-center gap-4 transition-all group text-[10px] uppercase tracking-[0.4em] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isProcessing ? (
-                    <><Loader2 size={16} className="animate-spin" /> Initializing Payment...</>
-                  ) : (
-                    <><CreditCard size={16} /> Complete Order · {formatPrice(totalPrice() - getDiscountAmount() + shippingFee)}</>
-                  )}
-                </button>
-
-                <p className="text-[9px] text-charcoal/30 text-center">
-                  Secured by Paystack · End-to-end encrypted · No card details stored.
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <Field label="City" field="city" icon={MapPin} placeholder="Lagos" half value={details.city} error={errors.city} onChange={set} />
+                <Field label="State / Province" field="state" icon={MapPin} placeholder="Lagos State" half value={details.state} error={errors.state} onChange={set} />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* ── Right: Order summary (sticky) ─────────────────────────── */}
+        {/* ── Right: Order summary & Pay Button ─────────────────────────── */}
         <div className="w-full md:w-[320px] lg:w-[400px] order-1 md:order-2 flex-shrink-0 z-20 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] pb-12">
           <div className="space-y-6 bg-white p-6 md:p-8 lg:p-10 border border-charcoal/10 shadow-sm h-full md:h-auto">
             <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-charcoal/50">Order Summary</h3>
@@ -545,7 +391,25 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <div className="space-y-4 pt-4">
+            {/* Pay button */}
+            {generalError && (
+              <div className="text-bloodred text-[10px] uppercase tracking-widest text-center pt-4">
+                {generalError}
+              </div>
+            )}
+            <button
+              onClick={handleCheckout}
+              disabled={isProcessing}
+              className="w-full mt-6 bg-bloodred hover:bg-charcoal text-alabaster py-6 flex items-center justify-center gap-4 transition-all group text-[10px] uppercase tracking-[0.4em] font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? (
+                <><Loader2 size={16} className="animate-spin" /> Processing...</>
+              ) : (
+                <><CreditCard size={16} /> Complete Order · {formatPrice(totalPrice() - getDiscountAmount() + shippingFee)}</>
+              )}
+            </button>
+
+            <div className="space-y-4 pt-6 border-t border-charcoal/8 mt-6">
               {[
                 { icon: ShieldCheck, text: 'Secure encrypted checkout' },
                 { icon: Truck, text: 'Global express shipping' },
