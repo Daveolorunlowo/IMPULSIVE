@@ -170,10 +170,10 @@ export default function ClientServicesContent() {
                         </div>
                       </div>
 
-                      <div className="bg-[#0A0A0A] border border-white/5 p-6 rounded-sm space-y-3">
-                        <h4 className="text-[10px] uppercase tracking-widest font-bold text-alabaster">Studio Fulfillment Timeline</h4>
-                        <p className="text-xs font-light text-alabaster/60 leading-relaxed">
-                          Orders are processed Monday through Friday, excluding public holidays. Orders containing **custom print studio customizations** require an extra 2 business days to verify print resolution and high-density screen finish.
+                      <div className="pt-8 border-t border-white/5">
+                        <h3 className="text-[10px] uppercase tracking-[0.3em] text-bloodred font-bold mb-4">02 / Terms & Conditions</h3>
+                        <p className="text-sm font-light text-alabaster/70 leading-relaxed">
+                          All orders are processed within 5-7 business days and in some cases where the product is out of stock it might take a few extra days. Deliveries are processed from Monday to Saturday and all orders can be tracked using the product tracker on site.
                         </p>
                       </div>
                     </div>
@@ -181,7 +181,7 @@ export default function ClientServicesContent() {
                     {/* Right Column: Return Info */}
                     <div className="bg-[#0A0A0A] border-l-2 border-bloodred border-y border-r border-white/5 p-8 md:p-10 space-y-8 rounded-sm">
                       <div>
-                        <h3 className="text-[10px] uppercase tracking-[0.3em] text-bloodred font-bold mb-4">02 / Returns & Exchanges</h3>
+                        <h3 className="text-[10px] uppercase tracking-[0.3em] text-bloodred font-bold mb-4">03 / Returns & Exchanges</h3>
                         <p className="text-xs font-light text-alabaster/60 leading-relaxed mb-6">
                           To maintain high studio standards, we accept returns within **14 days** of delivery. Items must be returned unworn, unwashed, with the original holographic tag and customized structural packaging intact.
                         </p>
