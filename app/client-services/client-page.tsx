@@ -223,25 +223,34 @@ export default function ClientServicesContent() {
                     {/* Right Column: Return Info */}
                     <div className="bg-[#0A0A0A] border-l-2 border-bloodred border-y border-r border-white/5 p-8 md:p-10 space-y-8 rounded-sm">
                       <div>
-                        <h3 className="text-[10px] uppercase tracking-[0.3em] text-bloodred font-bold mb-4">03 / Returns & Exchanges</h3>
-                        <p className="text-xs font-light text-alabaster/60 leading-relaxed mb-6">
-                          To maintain high studio standards, we accept returns within **14 days** of delivery. Items must be returned unworn, unwashed, with the original holographic tag and customized structural packaging intact.
-                        </p>
-                        
-                        <ul className="space-y-4 text-[9px] font-bold text-alabaster/70 uppercase tracking-widest">
-                          <li className="flex items-center gap-3">
-                            <div className="w-1.5 h-1.5 bg-bloodred" />
-                            Complimentary domestic return labels
-                          </li>
-                          <li className="flex items-center gap-3">
-                            <div className="w-1.5 h-1.5 bg-bloodred" />
-                            Exchanges subject to impulsive availability
-                          </li>
-                          <li className="flex items-center gap-3">
-                            <div className="w-1.5 h-1.5 bg-bloodred" />
-                            Refunds processed back within 5 - 7 business days
-                          </li>
-                        </ul>
+                        <h3 className="text-[10px] uppercase tracking-[0.3em] text-bloodred font-bold mb-4">03 / Refund & Exchange</h3>
+                        <div className="space-y-4 text-xs font-light text-alabaster/70 leading-relaxed">
+                          <p>
+                            <strong className="text-alabaster font-bold block mb-1">ALL SALES ARE FINAL. WE DO NOT OFFER REFUNDS UNLESS THE ITEM IS UNAVAILABLE OR IF THE ITEM IS LOST IN TRANSIT.</strong>
+                          </p>
+                          <ul className="space-y-3 list-none">
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>The item must be filed for return within 7 days of its delivery. Item must be unworn, unwashed and in original packaging.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>No returns on custom pieces and discounted items.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>No refund on items lost due to wrong delivery information from the customer.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>Refunds go back to your payment method (minus delivery fee).</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>Want an exchange? If we have your size, it&apos;s a go. If not, store credit or refund.</span>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
 
                       <div className="pt-6 border-t border-white/5 space-y-4">
