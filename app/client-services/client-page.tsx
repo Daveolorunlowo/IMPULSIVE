@@ -256,13 +256,13 @@ export default function ClientServicesContent() {
                       <div className="pt-6 border-t border-white/5 space-y-4">
                         <h4 className="text-[10px] font-bold uppercase tracking-wider text-alabaster">How to file a return</h4>
                         <p className="text-xs font-light text-alabaster/60 leading-relaxed">
-                          To begin a return claim, contact our stylist concierge service directly, quoting your Order Reference ID.
+                          To begin a return claim, contact our customer service directly, quoting your Order Reference ID.
                         </p>
                         <a 
-                          href="mailto:wearimpulsive@gmail.com" 
+                          href="mailto:returns@wearimpulsive.com" 
                           className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold text-bloodred hover:text-white transition-colors group pt-2"
                         >
-                          Send Email to Concierge <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                          Send Email to Customer Service <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </a>
                       </div>
                     </div>
@@ -419,7 +419,7 @@ export default function ClientServicesContent() {
                       <div className="space-y-2">
                         <h4 className="text-xs uppercase tracking-widest font-bold text-alabaster">02 / Product Order Fulfillment</h4>
                         <p className="text-xs">
-                          We reserve the right to review order allocations. If we cancel a payment, our concierge styling service will reach out to explain order status. Custom text print designs are reviewed against decency terms.
+                          We reserve the right to review order allocations. If we cancel a payment, our customer service will reach out to explain order status. Custom text print designs are reviewed against decency terms.
                         </p>
                       </div>
 

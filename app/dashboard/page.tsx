@@ -432,7 +432,7 @@ export default function DashboardPage() {
                 <div>
                   <h3 className="text-[10px] uppercase tracking-widest text-stone font-bold mb-4 border-b border-white/10 pb-4">Customer Support</h3>
                   <p className="text-xs text-alabaster/50 leading-relaxed font-light mb-6 max-w-lg">
-                    Need help with an order, sizing inquiries, or general questions? Our concierge team is available to assist you.
+                    Need help with an order, sizing inquiries, or general questions? Our customer service team is available to assist you.
                   </p>
                   <Link
                     href="https://wa.me/2349018389254"

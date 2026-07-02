@@ -18,7 +18,7 @@ const PRESETS = [
   { label: 'Studio Print Customization details', query: 'How does the Print Studio customization work?' },
 ];
 
-export default function ConciergeChat() {
+export default function CustomerServiceChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
@@ -31,7 +31,7 @@ export default function ConciergeChat() {
       {
         id: 'welcome',
         sender: 'stylist',
-        text: 'Welcome to IMPULSIVE Concierge. I am your personal design and fitting advisor. How can I assist you with custom print canvases, fits, or styling combinations today?',
+        text: 'Welcome to IMPULSIVE Customer Service. I am your personal design and fitting advisor. How can I assist you with custom print canvases, fits, or styling combinations today?',
         timestamp: new Date(),
       },
     ]);
@@ -56,11 +56,11 @@ export default function ConciergeChat() {
     setMessages((prev) => [...prev, userMsg]);
     setInputText('');
     setIsTyping(true);
-    trackActivity(`Consulted concierge styling with: "${text.slice(0, 30)}..."`);
+    trackActivity(`Consulted customer service with: "${text.slice(0, 30)}..."`);
 
-    // Simulate concierge response
+    // Simulate customer service response
     setTimeout(() => {
-      let responseText = "Our concierge team is reviewing your profile. For immediate fit assistance, we suggest using our Fit Advisor on the product detail sizing hub.";
+      let responseText = "Our customer service team is reviewing your profile. For immediate fit assistance, we suggest using our Fit Advisor on the product detail sizing hub.";
       
       const query = text.toLowerCase();
       if (query.includes('style') || query.includes('combination') || query.includes('pair')) {
@@ -113,7 +113,7 @@ export default function ConciergeChat() {
                 <div className="w-2.5 h-2.5 rounded-full bg-bloodred animate-pulse" />
                 <div>
                   <h3 className="text-xs uppercase tracking-[0.25em] font-bold text-alabaster">
-                    IMPULSIVE CONCIERGE
+                    IMPULSIVE CUSTOMER SERVICE
                   </h3>
                   <span className="text-[8px] uppercase tracking-widest text-stone font-bold">
                     PERSONAL STYLE & FIT HUB
@@ -123,7 +123,7 @@ export default function ConciergeChat() {
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-stone hover:text-alabaster transition-colors"
-                aria-label="Close concierge chat"
+                aria-label="Close customer service chat"
               >
                 <X size={16} />
               </button>
@@ -139,7 +139,7 @@ export default function ConciergeChat() {
                   }`}
                 >
                   <span className="text-[7px] uppercase tracking-widest text-stone font-bold mb-1">
-                    {msg.sender === 'user' ? 'CLIENT' : 'CONCIERGE STYLIST'} ·{' '}
+                    {msg.sender === 'user' ? 'CLIENT' : 'CUSTOMER SERVICE'} ·{' '}
                     {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                   <div
@@ -157,7 +157,7 @@ export default function ConciergeChat() {
               {isTyping && (
                 <div className="flex flex-col items-start mr-auto max-w-[85%]">
                   <span className="text-[7px] uppercase tracking-widest text-stone font-bold mb-1">
-                    CONCIERGE STYLIST TYPING
+                    CUSTOMER SERVICE TYPING
                   </span>
                   <div className="bg-[#141414] p-4 text-xs text-stone border border-white/5 rounded-sm flex gap-1 items-center">
                     <span className="w-1.5 h-1.5 rounded-full bg-stone animate-bounce" style={{ animationDelay: '0ms' }} />
