@@ -235,7 +235,7 @@ export default function ClientServicesContent() {
                           </li>
                           <li className="flex items-center gap-3">
                             <div className="w-1.5 h-1.5 bg-bloodred" />
-                            Exchanges subject to archive availability
+                            Exchanges subject to impulsive availability
                           </li>
                           <li className="flex items-center gap-3">
                             <div className="w-1.5 h-1.5 bg-bloodred" />
