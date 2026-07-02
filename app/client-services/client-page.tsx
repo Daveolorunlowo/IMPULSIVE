@@ -75,7 +75,7 @@ export default function ClientServicesContent() {
                 Client Services
               </h1>
               <p className="text-xs font-light text-alabaster/60 max-w-xl leading-relaxed mt-4">
-                We are dedicated to providing a seamless luxury experience. Browse shipping policies, utilize our interactive size advisor, or read our terms below.
+                We are dedicated to providing each customer a stress free and amazing experience. Browse our shipping policies utilise our interactive size advisor and read our terms below.
               </p>
             </div>
             <div className="text-[9px] uppercase tracking-widest font-mono text-alabaster/40 font-bold bg-white/5 border border-white/10 px-4 py-2">
@@ -145,34 +145,26 @@ export default function ClientServicesContent() {
                       <div>
                         <h3 className="text-[10px] uppercase tracking-[0.3em] text-bloodred font-bold mb-4">01 / Shipping Protocols</h3>
                         <p className="text-sm font-light text-alabaster/70 leading-relaxed mb-6">
-                          Each Impulsive garment is packaged in a dust-proof custom sleeve and shipped from our studio using reliable global logistics networks.
+                          Each piece is carefully packaged straight from our production centers and shipped to each customer through our reliable global logistics networks.
                         </p>
                         <div className="bg-[#0A0A0A] border border-white/5 divide-y divide-white/5 rounded-sm overflow-hidden">
                           <div className="p-5 flex justify-between items-center hover:bg-white/[0.02] transition-colors">
                             <div>
                               <p className="text-[11px] font-bold uppercase tracking-wider text-alabaster">Standard Courier</p>
-                              <p className="text-[9px] text-stone uppercase tracking-widest mt-1">3 - 5 Business Days</p>
+                              <p className="text-[9px] text-stone uppercase tracking-widest mt-1">5 - 7 Business Days</p>
                             </div>
-                            <span className="text-[10px] font-bold text-bloodred uppercase tracking-wider bg-bloodred/10 border border-bloodred/25 px-2.5 py-1" suppressHydrationWarning>
-                              Free on orders over {formatPrice(300)} // {formatPrice(10)}
+                            <span className="text-[10px] font-bold text-bloodred uppercase tracking-wider bg-bloodred/10 border border-bloodred/25 px-2.5 py-1 text-right max-w-[200px]" suppressHydrationWarning>
+                              PRICE RANGES FROM NGN 4,000 - NGN 10,000 NATIONWIDE
                             </span>
                           </div>
+
                           <div className="p-5 flex justify-between items-center hover:bg-white/[0.02] transition-colors">
                             <div>
-                              <p className="text-[11px] font-bold uppercase tracking-wider text-alabaster">Express Air</p>
-                              <p className="text-[9px] text-stone uppercase tracking-widest mt-1">1 - 2 Business Days</p>
-                            </div>
-                            <span className="text-[10px] font-bold text-bloodred uppercase tracking-wider bg-bloodred/10 border border-bloodred/25 px-2.5 py-1" suppressHydrationWarning>
-                              {formatPrice(25)} Flat
-                            </span>
-                          </div>
-                          <div className="p-5 flex justify-between items-center hover:bg-white/[0.02] transition-colors">
-                            <div>
-                              <p className="text-[11px] font-bold uppercase tracking-wider text-alabaster">International Global</p>
+                              <p className="text-[11px] font-bold uppercase tracking-wider text-alabaster">International Deliveries</p>
                               <p className="text-[9px] text-stone uppercase tracking-widest mt-1">5 - 10 Business Days</p>
                             </div>
-                            <span className="text-[10px] font-bold text-bloodred uppercase tracking-wider bg-bloodred/10 border border-bloodred/25 px-2.5 py-1" suppressHydrationWarning>
-                              {formatPrice(35)} Worldwide
+                            <span className="text-[10px] font-bold text-bloodred uppercase tracking-wider bg-bloodred/10 border border-bloodred/25 px-2.5 py-1 text-right max-w-[200px]" suppressHydrationWarning>
+                              RANGES FROM NGN 15,000 - NGN 30,000 WORLDWIDE
                             </span>
                           </div>
                         </div>
