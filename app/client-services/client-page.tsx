@@ -172,9 +172,51 @@ export default function ClientServicesContent() {
 
                       <div className="pt-8 border-t border-white/5">
                         <h3 className="text-[10px] uppercase tracking-[0.3em] text-bloodred font-bold mb-4">02 / Terms & Conditions</h3>
-                        <p className="text-sm font-light text-alabaster/70 leading-relaxed">
-                          All orders are processed within 5-7 business days and in some cases where the product is out of stock it might take a few extra days. Deliveries are processed from Monday to Saturday and all orders can be tracked using the product tracker on site.
-                        </p>
+                        <div className="space-y-4 text-xs font-light text-alabaster/70 leading-relaxed">
+                          <p>
+                            <strong className="text-alabaster font-bold block mb-1">IMPULSIVE TERMS AND CONDITIONS</strong>
+                          </p>
+                          <ul className="space-y-3 list-none">
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>Drops take up within 2 weeks for delivery unless stated otherwise under the product description.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>Pre-order / sale drops require up to 3 weeks before delivery.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>Shipping fees are non-negotiable and must be paid fully before the item is shipped out for fulfilment.</span>
+                            </li>
+                          </ul>
+                          
+                          <p>
+                            <strong className="text-alabaster font-bold block mt-6 mb-1">ADDITIONAL IMPULSIVE-ALIGNED TERMS:</strong>
+                          </p>
+                          <ul className="space-y-3 list-none">
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>All sales are final. No refunds after payment confirmation.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>Exchanges are only allowed for wrong sizes or defective items, reported within 48 hours of delivery.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>IMPULSIVE is not responsible for delays caused by third-party couriers.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>Orders not claimed within 7 days of delivery notice may be rescheduled at the buyer&apos;s expense.</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="text-bloodred mt-1">•</span>
+                              <span>Product colors may vary slightly due to lighting and screen display - this does not qualify for a return.</span>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
 
