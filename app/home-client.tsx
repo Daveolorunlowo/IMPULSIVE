@@ -217,9 +217,7 @@ export default function HomeClient() {
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="max-w-2xl pointer-events-none"
               >
-                <span className="text-[10px] uppercase tracking-[0.4em] text-bloodred font-bold block mb-6">
-                  Look 0{currentSlide + 1} // {featuredProducts[currentSlide].category}
-                </span>
+
                 
                 {/* Glitch text effect wrapper */}
                 <div className="relative group">
