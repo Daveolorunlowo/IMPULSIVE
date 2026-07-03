@@ -21,7 +21,7 @@ export default function ShopPage() {
         {/* Header - Minimal Luxury */}
         <header className="mb-24 flex flex-col md:flex-row justify-between items-end gap-12">
           <div className="space-y-4">
-            <span className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold block">Collection Archive</span>
+
             <h1 className="text-6xl md:text-8xl font-serif text-alabaster tracking-tight">The Inventory</h1>
           </div>
           
