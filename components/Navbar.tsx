@@ -116,7 +116,7 @@ export default function Navbar() {
             >
               <Logo 
                 variant="red" 
-                className="h-7 sm:h-8 md:h-12 lg:h-14 w-auto transition-all duration-500 group-hover:scale-110"
+                className="h-7 sm:h-7 md:h-8 lg:h-8 w-28 sm:w-32 md:w-36 lg:w-40 transition-all duration-500 group-hover:scale-105"
               />
             </Link>
           </div>
@@ -224,7 +224,7 @@ export default function Navbar() {
             <div className="flex justify-between items-center mb-12">
               <Logo 
                 variant="red" 
-                className="h-14 w-auto"
+                className="h-8 w-40"
               />
               <button onClick={() => setIsOpen(false)} className="hover:text-bloodred transition-colors" aria-label="Close menu">
                 <X size={24} strokeWidth={1.5} />

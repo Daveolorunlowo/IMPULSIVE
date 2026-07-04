@@ -52,7 +52,7 @@ export default function Footer() {
             <Link href="/" className="inline-block">
               <Logo 
                 variant="red" 
-                className="h-12 w-auto"
+                className="h-8 w-40"
               />
             </Link>
             <p className="text-sm text-alabaster/40 font-light leading-relaxed">
