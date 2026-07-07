@@ -121,6 +121,8 @@ export default function Footer() {
             <Link href="https://wa.me/2349018389254" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">WhatsApp</Link>
             <Link href="https://www.instagram.com/wearimpulsive_/" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">Instagram</Link>
             <Link href="https://www.tiktok.com/@wearimpulsive_" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">TikTok</Link>
+            <Link href="https://x.com/wear_impulsive?s=11" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">X</Link>
+            <Link href="https://snapchat.com/t/0VXA51xA" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">Snapchat</Link>
           </div>
 
           
