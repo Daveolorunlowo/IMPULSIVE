@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
+import { FaWhatsapp, FaInstagram, FaTiktok, FaXTwitter, FaSnapchatGhost } from 'react-icons/fa6';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -117,12 +118,27 @@ export default function Footer() {
           <div className="text-[10px] uppercase tracking-[0.3em] text-alabaster/20 font-semibold">
             © 2026 Impulsive Studio. All Rights Reserved.
           </div>
-          <div className="flex gap-8 text-[10px] uppercase tracking-[0.3em] text-alabaster/40 font-semibold">
-            <Link href="https://wa.me/2349018389254" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">WhatsApp</Link>
-            <Link href="https://www.instagram.com/wearimpulsive_/" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">Instagram</Link>
-            <Link href="https://www.tiktok.com/@wearimpulsive_" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">TikTok</Link>
-            <Link href="https://x.com/wear_impulsive?s=11" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">X</Link>
-            <Link href="https://snapchat.com/t/0VXA51xA" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">Snapchat</Link>
+          <div className="flex gap-6 text-xl text-alabaster/40">
+            <Link href="https://wa.me/2349018389254" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">
+              <span className="sr-only">WhatsApp</span>
+              <FaWhatsapp />
+            </Link>
+            <Link href="https://www.instagram.com/wearimpulsive_/" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">
+              <span className="sr-only">Instagram</span>
+              <FaInstagram />
+            </Link>
+            <Link href="https://www.tiktok.com/@wearimpulsive_" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">
+              <span className="sr-only">TikTok</span>
+              <FaTiktok />
+            </Link>
+            <Link href="https://x.com/wear_impulsive?s=11" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">
+              <span className="sr-only">X</span>
+              <FaXTwitter />
+            </Link>
+            <Link href="https://snapchat.com/t/0VXA51xA" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">
+              <span className="sr-only">Snapchat</span>
+              <FaSnapchatGhost />
+            </Link>
           </div>
 
           
