@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/Logo';
-import { FaWhatsapp, FaInstagram, FaTiktok, FaXTwitter, FaSnapchatGhost } from 'react-icons/fa6';
+import { FaWhatsapp, FaInstagram, FaTiktok, FaXTwitter, FaSnapchat } from 'react-icons/fa6';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
@@ -137,7 +137,7 @@ export default function Footer() {
             </Link>
             <Link href="https://snapchat.com/t/0VXA51xA" target="_blank" rel="noopener noreferrer" className="hover:text-bloodred transition-colors">
               <span className="sr-only">Snapchat</span>
-              <FaSnapchatGhost />
+              <FaSnapchat />
             </Link>
           </div>
 
