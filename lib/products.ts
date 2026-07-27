@@ -56,9 +56,11 @@ export const products: Product[] = [
       '/images/freedom-tee-hover.jpeg'
     ],
     details: [
-      'Heavy-weight premium cotton',
-      'Relaxed oversized fit',
-      'Vibrant graphic print'
+      '100% COTTON',
+      'DTF DESIGN PRINT',
+      'IMPULSIVE CUT AND SEWN BLANKS',
+      'TRUE TO SIZE',
+      'IMMEDIATE DELIVERY'
     ],
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
