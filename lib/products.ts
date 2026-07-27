@@ -40,5 +40,29 @@ export const products: Product[] = [
     colors: [
       { name: 'Red', hex: '#800000' }
     ]
+  },
+  {
+    id: '9',
+    slug: 'impulsive-freedom-man-tee',
+    name: 'IMPULSIVE FREEDOM MAN TEE',
+    category: 'Signature',
+    price: 15000,
+    status: 'New Drop',
+    description: 'The IMPULSIVE FREEDOM MAN TEE features a vibrant graphic design on a classic black base.',
+    mainImage: '/images/freedom-tee-main.jpeg',
+    hoverImage: '/images/freedom-tee-hover.jpeg',
+    images: [
+      '/images/freedom-tee-main.jpeg',
+      '/images/freedom-tee-hover.jpeg'
+    ],
+    details: [
+      'Heavy-weight premium cotton',
+      'Relaxed oversized fit',
+      'Vibrant graphic print'
+    ],
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    colors: [
+      { name: 'Black', hex: '#000000' }
+    ]
   }
 ];
