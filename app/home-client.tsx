@@ -102,7 +102,7 @@ export default function HomeClient() {
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[10vw] sm:text-[14vw] md:text-[12vw] lg:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
+            className="text-[12vw] sm:text-[10vw] md:text-[9vw] lg:text-[8vw] xl:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
           >
             <span className="block text-white">WEAR</span>
             <span className="block" style={{ WebkitTextStroke: '2px #d00000', color: 'transparent' }}>IMPULSIVE</span>
@@ -144,7 +144,7 @@ export default function HomeClient() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-4xl md:text-6xl lg:text-8xl font-black uppercase leading-[0.9] tracking-tighter text-white mb-8"
+            className="text-[10vw] sm:text-[8vw] md:text-[7vw] lg:text-[6vw] xl:text-[5vw] font-black uppercase leading-[0.9] tracking-tighter text-white mb-8"
           >
             MADE FOR THE
             <br />
@@ -161,7 +161,7 @@ export default function HomeClient() {
           <div className="flex items-end justify-between mb-12 md:mb-20">
             <div>
               <span className="text-[10px] uppercase tracking-[0.5em] text-bloodred font-bold block mb-3">The Collection</span>
-              <h2 className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-[0.9] text-white">
+              <h2 className="text-[12vw] sm:text-[10vw] md:text-[8vw] lg:text-[6vw] xl:text-[5vw] font-black uppercase tracking-tighter leading-[0.9] text-white">
                 NEW<br/>DROPS
               </h2>
             </div>
@@ -272,7 +272,7 @@ export default function HomeClient() {
             transition={{ duration: 0.8 }}
           >
             <span className="text-[8px] uppercase tracking-[0.6em] text-black/60 font-bold block mb-6">Impulsive Worldwide</span>
-            <h2 className="text-6xl sm:text-8xl md:text-[12vw] font-black uppercase leading-[0.85] tracking-tighter text-black">
+            <h2 className="text-[16vw] sm:text-[14vw] md:text-[12vw] lg:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter text-black">
               PURE<br/>STYLE.
             </h2>
             <p className="mt-6 text-black/60 text-xs uppercase tracking-[0.4em] font-bold">Designing the future of streetwear.</p>
@@ -314,7 +314,7 @@ export default function HomeClient() {
               <span className="text-[9px] uppercase tracking-[0.5em] text-bloodred font-black">Inner Circle</span>
               <div className="w-12 h-[1px] bg-bloodred" />
             </div>
-            <h2 className="text-5xl sm:text-7xl md:text-8xl font-black uppercase leading-[0.85] tracking-tighter text-white mb-6">
+            <h2 className="text-[14vw] sm:text-[12vw] md:text-[10vw] lg:text-[8vw] xl:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter text-white mb-6">
               JOIN OUR<br/><span className="text-bloodred">CLUB.</span>
             </h2>
             <p className="text-white/40 text-xs uppercase tracking-[0.3em] mb-14 max-w-sm mx-auto leading-relaxed">
