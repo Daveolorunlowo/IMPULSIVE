@@ -18,8 +18,8 @@ const toCamelCase = (dbProduct: any) => ({
   colors: dbProduct.colors || [],
   status: dbProduct.status || 'in_stock',
   stock: Array.isArray(dbProduct.variants) 
-    ? (dbProduct.variants[0]?.stock_quantity ?? 0) 
-    : (dbProduct.variants?.stock_quantity ?? 0),
+    ? (dbProduct.variants[0]?.stock_quantity ?? 100) 
+    : (dbProduct.variants?.stock_quantity ?? 100),
 });
 
 /**
@@ -33,15 +33,23 @@ export const GET = async () => {
 
     const { data: products, error } = await supabase
       .from('products')
-      .select('*, variants(*)')
-      .order('created_at', { ascending: true });
+      .select('*, variants(*)');
 
     if (error) {
       console.error('[GET /api/products] DB Error:', error);
       throw error;
     }
 
-    return NextResponse.json({ success: true, products: products.map(toCamelCase) });
+    const { products: hardcodedProducts } = await import('@/lib/products');
+    const formattedProducts = products.map(toCamelCase);
+
+    formattedProducts.sort((a, b) => {
+      const indexA = hardcodedProducts.findIndex((p: any) => p.id === a.id);
+      const indexB = hardcodedProducts.findIndex((p: any) => p.id === b.id);
+      return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+    });
+
+    return NextResponse.json({ success: true, products: formattedProducts });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'INTERNAL_SERVER_ERROR';
     console.error('[GET /api/products]', message);

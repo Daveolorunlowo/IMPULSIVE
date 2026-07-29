@@ -9,16 +9,16 @@ export function calculateShipping(stateName: string): number {
   if (!stateName) return 0;
   
   const stateNormalized = stateName.trim().toLowerCase();
-  let feeNGN = 8000; // Default: Other states - 8000 NGN
+  let feeNGN = 6000; // Default: Other states - 6000 NGN
 
   if (stateNormalized.includes('oyo')) {
-    feeNGN = 2000;
+    feeNGN = 0;
   } else if (stateNormalized.includes('lagos')) {
-    feeNGN = 4000;
+    feeNGN = 2000;
   } else if (stateNormalized.includes('osun')) {
-    feeNGN = 4000;
+    feeNGN = 2000;
   } else if (stateNormalized.includes('ogun')) {
-    feeNGN = 4000;
+    feeNGN = 2000;
   }
 
   return feeNGN;

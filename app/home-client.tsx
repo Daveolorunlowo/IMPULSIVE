@@ -1,34 +1,53 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useProducts } from '@/store/useProducts';
 import { useCurrency } from '@/store/useCurrency';
-import { motion, AnimatePresence, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+
+// --- MARQUEE COMPONENT ---
+function Marquee({ text, reverse = false, className = '' }: { text: string; reverse?: boolean; className?: string }) {
+  const items = Array(8).fill(text);
+  return (
+    <div className={`overflow-hidden whitespace-nowrap ${className}`}>
+      <motion.div
+        className="inline-flex"
+        animate={{ x: reverse ? ['0%', '50%'] : ['0%', '-50%'] }}
+        transition={{ repeat: Infinity, duration: 18, ease: 'linear' }}
+      >
+        {items.map((item, i) => (
+          <span key={i} className="inline-block px-6">{item} <span className="text-bloodred">✦</span></span>
+        ))}
+        {items.map((item, i) => (
+          <span key={`b-${i}`} className="inline-block px-6">{item} <span className="text-bloodred">✦</span></span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
 
 export default function HomeClient() {
   const { products } = useProducts();
   const featuredProducts = products.slice(0, 4);
   const { formatPrice } = useCurrency();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [activeSection, setActiveSection] = useState(0);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [cursorPosition, setCursorPosition] = useState({ x: -100, y: -100 });
-  const [isHovering, setIsHovering] = useState(false);
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   // Newsletter State
   const [email, setEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [newsletterMsg, setNewsletterMsg] = useState('');
 
+  // Scroll progress for subtle effects only (not opacity)
+  const { scrollYProgress } = useScroll({ target: heroRef });
+
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    
     setNewsletterStatus('loading');
     setNewsletterMsg('');
-
     try {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
@@ -36,139 +55,72 @@ export default function HomeClient() {
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
-
       if (!res.ok) {
         setNewsletterStatus('error');
-        if (data.error === 'ALREADY_SUBSCRIBED') {
-          setNewsletterMsg('You are already in the club.');
-        } else if (data.error === 'DISPOSABLE_EMAIL') {
-          setNewsletterMsg('Please use a real email address.');
-        } else if (data.error === 'TOO_MANY_REQUESTS') {
-          setNewsletterMsg('Too many attempts. Try again later.');
-        } else {
-          setNewsletterMsg(data.error || 'Something went wrong.');
-        }
+        if (data.error === 'ALREADY_SUBSCRIBED') setNewsletterMsg('You are already in the club.');
+        else if (data.error === 'DISPOSABLE_EMAIL') setNewsletterMsg('Real emails only.');
+        else setNewsletterMsg(data.error || 'Something went wrong.');
       } else {
         setNewsletterStatus('success');
-        setNewsletterMsg('Welcome to the Inner Circle.');
+        setNewsletterMsg('Welcome to the circle.');
         setEmail('');
       }
-    } catch (err) {
+    } catch {
       setNewsletterStatus('error');
-      setNewsletterMsg('Network error. Please try again.');
+      setNewsletterMsg('Network error. Try again.');
     }
   };
 
-  // Smooth cursor setup
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setCursorPosition({ x: e.clientX, y: e.clientY });
-      
-      // Parallax calculations
-      const x = (e.clientX / window.innerWidth - 0.5) * 30; // Max 15px movement
-      const y = (e.clientY / window.innerHeight - 0.5) * 30;
-      setMousePosition({ x, y });
-    };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  // Section tracking for dots
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const current = Math.round(scrollPosition / windowHeight);
-      setActiveSection(current);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === featuredProducts.length - 1 ? 0 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? featuredProducts.length - 1 : prev - 1));
-  };
-
-  useEffect(() => {
-    document.documentElement.style.scrollSnapType = 'y mandatory';
-    return () => {
-      document.documentElement.style.scrollSnapType = '';
-    };
-  }, []);
-
-  // Interactive Cursor
-  const cursorX = useSpring(cursorPosition.x, { stiffness: 300, damping: 20 });
-  const cursorY = useSpring(cursorPosition.y, { stiffness: 300, damping: 20 });
-
   return (
-    <div className="w-full bg-charcoal text-alabaster overflow-hidden">
-      
-      {/* Custom Cursor */}
-      <motion.div 
-        className="fixed top-0 left-0 w-8 h-8 rounded-full border border-bloodred pointer-events-none z-[100] mix-blend-difference hidden md:flex items-center justify-center"
-        style={{ x: cursorX, y: cursorY, translateX: '-50%', translateY: '-50%' }}
-        animate={{ scale: isHovering ? 2 : 1, backgroundColor: isHovering ? '#FF0000' : 'transparent' }}
-        transition={{ duration: 0.2 }}
-      />
+    <div className="w-full bg-[#080808] text-white overflow-x-hidden">
 
-      {/* Progress Dots */}
-      <div className="fixed right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4 hidden md:flex">
-        {[0, 1, 2, 3, 4].map((idx) => (
-          <div 
-            key={idx} 
-            className={`w-2 h-2 rounded-full transition-all duration-500 ${activeSection === idx ? 'bg-bloodred h-8' : 'bg-alabaster/30'}`}
+      {/* ─── SECTION 1: HERO (video background for this section only) ─── */}
+      <section
+        ref={heroRef}
+        className="relative w-full flex items-end overflow-hidden"
+        style={{ height: '100dvh', marginTop: '-64px', paddingTop: '64px' }}
+      >
+        {/* Video fills entire section including under navbar */}
+        <div className="absolute inset-0 w-full h-full">
+          <video
+            src="/hero-video.mp4"
+            autoPlay loop muted playsInline
+            className="absolute top-0 left-0 w-full h-full object-cover object-center"
           />
-        ))}
-      </div>
-      
-      {/* Slide 1: The Hero */}
-      <section className="h-screen w-full snap-start snap-always relative flex items-center justify-center overflow-hidden">
-        <video 
-          src="/hero-video.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover scale-105"
-        />
-        <div className="absolute inset-0 bg-charcoal/40 mix-blend-multiply" />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/20 to-transparent" />
-        
-        {/* Abstract Background Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] md:w-[40vw] md:h-[40vw] bg-bloodred/20 blur-[120px] rounded-full pointer-events-none" />
+          {/* Dark overlays for readability */}
+          <div className="absolute inset-0 bg-[#080808]/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#080808]/70 to-transparent" />
+          {/* Grain texture */}
+          <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: '150px'}} />
+        </div>
 
-        <div className="relative z-10 w-full px-6 flex flex-col items-center text-center mt-20">
+        {/* Hero Content */}
+        <div className="relative z-10 w-full px-6 md:px-16 pb-16 md:pb-24">
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
+          <motion.h1
+            initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-            className="flex flex-col items-center"
+            transition={{ delay: 0.3, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[18vw] sm:text-[14vw] md:text-[12vw] lg:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
           >
-            <h2 className="text-sm md:text-xl font-sans text-alabaster/80 uppercase tracking-[0.5em] mb-4">
-              Welcome To
-            </h2>
-            <h1 className="text-[14vw] sm:text-[10vw] md:text-[120px] lg:text-[160px] font-display text-alabaster leading-[0.8] tracking-tighter uppercase font-bold drop-shadow-2xl">
-              Wear<br />
-              <span className="text-transparent stroke-text drop-shadow-2xl">Impulsive</span>
-            </h1>
-          </motion.div>
+            <span className="block text-white">WEAR</span>
+            <span className="block" style={{ WebkitTextStroke: '2px #d00000', color: 'transparent' }}>IMPULSIVE</span>
+          </motion.h1>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-            className="mt-12"
+            transition={{ delay: 0.7, duration: 0.6 }}
           >
-            <Link href="/shop" className="group relative px-8 py-4 bg-alabaster text-charcoal font-bold uppercase tracking-widest text-xs overflow-hidden rounded-sm transition-all hover:bg-transparent border border-alabaster inline-block">
-              <span className="relative z-10 transition-colors duration-500 group-hover:text-alabaster">Explore Collection</span>
-              <div className="absolute inset-0 h-full w-full bg-bloodred translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out z-0" />
+            <Link
+              href="/shop"
+              className="group relative px-10 py-4 bg-bloodred text-white font-black uppercase tracking-[0.25em] text-[10px] overflow-hidden inline-flex items-center gap-3 shrink-0"
+            >
+              <span className="relative z-10">Shop Now</span>
+              <span className="relative z-10 transition-transform group-hover:translate-x-2">→</span>
+              <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
+              <span className="absolute inset-0 z-10 flex items-center justify-center gap-3 text-[#080808] opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-black uppercase tracking-[0.25em] text-[10px]">Shop Now →</span>
             </Link>
           </motion.div>
         </div>
@@ -176,200 +128,233 @@ export default function HomeClient() {
 
       </section>
 
-      {/* Slide 2: Manifesto / Breather */}
-      <section className="h-screen w-full snap-start snap-always relative flex flex-col items-center justify-center bg-charcoal px-6 md:px-24">
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <span className="text-[10px] uppercase tracking-[0.4em] text-bloodred font-bold block mb-12">Our Vision</span>
-          <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif text-alabaster leading-[1.3] font-light italic">
-            "We design clothing that looks great, fits perfectly, and stands out. High-quality streetwear in every piece."
-          </h2>
-          <div className="w-12 h-[1px] bg-bloodred mx-auto mt-12" />
+      {/* ─── MARQUEE TAPE ─── */}
+      <div className="bg-bloodred py-4 border-y-2 border-white/5 overflow-hidden">
+        <Marquee text="IMPULSIVE WORLDWIDE" className="text-[11px] font-black uppercase tracking-[0.3em] text-white" />
+      </div>
+
+      {/* ─── SECTION 2: MANIFESTO ─── */}
+      <section className="relative py-32 md:py-48 px-6 md:px-16 overflow-hidden bg-[#080808]">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[30vw] font-black text-white/[0.02] leading-none">01</span>
+        </div>
+        <div className="relative z-10 max-w-5xl">
+          <motion.h2
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-6xl lg:text-8xl font-black uppercase leading-[0.9] tracking-tighter text-white mb-8"
+          >
+            BUILT FOR THE
+            <br />
+            <span className="text-bloodred">STREETS.</span>
+            <br />
+            <span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)', color: 'transparent' }}>NO RULES.</span>
+          </motion.h2>
         </div>
       </section>
 
-      {/* Slide 3: Featured Products Slideshow with Parallax */}
-      <section className="h-screen w-full snap-start snap-always relative flex items-center justify-center overflow-hidden bg-charcoal">
-        {featuredProducts.length > 0 ? (
-          <>
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={currentSlide}
-                className="absolute inset-0 w-full h-full"
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ opacity: 1, scale: 1.05, x: mousePosition.x, y: mousePosition.y }}
-                exit={{ opacity: 0, scale: 1 }}
-                transition={{ opacity: { duration: 0.8 }, scale: { duration: 1.5 }, x: { type: "spring", stiffness: 50 }, y: { type: "spring", stiffness: 50 } }}
-              >
-            <Image 
-              src={featuredProducts[currentSlide].mainImage}
-              alt={featuredProducts[currentSlide].name}
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-charcoal/60" />
-            <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-charcoal/80 to-transparent opacity-90" />
-            
-            <div className="relative z-10 w-full max-w-[1600px] mx-auto px-8 md:px-24 lg:px-32 flex items-center h-full">
-              <motion.div 
-                initial={{ opacity: 0, filter: "blur(10px)", x: -30 }}
-                animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="max-w-2xl pointer-events-none"
-              >
+      {/* ─── SECTION 3: FEATURED PRODUCTS GRID ─── */}
+      <section className="py-20 md:py-32 px-4 md:px-12 bg-[#0c0c0c]">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-end justify-between mb-12 md:mb-20">
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.5em] text-bloodred font-bold block mb-3">The Collection</span>
+              <h2 className="text-4xl md:text-7xl font-black uppercase tracking-tighter leading-[0.9] text-white">
+                NEW<br/>DROPS
+              </h2>
+            </div>
+            <Link href="/shop" className="hidden md:flex items-center gap-3 text-white/50 hover:text-white transition-colors group text-[10px] uppercase tracking-[0.3em] font-bold">
+              <span>View All</span>
+              <span className="w-8 h-[1px] bg-white/30 group-hover:w-16 group-hover:bg-bloodred transition-all duration-500" />
+            </Link>
+          </div>
 
-                
-                {/* Glitch text effect wrapper */}
-                <div className="relative group">
-                  <h2 className="text-4xl sm:text-5xl md:text-8xl font-serif text-alabaster leading-[1.1] mb-8 relative z-10 transition-transform duration-300 group-hover:-translate-y-1">
-                    {featuredProducts[currentSlide].name}
-                  </h2>
-                  <h2 className="absolute top-0 left-0 text-4xl sm:text-5xl md:text-8xl font-serif text-bloodred leading-[1.1] mb-8 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:translate-y-1 transition-all duration-300 -z-10">
-                    {featuredProducts[currentSlide].name}
-                  </h2>
-                </div>
-
-                <p className="text-alabaster/70 text-base md:text-lg leading-relaxed mb-12 max-w-xl font-light">
-                  {featuredProducts[currentSlide].description}
-                </p>
-                
-                <div className="grid grid-cols-2 gap-8 mb-12 max-w-md pointer-events-auto">
-                  <div>
-                    <span className="text-[10px] uppercase tracking-widest text-stone block mb-2">Price</span>
-                    <span className="text-2xl font-serif text-bloodred" suppressHydrationWarning>{formatPrice(featuredProducts[currentSlide].price)}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase tracking-widest text-stone block mb-2">Sizes</span>
-                    <div className="flex gap-2">
-                      {featuredProducts[currentSlide].sizes.map(size => (
-                        <Link 
-                          key={size} 
-                          href={`/products/${featuredProducts[currentSlide].slug}`}
-                          className="text-xs font-sans border border-alabaster/20 px-2 py-1 hover:bg-alabaster hover:text-charcoal transition-colors cursor-pointer"
-                        >
-                          {size}
-                        </Link>
-                      ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            {featuredProducts.length > 0 ? featuredProducts.map((product, i) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+              >
+                <Link
+                  href={`/products/${product.slug}`}
+                  className="block group relative overflow-hidden bg-[#111]"
+                  onMouseEnter={() => setHoveredProduct(i)}
+                  onMouseLeave={() => setHoveredProduct(null)}
+                >
+                  <div className="relative aspect-[3/4] overflow-hidden">
+                    <Image
+                      src={hoveredProduct === i && product.hoverImage ? product.hoverImage : product.mainImage}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/90 via-transparent to-transparent" />
+                    {product.status && (
+                      <div className="absolute top-3 left-3">
+                        <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.3em] font-bold px-2.5 py-1">
+                          {product.status}
+                        </span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="bg-white text-[#080808] px-6 py-3 text-[9px] uppercase tracking-[0.3em] font-black">
+                        Shop Now
+                      </span>
                     </div>
                   </div>
-                </div>
-
-                <Link 
-                  href="/shop"
-                  onMouseEnter={() => setIsHovering(true)}
-                  onMouseLeave={() => setIsHovering(false)}
-                  className="pointer-events-auto bg-bloodred text-alabaster px-12 py-5 uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-alabaster hover:text-charcoal transition-all inline-block"
-                >
-                  Shop The Look
+                  <div className="p-4 border-t border-white/5 bg-[#111]">
+                    <h3 className="text-[10px] uppercase tracking-widest font-black text-white leading-tight mb-2 truncate">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <span className="text-bloodred font-black text-sm" suppressHydrationWarning>
+                        {formatPrice(product.price)}
+                      </span>
+                      <div className="flex gap-1">
+                        {product.sizes?.slice(0, 3).map(s => (
+                          <span key={s} className="text-[7px] text-white/30 uppercase font-bold">{s}</span>
+                        ))}
+                        {(product.sizes?.length || 0) > 3 && <span className="text-[7px] text-white/20">...</span>}
+                      </div>
+                    </div>
+                  </div>
                 </Link>
               </motion.div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Slideshow Controls */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
-          {featuredProducts.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-              className={`transition-all duration-500 ease-out rounded-full ${
-                currentSlide === idx 
-                  ? 'w-12 h-2 bg-bloodred' 
-                  : 'w-2 h-2 bg-alabaster/40 hover:bg-alabaster'
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
-          </>
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-charcoal">
-            <div className="w-16 h-16 border-t-2 border-bloodred border-solid rounded-full animate-spin mb-8" />
-            <p className="text-[10px] uppercase tracking-[0.4em] text-alabaster/50 font-bold animate-pulse">Syncing Archive...</p>
+            )) : (
+              <div className="col-span-4 flex items-center justify-center h-64">
+                <div className="text-center">
+                  <div className="w-8 h-8 border-t-2 border-bloodred rounded-full animate-spin mx-auto mb-4" />
+                  <p className="text-[9px] uppercase tracking-[0.4em] text-white/30">Loading Archive...</p>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+
+          <div className="mt-10 text-center md:hidden">
+            <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] font-black text-white border border-white/20 px-8 py-4 hover:border-bloodred hover:text-bloodred transition-all">
+              View All Drops →
+            </Link>
+          </div>
+        </div>
       </section>
 
-      {/* Slide 4: Transition / Breather */}
-      <section className="h-screen w-full snap-start snap-always relative flex flex-col items-center justify-center bg-bloodred overflow-hidden">
-        <div className="absolute top-1/2 left-0 w-full -translate-y-1/2 opacity-20 pointer-events-none -rotate-2 scale-110 z-0">
-          <motion.div 
+      {/* ─── MARQUEE 2 ─── */}
+      <div className="bg-[#111] py-4 border-y border-white/5 overflow-hidden">
+        <Marquee
+          text="STREETWEAR // IMPULSIVE // STAY IMPULSIVE // NEW DROPS"
+          reverse
+          className="text-[11px] font-black uppercase tracking-[0.3em] text-white/30"
+        />
+      </div>
+
+      {/* ─── SECTION 4: FULL-BLEED STATEMENT ─── */}
+      <section className="relative h-screen overflow-hidden flex items-center justify-center bg-bloodred">
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none">
+          <motion.div
             animate={{ x: [0, -1000] }}
-            transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
-            className="flex text-[100px] md:text-[200px] font-display font-bold uppercase text-charcoal whitespace-nowrap"
+            transition={{ repeat: Infinity, duration: 20, ease: 'linear' }}
+            className="whitespace-nowrap text-[18vw] font-black uppercase text-black/10 leading-none"
           >
-            <span className="mr-8">WEAR IMPULSIVE // WEAR IMPULSIVE //</span>
-            <span className="mr-8">WEAR IMPULSIVE // WEAR IMPULSIVE //</span>
-            <span className="mr-8">WEAR IMPULSIVE // WEAR IMPULSIVE //</span>
+            WEAR IMPULSIVE // STAY IMPULSIVE // WEAR IMPULSIVE // STAY IMPULSIVE //&nbsp;
+            WEAR IMPULSIVE // STAY IMPULSIVE // WEAR IMPULSIVE // STAY IMPULSIVE //&nbsp;
           </motion.div>
         </div>
         <div className="relative z-10 text-center px-6">
-          <h2 className="text-5xl md:text-8xl font-serif text-charcoal leading-none mb-6">Pure Style.</h2>
-          <p className="text-charcoal/80 text-xs md:text-sm tracking-[0.3em] uppercase font-bold">Designing the future of streetwear.</p>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <span className="text-[8px] uppercase tracking-[0.6em] text-black/60 font-bold block mb-6">Impulsive Worldwide</span>
+            <h2 className="text-6xl sm:text-8xl md:text-[12vw] font-black uppercase leading-[0.85] tracking-tighter text-black">
+              PURE<br/>STYLE.
+            </h2>
+            <p className="mt-6 text-black/60 text-xs uppercase tracking-[0.4em] font-bold">Designing the future of streetwear.</p>
+            <Link
+              href="/shop"
+              className="mt-12 inline-block bg-black text-white px-10 py-5 text-[10px] uppercase tracking-[0.3em] font-black hover:bg-white hover:text-black transition-all duration-300"
+            >
+              Shop the Drop →
+            </Link>
+          </motion.div>
         </div>
       </section>
 
-      {/* Slide 5: The Finale */}
-      <section className="h-screen w-full snap-start snap-always relative flex flex-col items-center justify-center bg-[#050505] px-6 text-center overflow-hidden">
-        <motion.div 
-            className="absolute inset-0 w-full h-full"
-            initial={{ scale: 1.1 }}
-            whileInView={{ scale: 1 }}
-            transition={{ duration: 2, ease: "easeOut" }}
-          >
-          <Image 
+      {/* ─── SECTION 5: NEWSLETTER / INNER CIRCLE ─── */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center py-24 px-6 bg-[#050505] overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
             src="/images/cta.png"
-            alt="Call to Action"
+            alt="IMPULSIVE"
             fill
-            className="object-cover opacity-30 mix-blend-luminosity grayscale"
+            className="object-cover opacity-10 grayscale"
           />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-charcoal/80" />
-        
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <span className="text-[10px] uppercase tracking-[0.4em] text-bloodred font-bold block mb-8">Inner Circle</span>
-          <h2 className="text-4xl sm:text-6xl md:text-8xl font-serif text-alabaster leading-[1.1] mb-6 md:mb-8 break-words">
-            Join Our Club.
-          </h2>
-          <p className="text-alabaster/60 mb-12 text-sm md:text-base leading-relaxed max-w-lg mx-auto font-light">
-            Sign up to get early access to new releases, limited drops, and special events.
-          </p>
-          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row justify-center items-stretch gap-3 sm:gap-0 w-full max-w-lg mx-auto">
-            <input 
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-              type="email" 
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
-              placeholder="ENTER EMAIL ADDRESS" 
-              className="bg-alabaster/5 backdrop-blur-md border border-alabaster/30 focus:border-bloodred focus:bg-alabaster/10 transition-all text-alabaster placeholder:text-alabaster/60 px-8 py-5 outline-none text-[10px] uppercase tracking-[0.2em] text-center sm:text-left w-full disabled:opacity-50" 
-              suppressHydrationWarning
-            />
-            <button 
-              type="submit"
-              disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-              className="bg-alabaster text-charcoal border border-alabaster px-10 py-5 uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-bloodred hover:text-alabaster hover:border-bloodred transition-all w-full sm:w-auto flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-              suppressHydrationWarning
-            >
-              {newsletterStatus === 'loading' ? 'Joining...' : newsletterStatus === 'success' ? 'Joined' : 'Join Now'}
-            </button>
-          </form>
-          {newsletterMsg && (
-            <motion.p 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`mt-6 text-[10px] uppercase tracking-[0.2em] font-bold ${newsletterStatus === 'error' ? 'text-bloodred' : 'text-alabaster/60'}`}
-            >
-              {newsletterMsg}
-            </motion.p>
-          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/80 to-[#050505]/60" />
+        </div>
+
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+          <span className="text-[20vw] font-black text-white/[0.015] leading-none uppercase">JOIN</span>
+        </div>
+
+        <div className="relative z-10 text-center max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <div className="w-12 h-[1px] bg-bloodred" />
+              <span className="text-[9px] uppercase tracking-[0.5em] text-bloodred font-black">Inner Circle</span>
+              <div className="w-12 h-[1px] bg-bloodred" />
+            </div>
+            <h2 className="text-5xl sm:text-7xl md:text-8xl font-black uppercase leading-[0.85] tracking-tighter text-white mb-6">
+              JOIN OUR<br/><span className="text-bloodred">CLUB.</span>
+            </h2>
+            <p className="text-white/40 text-xs uppercase tracking-[0.3em] mb-14 max-w-sm mx-auto leading-relaxed">
+              Early access to new drops, limited releases & exclusive events.
+            </p>
+
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-0 w-full max-w-md mx-auto">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
+                placeholder="YOUR EMAIL ADDRESS"
+                className="flex-1 bg-white/5 border border-white/10 focus:border-bloodred text-white placeholder:text-white/20 px-6 py-5 outline-none text-[9px] uppercase tracking-[0.2em] transition-all disabled:opacity-50"
+                suppressHydrationWarning
+              />
+              <button
+                type="submit"
+                disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
+                className="bg-bloodred text-white px-8 py-5 text-[9px] uppercase tracking-[0.3em] font-black hover:bg-white hover:text-[#080808] transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 border border-bloodred"
+                suppressHydrationWarning
+              >
+                {newsletterStatus === 'loading' ? '...' : newsletterStatus === 'success' ? '✓ Joined' : 'Join Now'}
+              </button>
+            </form>
+
+            <AnimatePresence>
+              {newsletterMsg && (
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className={`mt-6 text-[9px] uppercase tracking-[0.3em] font-bold ${newsletterStatus === 'error' ? 'text-bloodred' : 'text-white/50'}`}
+                >
+                  {newsletterMsg}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </section>
 

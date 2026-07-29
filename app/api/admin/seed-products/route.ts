@@ -6,6 +6,14 @@ import { products } from '@/lib/products';
 
 export const GET = async (req: Request) => {
   try {
+    const adminPassword = process.env.ADMIN_PASSWORD || 'impulsive2006';
+    const providedPassword = req.headers.get('x-admin-password');
+    
+    // Security Check
+    if (providedPassword !== adminPassword && process.env.NODE_ENV !== 'development') {
+      return NextResponse.json({ error: 'UNAUTHORIZED_ACCESS' }, { status: 403 });
+    }
+
     const supabase = (await import('@/lib/supabase')).getSupabaseAdmin();
 
     // Loop through hardcoded products and insert/upsert into DB

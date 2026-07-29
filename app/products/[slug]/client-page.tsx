@@ -276,6 +276,8 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                           className={`w-8 h-8 rounded-full border border-stone/20 ${
                             color.hex === '#800000' ? 'bg-[#800000]' : 
                             color.hex === '#0A0A0A' ? 'bg-[#0A0A0A]' : 
+                            color.hex === '#000000' ? 'bg-[#000000]' : 
+                            color.hex === '#FFFFFF' ? 'bg-[#FFFFFF]' : 
                             color.hex === '#F9F9F7' ? 'bg-[#F9F9F7]' : 'bg-stone'
                           }`}
                         >
@@ -325,17 +327,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                   </motion.div>
                 )}
                 
-                {productData.stock !== undefined && productData.stock === 0 && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center gap-3 bg-stone/5 border border-stone/10 p-4 rounded-sm text-stone"
-                  >
-                    <span className="text-[10px] uppercase tracking-[0.25em] font-bold">
-                      OUT OF STOCK // SOLD OUT
-                    </span>
-                  </motion.div>
-                )}
+
 
 
 
