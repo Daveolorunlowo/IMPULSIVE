@@ -12,11 +12,15 @@ import { useReviews } from '@/store/useReviews';
 import { useRouter, notFound } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useProducts } from '@/store/useProducts';
+import { products as hardcodedProducts } from '@/lib/products';
 
 export default function ProductDetailClient({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = React.use(params);
   const { products } = useProducts();
   const productData = products.find(p => p.slug === slug);
+
+  // sizeChart lives only in hardcoded data (not in Supabase), look it up by slug
+  const sizeChart = hardcodedProducts.find(p => p.slug === slug)?.sizeChart;
   
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(productData?.sizes[0] || '');
@@ -348,34 +352,89 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 </div>
 
                 {/* Inline Size Guide */}
-                <div className="space-y-4 pt-6">
-                  <h3 className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold mb-4">Garment Measurements</h3>
-                  <div className="border border-charcoal/10 text-xs text-charcoal/60 overflow-hidden bg-stone/5">
-                    <div className="grid grid-cols-4 bg-charcoal/5 p-3 font-bold text-[9px] uppercase tracking-widest text-charcoal border-b border-charcoal/10">
-                      <span>Size</span>
-                      <span>Chest</span>
-                      <span>Length</span>
-                      <span>Sleeve</span>
-                    </div>
-                    {[
-                      { s: 'S', c: '25"', l: '24"', sl: '22"' },
-                      { s: 'M', c: '26.5"', l: '25.5"', sl: '23.5"' },
-                      { s: 'L', c: '28"', l: '27"', sl: '25"' },
-                      { s: 'XL', c: '29.5"', l: '28.5"', sl: '26.5"' },
-                      { s: '2XL', c: '31"', l: '30"', sl: '28"' },
-                    ].map((row) => (
-                      <div key={row.s} className="grid grid-cols-4 p-3 border-b border-charcoal/5 last:border-0 hover:bg-charcoal/5 transition-colors">
-                        <span className="font-bold text-charcoal">{row.s}</span>
-                        <span>{row.c}</span>
-                        <span>{row.l}</span>
-                        <span>{row.sl}</span>
+                {sizeChart ? (
+                  <div className="pt-8">
+                    {/* Header */}
+                    <div className="flex items-center gap-4 mb-5">
+                      <div className="w-1 h-8 bg-bloodred" />
+                      <div>
+                        <p className="text-[9px] uppercase tracking-[0.4em] text-stone font-bold">Size Guide</p>
+                        <h3 className="text-lg font-serif font-bold text-charcoal uppercase tracking-tight">Garment Measurements</h3>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Table */}
+                    <div className="overflow-hidden border-2 border-charcoal">
+                      {/* Header row */}
+                      <div className={`grid ${sizeChart[0]?.sleeve ? 'grid-cols-4' : 'grid-cols-3'} bg-charcoal text-alabaster px-5 py-4`}>
+                        <span className="text-[10px] uppercase tracking-[0.35em] font-black">Size</span>
+                        <span className="text-[10px] uppercase tracking-[0.35em] font-black">Chest (in)</span>
+                        <span className="text-[10px] uppercase tracking-[0.35em] font-black">Length (in)</span>
+                        {sizeChart[0]?.sleeve && (
+                          <span className="text-[10px] uppercase tracking-[0.35em] font-black">Sleeve (in)</span>
+                        )}
+                      </div>
+                      {/* Data rows */}
+                      {sizeChart.map((row, i) => (
+                        <div
+                          key={row.size}
+                          className={`grid ${row.sleeve ? 'grid-cols-4' : 'grid-cols-3'} px-5 py-4 border-b border-charcoal/10 last:border-0 transition-colors ${
+                            selectedSize === row.size
+                              ? 'bg-bloodred/10 border-l-4 border-l-bloodred'
+                              : i % 2 === 0 ? 'bg-stone/5 hover:bg-bloodred/5' : 'bg-white hover:bg-bloodred/5'
+                          }`}
+                        >
+                          <span className={`font-black text-sm tracking-widest flex items-center gap-2 ${
+                            selectedSize === row.size ? 'text-bloodred' : 'text-charcoal'
+                          }`}>
+                            {row.size}
+                            {selectedSize === row.size && (
+                              <span className="text-[7px] uppercase tracking-widest text-bloodred bg-bloodred/10 px-1.5 py-0.5">selected</span>
+                            )}
+                          </span>
+                          <span className="text-charcoal font-semibold text-sm">{row.chest}</span>
+                          <span className="text-charcoal font-semibold text-sm">{row.length}</span>
+                          {row.sleeve && (
+                            <span className="text-charcoal font-semibold text-sm">{row.sleeve}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="mt-3 text-[9px] uppercase tracking-widest text-stone/70 leading-relaxed">
+                      ✦ All measurements are in inches and are true to size
+                    </p>
                   </div>
-                  <p className="text-[9px] uppercase tracking-widest text-stone leading-relaxed">
-                    ALL MEASUREMENTS ARE IN INCHES AND ARE TRUE TO SIZE
-                  </p>
-                </div>
+                ) : (
+                  <div className="space-y-4 pt-6">
+                    <h3 className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold mb-4">Garment Measurements</h3>
+                    <div className="border border-charcoal/10 text-xs text-charcoal/60 overflow-hidden bg-stone/5">
+                      <div className="grid grid-cols-4 bg-charcoal/5 p-3 font-bold text-[9px] uppercase tracking-widest text-charcoal border-b border-charcoal/10">
+                        <span>Size</span>
+                        <span>Chest</span>
+                        <span>Length</span>
+                        <span>Sleeve</span>
+                      </div>
+                      {[
+                        { s: 'S', c: '25"', l: '24"', sl: '22"' },
+                        { s: 'M', c: '26.5"', l: '25.5"', sl: '23.5"' },
+                        { s: 'L', c: '28"', l: '27"', sl: '25"' },
+                        { s: 'XL', c: '29.5"', l: '28.5"', sl: '26.5"' },
+                        { s: '2XL', c: '31"', l: '30"', sl: '28"' },
+                      ].map((row) => (
+                        <div key={row.s} className="grid grid-cols-4 p-3 border-b border-charcoal/5 last:border-0 hover:bg-charcoal/5 transition-colors">
+                          <span className="font-bold text-charcoal">{row.s}</span>
+                          <span>{row.c}</span>
+                          <span>{row.l}</span>
+                          <span>{row.sl}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-[9px] uppercase tracking-widest text-stone leading-relaxed">
+                      ALL MEASUREMENTS ARE IN INCHES AND ARE TRUE TO SIZE
+                    </p>
+                  </div>
+                )}
 
                 {/* Add to Cart */}
                 <div className="pt-8">

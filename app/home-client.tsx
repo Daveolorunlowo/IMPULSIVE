@@ -102,7 +102,7 @@ export default function HomeClient() {
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[12vw] sm:text-[10vw] md:text-[9vw] lg:text-[8vw] xl:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
+            className="text-[9vw] sm:text-[10vw] md:text-[9vw] lg:text-[8vw] xl:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
           >
             <span className="block text-white">WEAR</span>
             <span className="block" style={{ WebkitTextStroke: '2px #d00000', color: 'transparent' }}>IMPULSIVE</span>
@@ -128,10 +128,7 @@ export default function HomeClient() {
 
       </section>
 
-      {/* ─── MARQUEE TAPE ─── */}
-      <div className="bg-bloodred py-4 border-y-2 border-white/5 overflow-hidden">
-        <Marquee text="IMPULSIVE WORLDWIDE" className="text-[11px] font-black uppercase tracking-[0.3em] text-white" />
-      </div>
+
 
       {/* ─── SECTION 2: MANIFESTO ─── */}
       <section className="relative py-32 md:py-48 px-6 md:px-16 overflow-hidden bg-[#080808]">
@@ -243,14 +240,7 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* ─── MARQUEE 2 ─── */}
-      <div className="bg-[#111] py-4 border-y border-white/5 overflow-hidden">
-        <Marquee
-          text="STREETWEAR // IMPULSIVE // STAY IMPULSIVE // NEW DROPS"
-          reverse
-          className="text-[11px] font-black uppercase tracking-[0.3em] text-white/30"
-        />
-      </div>
+
 
       {/* ─── SECTION 4: FULL-BLEED STATEMENT ─── */}
       <section className="relative h-screen overflow-hidden flex items-center justify-center bg-bloodred">

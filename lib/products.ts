@@ -1,3 +1,10 @@
+export interface SizeChartRow {
+  size: string;
+  chest: string;
+  length: string;
+  sleeve?: string;
+}
+
 export interface Product {
   id: string;
   slug: string;
@@ -13,6 +20,7 @@ export interface Product {
   colors: { name: string; hex: string }[];
   status?: string;
   stock?: number;
+  sizeChart?: SizeChartRow[];
 }
 
 export const products: Product[] = [
@@ -21,7 +29,7 @@ export const products: Product[] = [
     slug: 'impulsive-worldwide-swagger-long-sleeve',
     name: 'IMPULSIVE WORLDWIDE SWAGGER LONG SLEEVE',
     category: 'Signature',
-    price: 20000,
+    price: 25000,
     status: 'In Stock',
     description: 'The IMPULSIVE WORLDWIDE SWAGGER LONG SLEEVE features an eye-catching graphic and custom typography.',
     mainImage: '/images/worldwide-swagger-main.jpeg',
@@ -40,6 +48,13 @@ export const products: Product[] = [
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
       { name: 'Black/White', hex: '#0A0A0A' }
+    ],
+    sizeChart: [
+      { size: 'S',   chest: '25"', length: '24"', sleeve: '22"' },
+      { size: 'M',   chest: '26.5"', length: '25.5"', sleeve: '23.5"' },
+      { size: 'L',   chest: '28"', length: '27"', sleeve: '25"' },
+      { size: 'XL',  chest: '29.5"', length: '28.5"', sleeve: '26.5"' },
+      { size: '2XL', chest: '31"', length: '30"', sleeve: '28"' },
     ]
   },
   {
@@ -47,7 +62,7 @@ export const products: Product[] = [
     slug: 'impulsive-swagger-long-sleeve-red',
     name: 'IMPULSIVE SWAGGER LONG SLEEVE RED',
     category: 'Signature',
-    price: 20000,
+    price: 25000,
     status: 'In Stock',
     description: 'The definitive IMPULSIVE SWAGGER LONG SLEEVE in red. Engineered for a bold, structural fit.',
     mainImage: '/images/impulsive-swagger-main.jpeg',
@@ -64,6 +79,13 @@ export const products: Product[] = [
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
       { name: 'Red', hex: '#800000' }
+    ],
+    sizeChart: [
+      { size: 'S',   chest: '25"', length: '24"', sleeve: '22"' },
+      { size: 'M',   chest: '26.5"', length: '25.5"', sleeve: '23.5"' },
+      { size: 'L',   chest: '28"', length: '27"', sleeve: '25"' },
+      { size: 'XL',  chest: '29.5"', length: '28.5"', sleeve: '26.5"' },
+      { size: '2XL', chest: '31"', length: '30"', sleeve: '28"' },
     ]
   },
   {
@@ -90,6 +112,12 @@ export const products: Product[] = [
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
       { name: 'White', hex: '#FFFFFF' }
+    ],
+    sizeChart: [
+      { size: 'M',   chest: '40"', length: '29"' },
+      { size: 'L',   chest: '42"', length: '29"' },
+      { size: 'XL',  chest: '44"', length: '31"' },
+      { size: 'XXL', chest: '46"', length: '32"' },
     ]
   },
   {
@@ -116,6 +144,12 @@ export const products: Product[] = [
     sizes: ['M', 'L', 'XL', 'XXL'],
     colors: [
       { name: 'Black', hex: '#000000' }
+    ],
+    sizeChart: [
+      { size: 'M',   chest: '40"', length: '29"' },
+      { size: 'L',   chest: '42"', length: '29"' },
+      { size: 'XL',  chest: '44"', length: '31"' },
+      { size: 'XXL', chest: '46"', length: '32"' },
     ]
   }
 ];
