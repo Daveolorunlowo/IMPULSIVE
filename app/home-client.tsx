@@ -102,7 +102,7 @@ export default function HomeClient() {
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[18vw] sm:text-[14vw] md:text-[12vw] lg:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
+            className="text-[10vw] sm:text-[14vw] md:text-[12vw] lg:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
           >
             <span className="block text-white">WEAR</span>
             <span className="block" style={{ WebkitTextStroke: '2px #d00000', color: 'transparent' }}>IMPULSIVE</span>
@@ -171,7 +171,7 @@ export default function HomeClient() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
             {featuredProducts.length > 0 ? featuredProducts.map((product, i) => (
               <motion.div
                 key={product.id}
