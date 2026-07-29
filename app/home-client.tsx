@@ -146,7 +146,7 @@ export default function HomeClient() {
             transition={{ duration: 0.8 }}
             className="text-4xl md:text-6xl lg:text-8xl font-black uppercase leading-[0.9] tracking-tighter text-white mb-8"
           >
-            BUILT FOR THE
+            MADE FOR THE
             <br />
             <span className="text-bloodred">STREETS.</span>
             <br />
