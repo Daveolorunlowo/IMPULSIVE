@@ -24,16 +24,25 @@ export const metadata: Metadata = {
   description: "Curated collections for the modern era. Experience refined shopping. Archival design systems.",
   openGraph: {
     title: "WEARIMPULSIVE",
-    description: "Curated collections for the modern era. Experience refined shopping.",
+    description: "Curated collections for the modern era. Experience refined shopping. Archival design systems built for longevity.",
     url: 'https://wearimpulsive.site',
     siteName: 'WEARIMPULSIVE',
+    images: [
+      {
+        url: '/images/lookout-logo.jpeg',
+        width: 1200,
+        height: 1200,
+        alt: 'WEARIMPULSIVE Logo',
+      },
+    ],
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'WEARIMPULSIVE',
-    description: 'Curated collections for the modern era. Experience refined shopping.',
+    description: 'Curated collections for the modern era. Experience refined shopping. Archival design systems built for longevity.',
+    images: ['/images/lookout-logo.jpeg'],
   },
   robots: {
     index: true,
