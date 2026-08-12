@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   },
   description: "Curated collections for the modern era. Experience refined shopping. Archival design systems.",
   icons: {
-    icon: '/images/wi-logo.png',
-    shortcut: '/images/wi-logo.png',
-    apple: '/images/wi-logo.png',
+    icon: '/images/lookout-logo.jpeg',
+    shortcut: '/images/lookout-logo.jpeg',
+    apple: '/images/lookout-logo.jpeg',
   },
   openGraph: {
     title: "WEARIMPULSIVE",
