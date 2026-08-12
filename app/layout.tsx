@@ -16,16 +16,21 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://wearimpulsive.site'),
+  metadataBase: new URL('https://www.wearimpulsive.site'),
   title: {
     default: "WEARIMPULSIVE | Modern Luxury Fashion",
     template: "%s | WEARIMPULSIVE"
   },
   description: "Curated collections for the modern era. Experience refined shopping. Archival design systems.",
+  icons: {
+    icon: '/images/lookout-logo.jpeg',
+    shortcut: '/images/lookout-logo.jpeg',
+    apple: '/images/lookout-logo.jpeg',
+  },
   openGraph: {
     title: "WEARIMPULSIVE",
     description: "Curated collections for the modern era. Experience refined shopping. Archival design systems built for longevity.",
-    url: 'https://wearimpulsive.site',
+    url: 'https://www.wearimpulsive.site',
     siteName: 'WEARIMPULSIVE',
     images: [
       {
