@@ -15,53 +15,86 @@ export default async function Image() {
     (
       <div
         style={{
-          background: '#040404', 
+          background: '#0F0F0F', 
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
-          justifyContent: 'center',
+          fontFamily: 'sans-serif',
         }}
       >
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '8px', background: '#D90000' }} />
-        
-        <img
-          src={logoSrc}
-          alt="WEARIMPULSIVE Logo"
+        {/* Left Side: Logo Area */}
+        <div 
           style={{ 
-            width: '400px', 
-            height: '300px', 
-            objectFit: 'contain' 
-          }}
-        />
-        
-        <div
-          style={{
-            color: '#FFFFFF',
-            fontSize: '36px',
-            fontWeight: 800,
-            letterSpacing: '0.4em',
-            marginTop: '60px',
-            textTransform: 'uppercase',
-            fontFamily: 'sans-serif',
+            display: 'flex', 
+            width: '50%', 
+            height: '100%', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            background: '#000000',
+            borderRight: '1px solid #222222'
           }}
         >
-          WEARIMPULSIVE
+          <img
+            src={logoSrc}
+            alt="WEARIMPULSIVE Logo"
+            style={{ 
+              width: '450px', 
+              height: '450px', 
+              objectFit: 'contain' 
+            }}
+          />
         </div>
         
-        <div
-          style={{
-            color: '#888888',
-            fontSize: '20px',
-            fontWeight: 400,
-            letterSpacing: '0.2em',
-            marginTop: '15px',
-            textTransform: 'uppercase',
-            fontFamily: 'sans-serif',
+        {/* Right Side: Typography */}
+        <div 
+          style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            width: '50%', 
+            height: '100%',
+            padding: '80px',
+            justifyContent: 'center'
           }}
         >
-          Archive Collection
+          <div
+            style={{
+              color: '#FFFFFF',
+              fontSize: '56px',
+              fontWeight: 900,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              textTransform: 'uppercase',
+            }}
+          >
+            WEARIMPULSIVE
+          </div>
+          
+          <div
+            style={{
+              color: '#A0A0A0',
+              fontSize: '28px',
+              fontWeight: 400,
+              marginTop: '24px',
+              lineHeight: 1.4,
+            }}
+          >
+            Curated collections for the modern era. Archival design systems.
+          </div>
+
+          <div
+            style={{
+              color: '#D90000',
+              fontSize: '22px',
+              fontWeight: 700,
+              letterSpacing: '0.15em',
+              marginTop: '60px',
+              textTransform: 'uppercase',
+            }}
+          >
+            wearimpulsive.site
+          </div>
         </div>
       </div>
     ),
