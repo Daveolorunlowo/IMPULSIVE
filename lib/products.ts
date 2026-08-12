@@ -100,7 +100,6 @@ export const products: Product[] = [
     hoverImage: '/images/freedom-tee-alt1.jpeg',
     images: [
       '/images/freedom-tee-main.jpeg',
-      '/images/freedom-tee-hover.jpeg',
       '/images/freedom-tee-alt1.jpeg',
       '/images/freedom-tee-alt2.jpeg'
     ],
@@ -134,7 +133,6 @@ export const products: Product[] = [
     hoverImage: '/images/freedom-tee-black-alt1.jpeg',
     images: [
       '/images/freedom-tee-black-main.jpeg',
-      '/images/freedom-tee-black-hover.jpeg',
       '/images/freedom-tee-black-alt1.jpeg',
       '/images/freedom-tee-black-alt2.jpeg'
     ],

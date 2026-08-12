@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   },
   description: "Curated collections for the modern era. Experience refined shopping. Archival design systems.",
   icons: {
-    icon: '/images/lookout-logo.jpeg',
-    shortcut: '/images/lookout-logo.jpeg',
-    apple: '/images/lookout-logo.jpeg',
+    icon: '/images/impulsive-logo-new-removebg-preview.png',
+    shortcut: '/images/impulsive-logo-new-removebg-preview.png',
+    apple: '/images/impulsive-logo-new-removebg-preview.png',
   },
   openGraph: {
     title: "WEARIMPULSIVE",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     siteName: 'WEARIMPULSIVE',
     images: [
       {
-        url: '/images/lookout-logo.jpeg',
+        url: '/images/impulsive-logo-new-removebg-preview.png',
         width: 1200,
         height: 1200,
         alt: 'WEARIMPULSIVE Logo',
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WEARIMPULSIVE',
     description: 'Curated collections for the modern era. Experience refined shopping. Archival design systems built for longevity.',
-    images: ['/images/lookout-logo.jpeg'],
+    images: ['/images/impulsive-logo-new-removebg-preview.png'],
   },
   robots: {
     index: true,

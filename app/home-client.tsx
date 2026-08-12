@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useProducts } from '@/store/useProducts';
 import { useCurrency } from '@/store/useCurrency';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { ProductSkeleton } from '@/components/SkeletonLoaders';
 
 // --- MARQUEE COMPONENT ---
 function Marquee({ text, reverse = false, className = '' }: { text: string; reverse?: boolean; className?: string }) {
@@ -29,7 +30,7 @@ function Marquee({ text, reverse = false, className = '' }: { text: string; reve
 }
 
 export default function HomeClient() {
-  const { products } = useProducts();
+  const { products, isLoading } = useProducts();
   const featuredProducts = products.slice(0, 4);
   const { formatPrice } = useCurrency();
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
@@ -189,7 +190,13 @@ export default function HomeClient() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
-            {featuredProducts.length > 0 ? featuredProducts.map((product, i) => (
+            {isLoading ? (
+              Array(4).fill(0).map((_, i) => (
+                <div key={`skeleton-${i}`} className="bg-[#111] p-4">
+                  <ProductSkeleton />
+                </div>
+              ))
+            ) : featuredProducts.length > 0 ? featuredProducts.map((product, i) => (
               <motion.div
                 key={product.id}
                 initial={{ opacity: 0, y: 40 }}
@@ -208,7 +215,7 @@ export default function HomeClient() {
                       src={
                         hoveredProduct === i
                           ? (product.slug.includes('freedom-man-tee')
-                              ? product.images.filter((img) => img !== product.mainImage)[cycleIndex] || product.hoverImage
+                              ? product.images.filter((img: string) => img !== product.mainImage)[cycleIndex] || product.hoverImage
                               : product.hoverImage)
                           : product.mainImage
                       }
@@ -239,7 +246,7 @@ export default function HomeClient() {
                         {formatPrice(product.price)}
                       </span>
                       <div className="flex gap-1">
-                        {product.sizes?.slice(0, 3).map(s => (
+                        {product.sizes?.slice(0, 3).map((s: string) => (
                           <span key={s} className="text-[7px] text-white/30 uppercase font-bold">{s}</span>
                         ))}
                         {(product.sizes?.length || 0) > 3 && <span className="text-[7px] text-white/20">...</span>}
@@ -251,8 +258,7 @@ export default function HomeClient() {
             )) : (
               <div className="col-span-4 flex items-center justify-center h-64">
                 <div className="text-center">
-                  <div className="w-8 h-8 border-t-2 border-bloodred rounded-full animate-spin mx-auto mb-4" />
-                  <p className="text-[9px] uppercase tracking-[0.4em] text-white/30">Loading Archive...</p>
+                  <p className="text-[9px] uppercase tracking-[0.4em] text-white/30">No products found</p>
                 </div>
               </div>
             )}

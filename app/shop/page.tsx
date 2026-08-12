@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/store/useProducts';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ProductSkeleton } from '@/components/SkeletonLoaders';
 
 const categories = ['All'];
 
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState('All');
-  const { products } = useProducts();
+  const { products, isLoading } = useProducts();
 
   const filteredProducts = activeCategory === 'All' 
     ? products 
@@ -46,24 +47,30 @@ export default function ShopPage() {
 
         {/* Product Grid - Clean 4-Column */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-8 md:gap-x-12 gap-y-16 md:gap-y-24">
-          <AnimatePresence mode="popLayout">
-            {filteredProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                layout
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: index * 0.05 }}
-              >
-                <ProductCard {...product} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+          {isLoading ? (
+            Array(8).fill(0).map((_, index) => (
+              <ProductSkeleton key={index} />
+            ))
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {filteredProducts.map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  layout
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: index * 0.05 }}
+                >
+                  <ProductCard {...product} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
         </div>
 
         {/* Empty State */}
-        {filteredProducts.length === 0 && (
+        {!isLoading && filteredProducts.length === 0 && (
           <div className="py-60 text-center border-t border-stone/20">
             <p className="text-xl font-serif text-alabaster/30">
               No pieces found in this category.
