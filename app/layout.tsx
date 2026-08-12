@@ -23,9 +23,9 @@ export const metadata: Metadata = {
   },
   description: "Curated collections for the modern era. Experience refined shopping. Archival design systems.",
   icons: {
-    icon: '/images/impulsive-logo-new-removebg-preview.png',
-    shortcut: '/images/impulsive-logo-new-removebg-preview.png',
-    apple: '/images/impulsive-logo-new-removebg-preview.png',
+    icon: '/images/wi-logo.png',
+    shortcut: '/images/wi-logo.png',
+    apple: '/images/wi-logo.png',
   },
   openGraph: {
     title: "WEARIMPULSIVE",
