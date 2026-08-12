@@ -11,24 +11,20 @@ export default function Logo({ className = '', variant = 'light' }: LogoProps) {
     : 'none';
 
   return (
-    // Content occupies y:39%–60% of the 500×500 square.
-    // marginTop: -38% offsets the top padding so the wordmark
-    // sits at the top of the crop window (% is relative to parent width).
-    // Container height must be ≥ 22% of its width to show all content.
     <div
       className={className}
-      style={{ overflow: 'hidden', position: 'relative', flexShrink: 0 }}
+      style={{ position: 'relative', flexShrink: 0, display: 'flex', alignItems: 'center' }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/images/impulsive-logo-new-removebg-preview.png"
+        src="/images/lookout-logo.jpeg"
         alt="Impulsive Logo"
         style={{
           width: '100%',
           height: 'auto',
-          marginTop: '-36%',
           display: 'block',
           filter: filterStyle,
+          borderRadius: '4px', // slight rounding since it's a jpeg
         }}
       />
     </div>
