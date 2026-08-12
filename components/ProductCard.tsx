@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 
 import { useCart } from '@/store/useCart';
@@ -18,6 +18,7 @@ interface ProductCardProps {
   price: number;
   mainImage: string;
   hoverImage: string;
+  images: string[];
   category: string;
   sizes: string[];
   colors: { name: string; hex: string }[];
@@ -32,12 +33,32 @@ export default function ProductCard({
   price,
   mainImage,
   hoverImage,
+  images,
   category,
   sizes,
   colors,
   stock,
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [cycleIndex, setCycleIndex] = useState(0);
+
+  const cycleImages = images ? images.filter(img => img !== mainImage) : [];
+  const hasCycleImages = slug.includes('freedom-man-tee') && cycleImages.length > 1;
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isHovered && hasCycleImages) {
+      interval = setInterval(() => {
+        setCycleIndex(prev => (prev + 1) % cycleImages.length);
+      }, 800);
+    } else {
+      setCycleIndex(0);
+    }
+    return () => clearInterval(interval);
+  }, [isHovered, hasCycleImages, cycleImages.length]);
+
+  const currentHoverImage = hasCycleImages ? cycleImages[cycleIndex] : hoverImage;
+
   const { addItem } = useCart();
   const { formatPrice } = useCurrency();
   const { isAuthenticated, trackActivity } = useAuth();
@@ -87,7 +108,7 @@ export default function ProductCard({
               )}
             />
             <Image
-              src={hoverImage}
+              src={currentHoverImage}
               alt={name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

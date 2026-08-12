@@ -33,6 +33,26 @@ export default function HomeClient() {
   const featuredProducts = products.slice(0, 4);
   const { formatPrice } = useCurrency();
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const [cycleIndex, setCycleIndex] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (hoveredProduct !== null) {
+      const product = featuredProducts[hoveredProduct];
+      if (product && product.slug.includes('freedom-man-tee')) {
+        const cycleImages = product.images.filter((img: string) => img !== product.mainImage);
+        if (cycleImages.length > 1) {
+          interval = setInterval(() => {
+            setCycleIndex((prev) => (prev + 1) % cycleImages.length);
+          }, 800);
+        }
+      }
+    } else {
+      setCycleIndex(0);
+    }
+    return () => clearInterval(interval);
+  }, [hoveredProduct, featuredProducts]);
+
   const heroRef = useRef<HTMLDivElement>(null);
 
   // Newsletter State
@@ -185,7 +205,13 @@ export default function HomeClient() {
                 >
                   <div className="relative aspect-[3/4] overflow-hidden">
                     <Image
-                      src={hoveredProduct === i && product.hoverImage ? product.hoverImage : product.mainImage}
+                      src={
+                        hoveredProduct === i
+                          ? (product.slug.includes('freedom-man-tee')
+                              ? product.images.filter((img) => img !== product.mainImage)[cycleIndex] || product.hoverImage
+                              : product.hoverImage)
+                          : product.mainImage
+                      }
                       alt={product.name}
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
