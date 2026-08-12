@@ -97,10 +97,12 @@ export const products: Product[] = [
     status: 'New Drop',
     description: 'The IMPULSIVE FREEDOM MAN TEE WHITE features a vibrant graphic design.',
     mainImage: '/images/freedom-tee-main.jpeg',
-    hoverImage: '/images/freedom-tee-hover.jpeg',
+    hoverImage: '/images/freedom-tee-alt1.jpeg',
     images: [
       '/images/freedom-tee-main.jpeg',
-      '/images/freedom-tee-hover.jpeg'
+      '/images/freedom-tee-hover.jpeg',
+      '/images/freedom-tee-alt1.jpeg',
+      '/images/freedom-tee-alt2.jpeg'
     ],
     details: [
       '100% COTTON',
@@ -129,10 +131,12 @@ export const products: Product[] = [
     status: 'New Drop',
     description: 'The IMPULSIVE FREEDOM MAN TEE BLACK features a vibrant graphic design.',
     mainImage: '/images/freedom-tee-black-main.jpeg',
-    hoverImage: '/images/freedom-tee-black-hover.jpeg',
+    hoverImage: '/images/freedom-tee-black-alt1.jpeg',
     images: [
       '/images/freedom-tee-black-main.jpeg',
-      '/images/freedom-tee-black-hover.jpeg'
+      '/images/freedom-tee-black-hover.jpeg',
+      '/images/freedom-tee-black-alt1.jpeg',
+      '/images/freedom-tee-black-alt2.jpeg'
     ],
     details: [
       '100% COTTON',
