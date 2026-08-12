@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     siteName: 'WEARIMPULSIVE',
     images: [
       {
-        url: '/images/impulsive-logo-new-removebg-preview.png',
+        url: '/images/wi-logo.png',
         width: 1200,
         height: 1200,
         alt: 'WEARIMPULSIVE Logo',
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'WEARIMPULSIVE',
     description: 'Curated collections for the modern era. Experience refined shopping. Archival design systems built for longevity.',
-    images: ['/images/impulsive-logo-new-removebg-preview.png'],
+    images: ['/images/wi-logo.png'],
   },
   robots: {
     index: true,
