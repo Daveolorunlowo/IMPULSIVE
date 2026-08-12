@@ -16,55 +16,23 @@ export default async function Image() {
     (
       <div
         style={{
-          background: '#040404', // Very dark luxury charcoal/black
+          background: '#000000', // Pure black to match the logo background
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        {/* Subtle top border for a premium feel */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '8px', background: '#D90000' }} />
-        
         <img
           src={logoSrc}
           alt="WEARIMPULSIVE Logo"
           style={{ 
-            width: '280px', 
-            height: '280px', 
+            width: '600px', 
+            height: '600px', 
             objectFit: 'contain' 
           }}
         />
-        
-        <div
-          style={{
-            color: '#FFFFFF',
-            fontSize: '28px',
-            fontWeight: 800,
-            letterSpacing: '0.5em',
-            marginTop: '80px',
-            textTransform: 'uppercase',
-            fontFamily: 'sans-serif',
-          }}
-        >
-          WEARIMPULSIVE
-        </div>
-        
-        <div
-          style={{
-            color: '#666666',
-            fontSize: '18px',
-            fontWeight: 400,
-            letterSpacing: '0.3em',
-            marginTop: '20px',
-            textTransform: 'uppercase',
-            fontFamily: 'sans-serif',
-          }}
-        >
-          Archive Collection
-        </div>
       </div>
     ),
     { ...size }
