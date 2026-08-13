@@ -19,52 +19,43 @@ export default async function Image() {
           width: '100%',
           height: '100%',
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column',
           alignItems: 'center',
+          justifyContent: 'center',
           fontFamily: 'sans-serif',
+          padding: '40px',
         }}
       >
-        {/* Left Side: Logo Area */}
-        <div 
-          style={{ 
-            display: 'flex', 
-            width: '50%', 
-            height: '100%', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            background: '#000000',
-            borderRight: '1px solid #222222'
-          }}
-        >
-          <img
-            src={logoSrc}
-            alt="WEARIMPULSIVE Logo"
-            style={{ 
-              width: '450px', 
-              height: '450px', 
-              objectFit: 'contain' 
-            }}
-          />
-        </div>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '12px', background: '#D90000' }} />
         
-        {/* Right Side: Typography */}
+        {/* Centered Logo */}
+        <img
+          src={logoSrc}
+          alt="WEARIMPULSIVE Logo"
+          style={{ 
+            width: '240px', 
+            height: '240px', 
+            objectFit: 'contain',
+            marginBottom: '40px'
+          }}
+        />
+        
+        {/* Centered Typography */}
         <div 
           style={{ 
             display: 'flex', 
             flexDirection: 'column', 
-            width: '50%', 
-            height: '100%',
-            padding: '80px',
-            justifyContent: 'center'
+            alignItems: 'center',
+            textAlign: 'center'
           }}
         >
           <div
             style={{
               color: '#FFFFFF',
-              fontSize: '56px',
+              fontSize: '72px',
               fontWeight: 900,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
+              letterSpacing: '0.1em',
+              lineHeight: 1,
               textTransform: 'uppercase',
             }}
           >
@@ -74,10 +65,12 @@ export default async function Image() {
           <div
             style={{
               color: '#A0A0A0',
-              fontSize: '28px',
+              fontSize: '32px',
               fontWeight: 400,
               marginTop: '24px',
               lineHeight: 1.4,
+              maxWidth: '800px',
+              textAlign: 'center'
             }}
           >
             Curated collections for the modern era. Archival design systems.
@@ -86,10 +79,10 @@ export default async function Image() {
           <div
             style={{
               color: '#D90000',
-              fontSize: '22px',
+              fontSize: '28px',
               fontWeight: 700,
-              letterSpacing: '0.15em',
-              marginTop: '60px',
+              letterSpacing: '0.2em',
+              marginTop: '48px',
               textTransform: 'uppercase',
             }}
           >
