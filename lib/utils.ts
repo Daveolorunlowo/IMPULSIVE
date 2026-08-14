@@ -14,7 +14,7 @@ export function calculateShipping(stateName: string): number {
   if (stateNormalized.includes('oyo')) {
     feeNGN = 0;
   } else if (stateNormalized.includes('lagos')) {
-    feeNGN = 2000;
+    feeNGN = 6000;
   } else if (stateNormalized.includes('osun')) {
     feeNGN = 2000;
   } else if (stateNormalized.includes('ogun')) {

@@ -25,14 +25,7 @@ export default function SocialPreview({
   className,
 }: SocialPreviewProps) {
   // Extract domain from URL if not explicitly provided
-  const displayDomain = domain || (() => {
-    try {
-      const urlObj = new URL(url);
-      return urlObj.hostname.replace('www.', '');
-    } catch {
-      return '';
-    }
-  })();
+  const displayDomain = domain || 'IMPULSIVE';
 
   return (
     <motion.a
@@ -65,7 +58,7 @@ export default function SocialPreview({
 
       {/* Content Section */}
       <div className="flex flex-col gap-3 p-5 sm:p-6 bg-alabaster">
-        <div className="flex items-center justify-between text-xs font-mono uppercase tracking-widest text-charcoal/50">
+        <div className="flex items-center justify-between text-xs font-display font-bold uppercase tracking-widest text-charcoal/50">
           <span className="flex items-center gap-2 truncate">
             <Link2 size={14} className="flex-shrink-0 text-bloodred" />
             <span className="truncate">{displayDomain}</span>
