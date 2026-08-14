@@ -104,7 +104,7 @@ export default function HomeClient() {
         {/* Video fills entire section including under navbar */}
         <div className="absolute inset-0 w-full h-full">
           <video
-            src="/hero-video.mp4"
+            src="/New-hero-video.mp4"
             autoPlay loop muted playsInline
             className="absolute top-0 left-0 w-full h-full object-cover object-center"
           />
