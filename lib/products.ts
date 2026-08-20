@@ -27,11 +27,11 @@ export const products: Product[] = [
   {
     id: '11',
     slug: 'impulsive-worldwide-swagger-long-sleeve',
-    name: 'IMPULSIVE WORLDWIDE SWAGGER LONG SLEEVE',
+    name: 'IMPULSIVE SWAGGER LONG SLEEVE',
     category: 'Signature',
     price: 25000,
     status: 'In Stock',
-    description: 'The IMPULSIVE WORLDWIDE SWAGGER LONG SLEEVE features an eye-catching graphic and custom typography.',
+    description: 'The IMPULSIVE SWAGGER LONG SLEEVE features an eye-catching graphic and custom typography.',
     mainImage: '/images/worldwide-swagger-main.jpeg',
     hoverImage: '/images/worldwide-swagger-hover.jpeg',
     images: [
