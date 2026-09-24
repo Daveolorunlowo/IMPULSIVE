@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>IMPULSIVE - Coming Soon</title>
+    <link rel="icon" href="./public/images/impulsive-logo-new-removebg-preview.png">
+    
+    <!-- Google Fonts: Syne (Display) & Inter (Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-main: #FFFFFF;
+            --text-sub: #A0A0A0;
+            --accent-color: #800000;
+            --card-bg: #1A1A1A;
+            --card-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow-x: hidden;
+            padding: clamp(1rem, 5vw, 3rem);
+            position: relative;
+        }
+
+        .bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: 1;
+            filter: grayscale(100%) brightness(0.5);
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, rgba(128, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.95) 80%, #000000 100%);
+            z-index: 2;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+
+        .content-wrapper {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            width: clamp(100px, 15vw, 150px);
+            max-width: 80vw;
+            margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(128, 0, 0, 0.3));
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.75rem, 6vw + 0.5rem, 5rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+            padding: 0;
+            width: 100%;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.8);
+            color: transparent;
+            background: linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            word-wrap: break-word;
+        }
+
+        .divider {
+            width: clamp(60px, 15vw, 100px);
+            height: 2px;
+            background-color: var(--accent-color);
+            margin: 0 auto clamp(1.5rem, 4vw, 2rem);
+        }
+
+        p.subtext {
+            color: var(--text-sub);
+            font-size: clamp(0.85rem, 2vw + 0.5rem, 1.25rem);
+            font-weight: 400;
+            margin-bottom: clamp(2.5rem, 6vw, 4rem);
+            max-width: 800px;
+            line-height: 1.6;
+            padding: 0 0.5rem;
+        }
+
+        .countdown-container {
+            display: flex;
+            gap: clamp(0.75rem, 3vw, 1.5rem);
+            justify-content: center;
+            flex-wrap: wrap; 
+            width: 100%;
+        }
+
+        .countdown-block {
+            background-color: var(--card-bg);
+            border: 2px solid transparent;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            flex: 1 1 auto;
+            min-width: 100px;
+            max-width: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .countdown-block:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 30px rgba(128, 0, 0, 0.2);
+        }
+
+        .number {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2rem, 8vw, 4.5rem);
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .label {
+            font-size: clamp(0.6rem, 1.5vw + 0.3rem, 0.85rem);
+            text-transform: uppercase;
+            color: var(--accent-color);
+            letter-spacing: 0.2em;
+            font-weight: 700;
+        }
+
+        .pulse {
+            animation: pulseAnim 1s infinite;
+        }
+
+        @keyframes pulseAnim {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.8; color: var(--accent-color); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: var(--text-main);
+            padding: clamp(1rem, 3vw, 1.25rem) clamp(2rem, 5vw, 3rem);
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: clamp(0.65rem, 1.5vw + 0.3rem, 0.8rem);
+            text-decoration: none;
+            margin-top: clamp(2rem, 5vw, 3rem);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(128, 0, 0, 0.3);
+        }
+
+        .btn:hover {
+            background-color: var(--text-main);
+            color: var(--bg-color);
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 480px) {
+            .countdown-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .countdown-block {
+                min-width: unset;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <video autoplay loop muted playsinline class="bg-video">
+        <source src="/New-hero-video.mp4" type="video/mp4">
+    </video>
+    <div class="bg-overlay"></div>
+
+    <div class="content-wrapper">
+        <!-- Logo -->
+        <img src="/images/impulsive-logo-new-removebg-preview.png" alt="IMPULSIVE Logo" class="logo" />
+
+        <h1 id="headline">SITE IS TEMPORARILY CLOSED</h1>
+        <div class="divider" id="divider"></div>
+        <p class="subtext" id="subtext">LOCK IN. THE NEXT COLLECTION DROPS SATURDAY, 10TH OCT @ 7:00 PM.<br/>EXCLUSIVE PIECES. NO RESTOCKS. STAY READY.</p>
+
+        <!-- Countdown Timer -->
+        <div class="countdown-container" id="countdown" aria-live="polite">
+            <div class="countdown-block">
+                <div class="number" id="days">00</div>
+                <div class="label">Days</div>
+            </div>
+            <div class="countdown-block">
+                <div class="number" id="hours">00</div>
+                <div class="label">Hours</div>
+            </div>
+            <div class="countdown-block">
+                <div class="number" id="minutes">00</div>
+                <div class="label">Minutes</div>
+            </div>
+            <div class="countdown-block">
+                <div class="number pulse" id="seconds">00</div>
+                <div class="label">Seconds</div>
+            </div>
+        </div>
+
+        <!-- Enter Site Button -->
+        <a href="#" class="btn hidden" id="enter-btn">ENTER SITE</a>
+    </div>
+
+    <script>
+        const TARGET_DATE_ISO = "2026-10-10T19:00:00+01:00";
+        const targetDate = new Date(TARGET_DATE_ISO).getTime();
+
+        const headlineEl = document.getElementById('headline');
+        const subtextEl = document.getElementById('subtext');
+        const countdownEl = document.getElementById('countdown');
+        const enterBtnEl = document.getElementById('enter-btn');
+        const secondsEl = document.getElementById('seconds');
+        
+        const padZero = (num) => num.toString().padStart(2, '0');
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance <= 0) {
+                clearInterval(timerInterval);
+                headlineEl.textContent = "WE ARE NOW OPEN";
+                subtextEl.classList.add('hidden');
+                countdownEl.classList.add('hidden');
+                enterBtnEl.classList.remove('hidden');
+                secondsEl.classList.remove('pulse');
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = padZero(days);
+            document.getElementById('hours').textContent = padZero(hours);
+            document.getElementById('minutes').textContent = padZero(minutes);
+            secondsEl.textContent = padZero(seconds);
+        }
+
+        updateCountdown();
+        const timerInterval = setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
