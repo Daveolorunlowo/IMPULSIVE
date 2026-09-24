@@ -98,12 +98,12 @@
 
         h1 {
             font-family: 'Syne', sans-serif;
-            font-size: clamp(1.75rem, 6vw + 0.5rem, 5rem);
+            font-size: clamp(1.4rem, 7vw, 5rem);
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.02em; /* Reduced tracking slightly for mobile fit */
             margin-bottom: 1rem;
-            line-height: 1.1;
+            line-height: 1.15;
             padding: 0;
             width: 100%;
             -webkit-text-stroke: 1px rgba(255, 255, 255, 0.8);
@@ -111,7 +111,8 @@
             background: linear-gradient(180deg, #FFFFFF 0%, #A0A0A0 100%);
             -webkit-background-clip: text;
             background-clip: text;
-            word-wrap: break-word;
+            word-wrap: normal;
+            word-break: keep-all;
         }
 
         .divider {
