@@ -31,16 +31,17 @@ export const GET = async () => {
     // Public fetch, bypass RLS since we want everyone to see products
     const supabase = (await import('@/lib/supabase')).getSupabaseAdmin();
 
+    const { products: hardcodedProducts } = await import('@/lib/products');
+
     const { data: products, error } = await supabase
       .from('products')
       .select('*, variants(*)');
 
-    if (error) {
-      console.error('[GET /api/products] DB Error:', error);
-      throw error;
+    if (error || !products) {
+      console.error('[GET /api/products] DB Error, falling back to local products:', error);
+      return NextResponse.json({ success: true, products: hardcodedProducts });
     }
 
-    const { products: hardcodedProducts } = await import('@/lib/products');
     const formattedProducts = products.map(toCamelCase);
 
     formattedProducts.sort((a, b) => {
@@ -53,6 +54,7 @@ export const GET = async () => {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'INTERNAL_SERVER_ERROR';
     console.error('[GET /api/products]', message);
-    return NextResponse.json({ error: message }, { status: 500 });
+    const { products: hardcodedProducts } = await import('@/lib/products');
+    return NextResponse.json({ success: true, products: hardcodedProducts });
   }
 };

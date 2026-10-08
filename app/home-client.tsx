@@ -40,7 +40,7 @@ export default function HomeClient() {
     let interval: NodeJS.Timeout;
     if (hoveredProduct !== null) {
       const product = featuredProducts[hoveredProduct];
-      if (product && product.slug.includes('freedom-man-tee')) {
+      if (product) {
         const cycleImages = product.images.filter((img: string) => img !== product.mainImage);
         if (cycleImages.length > 1) {
           interval = setInterval(() => {
@@ -214,7 +214,7 @@ export default function HomeClient() {
                     <Image
                       src={
                         hoveredProduct === i
-                          ? (product.slug.includes('freedom-man-tee')
+                          ? (product.images.filter((img: string) => img !== product.mainImage).length > 1
                               ? product.images.filter((img: string) => img !== product.mainImage)[cycleIndex] || product.hoverImage
                               : product.hoverImage)
                           : product.mainImage

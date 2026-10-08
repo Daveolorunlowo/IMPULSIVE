@@ -366,39 +366,60 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                     {/* Table */}
                     <div className="overflow-hidden border-2 border-charcoal">
                       {/* Header row */}
-                      <div className={`grid ${sizeChart[0]?.sleeve ? 'grid-cols-4' : 'grid-cols-3'} bg-charcoal text-alabaster px-5 py-4`}>
-                        <span className="text-[10px] uppercase tracking-[0.35em] font-black">Size</span>
-                        <span className="text-[10px] uppercase tracking-[0.35em] font-black">Chest (in)</span>
-                        <span className="text-[10px] uppercase tracking-[0.35em] font-black">Length (in)</span>
-                        {sizeChart[0]?.sleeve && (
-                          <span className="text-[10px] uppercase tracking-[0.35em] font-black">Sleeve (in)</span>
-                        )}
-                      </div>
-                      {/* Data rows */}
-                      {sizeChart.map((row, i) => (
-                        <div
-                          key={row.size}
-                          className={`grid ${row.sleeve ? 'grid-cols-4' : 'grid-cols-3'} px-5 py-4 border-b border-charcoal/10 last:border-0 transition-colors ${
-                            selectedSize === row.size
-                              ? 'bg-bloodred/10 border-l-4 border-l-bloodred'
-                              : i % 2 === 0 ? 'bg-stone/5 hover:bg-bloodred/5' : 'bg-white hover:bg-bloodred/5'
-                          }`}
-                        >
-                          <span className={`font-black text-sm tracking-widest flex items-center gap-2 ${
-                            selectedSize === row.size ? 'text-bloodred' : 'text-charcoal'
-                          }`}>
-                            {row.size}
-                            {selectedSize === row.size && (
-                              <span className="text-[7px] uppercase tracking-widest text-bloodred bg-bloodred/10 px-1.5 py-0.5">selected</span>
-                            )}
-                          </span>
-                          <span className="text-charcoal font-semibold text-sm">{row.chest}</span>
-                          <span className="text-charcoal font-semibold text-sm">{row.length}</span>
-                          {row.sleeve && (
-                            <span className="text-charcoal font-semibold text-sm">{row.sleeve}</span>
-                          )}
-                        </div>
-                      ))}
+                      {(() => {
+                        const hasLength = !!sizeChart[0]?.length;
+                        const hasChest = !!sizeChart[0]?.chest;
+                        const hasWaist = !!sizeChart[0]?.waist;
+                        const hasFrontRise = !!sizeChart[0]?.frontRise;
+                        const hasThigh = !!sizeChart[0]?.thigh;
+                        const hasHem = !!sizeChart[0]?.hem;
+                        const hasSleeve = !!sizeChart[0]?.sleeve;
+                        
+                        const colCount = 1 + (hasLength ? 1 : 0) + (hasChest ? 1 : 0) + (hasWaist ? 1 : 0) + (hasFrontRise ? 1 : 0) + (hasThigh ? 1 : 0) + (hasHem ? 1 : 0) + (hasSleeve ? 1 : 0);
+
+                        return (
+                          <>
+                            <div className="bg-charcoal text-alabaster px-5 py-4 grid gap-2" style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
+                              <span className="text-[10px] uppercase tracking-[0.35em] font-black">Size</span>
+                              {hasLength && <span className="text-[10px] uppercase tracking-[0.35em] font-black">Length (in)</span>}
+                              {hasChest && <span className="text-[10px] uppercase tracking-[0.35em] font-black">Chest (in)</span>}
+                              {hasWaist && <span className="text-[10px] uppercase tracking-[0.35em] font-black">1/2 Waist (in)</span>}
+                              {hasFrontRise && <span className="text-[10px] uppercase tracking-[0.35em] font-black">Front Rise (in)</span>}
+                              {hasThigh && <span className="text-[10px] uppercase tracking-[0.35em] font-black">Thigh (in)</span>}
+                              {hasHem && <span className="text-[10px] uppercase tracking-[0.35em] font-black">Hem (in)</span>}
+                              {hasSleeve && <span className="text-[10px] uppercase tracking-[0.35em] font-black">Sleeve (in)</span>}
+                            </div>
+                            {/* Data rows */}
+                            {sizeChart.map((row, i) => (
+                              <div
+                                key={row.size}
+                                className={`grid px-5 py-4 gap-2 border-b border-charcoal/10 last:border-0 transition-colors ${
+                                  selectedSize === row.size
+                                    ? 'bg-bloodred/10 border-l-4 border-l-bloodred'
+                                    : i % 2 === 0 ? 'bg-stone/5 hover:bg-bloodred/5' : 'bg-white hover:bg-bloodred/5'
+                                }`}
+                                style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}
+                              >
+                                <span className={`font-black text-sm tracking-widest flex items-center gap-2 ${
+                                  selectedSize === row.size ? 'text-bloodred' : 'text-charcoal'
+                                }`}>
+                                  {row.size}
+                                  {selectedSize === row.size && (
+                                    <span className="text-[7px] uppercase tracking-widest text-bloodred bg-bloodred/10 px-1.5 py-0.5">selected</span>
+                                  )}
+                                </span>
+                                {hasLength && <span className="text-charcoal font-semibold text-sm">{row.length}</span>}
+                                {hasChest && <span className="text-charcoal font-semibold text-sm">{row.chest}</span>}
+                                {hasWaist && <span className="text-charcoal font-semibold text-sm">{row.waist}</span>}
+                                {hasFrontRise && <span className="text-charcoal font-semibold text-sm">{row.frontRise}</span>}
+                                {hasThigh && <span className="text-charcoal font-semibold text-sm">{row.thigh}</span>}
+                                {hasHem && <span className="text-charcoal font-semibold text-sm">{row.hem}</span>}
+                                {hasSleeve && <span className="text-charcoal font-semibold text-sm">{row.sleeve}</span>}
+                              </div>
+                            ))}
+                          </>
+                        );
+                      })()}
                     </div>
 
                     <p className="mt-3 text-[9px] uppercase tracking-widest text-stone/70 leading-relaxed">
@@ -613,28 +634,71 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
               {/* Sizing Grid Table */}
               <div className="space-y-6 mb-12">
                 <h3 className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold mb-4">Garment Measurements</h3>
-                <div className="border border-alabaster/10 text-xs text-alabaster/60 overflow-hidden bg-stone/20">
-                  <div className="grid grid-cols-4 bg-alabaster/5 p-3 font-bold text-[9px] uppercase tracking-widest text-stone border-b border-alabaster/10">
-                    <span>Size</span>
-                    <span>Chest</span>
-                    <span>Length</span>
-                    <span>Sleeve</span>
+                {sizeChart ? (
+                  <div className="border border-alabaster/10 text-xs text-alabaster/60 overflow-hidden bg-stone/20">
+                    {(() => {
+                      const hasLength = !!sizeChart[0]?.length;
+                      const hasChest = !!sizeChart[0]?.chest;
+                      const hasWaist = !!sizeChart[0]?.waist;
+                      const hasFrontRise = !!sizeChart[0]?.frontRise;
+                      const hasThigh = !!sizeChart[0]?.thigh;
+                      const hasHem = !!sizeChart[0]?.hem;
+                      const hasSleeve = !!sizeChart[0]?.sleeve;
+                      
+                      const colCount = 1 + (hasLength ? 1 : 0) + (hasChest ? 1 : 0) + (hasWaist ? 1 : 0) + (hasFrontRise ? 1 : 0) + (hasThigh ? 1 : 0) + (hasHem ? 1 : 0) + (hasSleeve ? 1 : 0);
+
+                      return (
+                        <>
+                          <div className="grid bg-alabaster/5 p-3 font-bold text-[9px] uppercase tracking-widest text-stone border-b border-alabaster/10 gap-2" style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
+                            <span>Size</span>
+                            {hasLength && <span>Length</span>}
+                            {hasChest && <span>Chest</span>}
+                            {hasWaist && <span>1/2 Waist</span>}
+                            {hasFrontRise && <span>Front Rise</span>}
+                            {hasThigh && <span>Thigh</span>}
+                            {hasHem && <span>Hem</span>}
+                            {hasSleeve && <span>Sleeve</span>}
+                          </div>
+                          {sizeChart.map((row) => (
+                            <div key={row.size} className="grid p-3 border-b border-alabaster/5 last:border-0 hover:bg-alabaster/5 transition-colors gap-2" style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
+                              <span className="font-bold text-alabaster">{row.size}</span>
+                              {hasLength && <span>{row.length}</span>}
+                              {hasChest && <span>{row.chest}</span>}
+                              {hasWaist && <span>{row.waist}</span>}
+                              {hasFrontRise && <span>{row.frontRise}</span>}
+                              {hasThigh && <span>{row.thigh}</span>}
+                              {hasHem && <span>{row.hem}</span>}
+                              {hasSleeve && <span>{row.sleeve}</span>}
+                            </div>
+                          ))}
+                        </>
+                      );
+                    })()}
                   </div>
-                  {[
-                    { s: 'S', c: '25"', l: '24"', sl: '22"' },
-                    { s: 'M', c: '26.5"', l: '25.5"', sl: '23.5"' },
-                    { s: 'L', c: '28"', l: '27"', sl: '25"' },
-                    { s: 'XL', c: '29.5"', l: '28.5"', sl: '26.5"' },
-                    { s: '2XL', c: '31"', l: '30"', sl: '28"' },
-                  ].map((row) => (
-                    <div key={row.s} className="grid grid-cols-4 p-3 border-b border-alabaster/5 last:border-0 hover:bg-alabaster/5 transition-colors">
-                      <span className="font-bold text-alabaster">{row.s}</span>
-                      <span>{row.c}</span>
-                      <span>{row.l}</span>
-                      <span>{row.sl}</span>
+                ) : (
+                  <div className="border border-alabaster/10 text-xs text-alabaster/60 overflow-hidden bg-stone/20">
+                    <div className="grid grid-cols-4 bg-alabaster/5 p-3 font-bold text-[9px] uppercase tracking-widest text-stone border-b border-alabaster/10">
+                      <span>Size</span>
+                      <span>Chest</span>
+                      <span>Length</span>
+                      <span>Sleeve</span>
                     </div>
-                  ))}
-                </div>
+                    {[
+                      { s: 'S', c: '25"', l: '24"', sl: '22"' },
+                      { s: 'M', c: '26.5"', l: '25.5"', sl: '23.5"' },
+                      { s: 'L', c: '28"', l: '27"', sl: '25"' },
+                      { s: 'XL', c: '29.5"', l: '28.5"', sl: '26.5"' },
+                      { s: '2XL', c: '31"', l: '30"', sl: '28"' },
+                    ].map((row) => (
+                      <div key={row.s} className="grid grid-cols-4 p-3 border-b border-alabaster/5 last:border-0 hover:bg-alabaster/5 transition-colors">
+                        <span className="font-bold text-alabaster">{row.s}</span>
+                        <span>{row.c}</span>
+                        <span>{row.l}</span>
+                        <span>{row.sl}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <p className="text-[9px] uppercase tracking-widest text-stone leading-relaxed">
                   ALL MEASUREMENTS ARE IN INCHES AND ARE TRUE TO SIZE
                 </p>
