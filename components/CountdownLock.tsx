@@ -95,7 +95,7 @@ export default function CountdownLock({ children }: { children: React.ReactNode 
       `}} />
 
       <video autoPlay loop muted playsInline className="fixed top-0 left-0 w-screen h-screen object-cover z-[1] grayscale brightness-50">
-          <source src="/New-hero-video.mp4" type="video/mp4" />
+          <source src="/Hero-new-video.mp4" type="video/mp4" />
       </video>
 
       <div className="fixed top-0 left-0 w-screen h-screen z-[2] bg-[radial-gradient(circle_at_center,rgba(128,0,0,0.4)_0%,rgba(0,0,0,0.95)_80%,#000000_100%)]"></div>
