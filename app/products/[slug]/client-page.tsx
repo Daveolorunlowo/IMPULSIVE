@@ -318,7 +318,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 </div>
 
                 {/* FOMO Stock Scarcity Pulser */}
-                {productData.stock !== undefined && productData.stock <= 3 && productData.stock > 0 && (
+                {productData.stock !== undefined && productData.stock <= 5 && productData.stock > 0 && (
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -326,7 +326,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                   >
                     <div className="w-2 h-2 rounded-full bg-bloodred animate-ping shadow-[0_0_10px_#800000]" />
                     <span className="text-[10px] uppercase tracking-[0.25em] font-bold">
-                      LOW STOCK ALERT // ONLY {productData.stock} PIECES REMAINING
+                      LOW STOCK ALERT // ONLY {productData.stock} PIECES LEFT
                     </span>
                   </motion.div>
                 )}

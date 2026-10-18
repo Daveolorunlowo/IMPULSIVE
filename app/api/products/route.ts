@@ -3,24 +3,29 @@ export const dynamic = 'force-dynamic';
 import { getSupabaseClient } from '@/lib/supabase';
 
 // Helper to convert snake_case DB columns to camelCase frontend model
-const toCamelCase = (dbProduct: any) => ({
-  id: dbProduct.id,
-  slug: dbProduct.slug,
-  name: dbProduct.name,
-  category: dbProduct.category,
-  price: Number(dbProduct.price),
-  description: dbProduct.description,
-  mainImage: dbProduct.main_image,
-  hoverImage: dbProduct.hover_image,
-  images: dbProduct.images || [],
-  details: dbProduct.details || [],
-  sizes: dbProduct.sizes || [],
-  colors: dbProduct.colors || [],
-  status: dbProduct.status || 'in_stock',
-  stock: Array.isArray(dbProduct.variants) 
-    ? (dbProduct.variants[0]?.stock_quantity ?? 100) 
-    : (dbProduct.variants?.stock_quantity ?? 100),
-});
+const toCamelCase = (dbProduct: any, hardcodedList: any[] = []) => {
+  const match = hardcodedList.find((p: any) => p.id === dbProduct.id || p.slug === dbProduct.slug);
+  const variantStock = Array.isArray(dbProduct.variants) && dbProduct.variants.length > 0
+    ? dbProduct.variants[0]?.stock_quantity 
+    : (dbProduct.variants?.stock_quantity ?? match?.stock ?? 100);
+
+  return {
+    id: dbProduct.id,
+    slug: dbProduct.slug,
+    name: dbProduct.name,
+    category: dbProduct.category,
+    price: Number(dbProduct.price),
+    description: dbProduct.description,
+    mainImage: dbProduct.main_image,
+    hoverImage: dbProduct.hover_image,
+    images: dbProduct.images || [],
+    details: dbProduct.details || [],
+    sizes: dbProduct.sizes || [],
+    colors: dbProduct.colors || [],
+    status: dbProduct.status || 'in_stock',
+    stock: variantStock,
+  };
+};
 
 /**
  * GET /api/products
@@ -42,7 +47,7 @@ export const GET = async () => {
       return NextResponse.json({ success: true, products: hardcodedProducts });
     }
 
-    const formattedProducts = products.map(toCamelCase);
+    const formattedProducts = products.map((p) => toCamelCase(p, hardcodedProducts));
 
     formattedProducts.sort((a, b) => {
       const indexA = hardcodedProducts.findIndex((p: any) => p.id === a.id);

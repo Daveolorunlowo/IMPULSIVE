@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Product } from '@/lib/products';
+import { Product, products as defaultProducts } from '@/lib/products';
 
 interface ProductsStore {
   products: Product[];
@@ -12,7 +12,7 @@ interface ProductsStore {
 export const useProducts = create<ProductsStore>()(
   persist(
     (set) => ({
-      products: [],
+      products: defaultProducts,
       isLoading: false,
       fetchProducts: async () => {
         set({ isLoading: true });
@@ -40,7 +40,13 @@ export const useProducts = create<ProductsStore>()(
     }),
     {
       name: 'impulsive-products-cache',
-      version: 2,
+      version: 3,
+      migrate: (persistedState: any) => {
+        return {
+          ...(persistedState || {}),
+          products: defaultProducts,
+        };
+      },
     }
   )
 );

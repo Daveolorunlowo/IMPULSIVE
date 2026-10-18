@@ -231,6 +231,14 @@ export default function HomeClient() {
                         </span>
                       </div>
                     )}
+                    {product.stock !== undefined && product.stock <= 5 && product.stock > 0 && (
+                      <div className="absolute top-3 right-3">
+                        <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.25em] font-bold px-2.5 py-1 flex items-center gap-1.5 shadow-md">
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                          {product.stock} PIECES LEFT
+                        </span>
+                      </div>
+                    )}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <span className="bg-white text-[#080808] px-6 py-3 text-[9px] uppercase tracking-[0.3em] font-black">
                         Shop Now
