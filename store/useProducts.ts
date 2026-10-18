@@ -40,7 +40,7 @@ export const useProducts = create<ProductsStore>()(
     }),
     {
       name: 'impulsive-products-cache',
-      version: 3,
+      version: 4,
       migrate: (persistedState: any) => {
         return {
           ...(persistedState || {}),

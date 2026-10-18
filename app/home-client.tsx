@@ -231,7 +231,7 @@ export default function HomeClient() {
                         </span>
                       </div>
                     )}
-                    {product.stock !== undefined && product.stock <= 5 && product.stock > 0 && (
+                    {product.stock !== undefined && product.stock <= 10 && product.stock > 0 && (
                       <div className="absolute top-3 right-3">
                         <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.25em] font-bold px-2.5 py-1 flex items-center gap-1.5 shadow-md">
                           <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />

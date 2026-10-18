@@ -318,7 +318,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 </div>
 
                 {/* FOMO Stock Scarcity Pulser */}
-                {productData.stock !== undefined && productData.stock <= 5 && productData.stock > 0 && (
+                {productData.stock !== undefined && productData.stock <= 10 && productData.stock > 0 && (
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}

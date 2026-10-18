@@ -117,7 +117,7 @@ export default function ProductCard({
                 isHovered ? "opacity-100 scale-100" : "opacity-0"
               )}
             />
-            {stock !== undefined && stock <= 5 && stock > 0 && (
+            {stock !== undefined && stock <= 10 && stock > 0 && (
               <div className="absolute top-3 left-3 z-10 pointer-events-none">
                 <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.25em] font-bold px-2.5 py-1 shadow-md flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
