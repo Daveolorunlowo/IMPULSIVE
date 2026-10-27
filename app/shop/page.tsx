@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/store/useProducts';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,7 +10,11 @@ const categories = ['All'];
 
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState('All');
-  const { products, isLoading } = useProducts();
+  const { products, isLoading, fetchProducts } = useProducts();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const filteredProducts = activeCategory === 'All' 
     ? products 

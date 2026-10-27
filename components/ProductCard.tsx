@@ -43,7 +43,7 @@ export default function ProductCard({
   const [cycleIndex, setCycleIndex] = useState(0);
 
   const cycleImages = images ? images.filter(img => img !== mainImage) : [];
-  const hasCycleImages = slug.includes('freedom-man-tee') && cycleImages.length > 1;
+  const hasCycleImages = cycleImages.length > 1;
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -143,12 +143,10 @@ export default function ProductCard({
                     <button
                       key={color.name}
                       onClick={() => setSelectedColor(color)}
+                      style={{ backgroundColor: color.hex }}
                       className={cn(
                         "w-5 h-5 rounded-full border transition-all",
-                        selectedColor.name === color.name ? "border-bloodred scale-110 shadow-[0_0_10px_rgba(255,0,0,0.5)]" : "border-transparent",
-                        color.hex === '#800000' ? 'bg-[#800000]' : 
-                        color.hex === '#0A0A0A' ? 'bg-[#0A0A0A]' : 
-                        color.hex === '#F9F9F7' ? 'bg-[#F9F9F7]' : 'bg-stone'
+                        selectedColor.name === color.name ? "border-bloodred scale-110 shadow-[0_0_10px_rgba(255,0,0,0.5)]" : "border-white/20"
                       )}
                       aria-label={`Select color ${color.name}`}
                     />

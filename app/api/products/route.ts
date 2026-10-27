@@ -38,12 +38,16 @@ export const GET = async () => {
 
     const { products: hardcodedProducts } = await import('@/lib/products');
 
-    const { data: products, error } = await supabase
-      .from('products')
-      .select('*, variants(*)');
+    const timeoutPromise = new Promise<{ data: null; error: any }>((resolve) =>
+      setTimeout(() => resolve({ data: null, error: new Error('DB_TIMEOUT') }), 1500)
+    );
+    const queryPromise = supabase.from('products').select('*, variants(*)');
+    const { data: products, error } = await Promise.race([queryPromise, timeoutPromise]);
 
     if (error || !products) {
-      console.error('[GET /api/products] DB Error, falling back to local products:', error);
+      if (error?.message !== 'DB_TIMEOUT') {
+        console.error('[GET /api/products] DB Error, falling back to local products:', error);
+      }
       return NextResponse.json({ success: true, products: hardcodedProducts });
     }
 
