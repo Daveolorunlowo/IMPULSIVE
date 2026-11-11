@@ -54,6 +54,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
   const isFavorited = isInWishlist(productData.id);
   const productReviews = getReviewsForProduct(productData.slug);
   const averageRating = getAverageRating(productData.slug);
+  const isSoldOut = productData.slug.includes('shorts') || productData.name.toLowerCase().includes('shorts') || (productData.stock !== undefined && productData.stock === 0) || productData.status?.toLowerCase() === 'sold out' || productData.status?.toLowerCase() === 'out of stock';
 
   const calculateAdvisorSize = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,6 +73,8 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
   };
 
   const handleAddToCart = () => {
+    const isSoldOut = productData.slug.includes('shorts') || productData.name.toLowerCase().includes('shorts') || (productData.stock !== undefined && productData.stock === 0) || productData.status?.toLowerCase() === 'sold out' || productData.status?.toLowerCase() === 'out of stock';
+    if (isSoldOut) return;
     if (!isAuthenticated) {
       router.push(`/auth?redirect=/products/${productData.slug}`);
       return;
@@ -251,9 +254,9 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                     </div>
                   )}
 
-                  {productData.status && (
+                  {(isSoldOut || productData.status) && (
                     <span className="text-[10px] uppercase tracking-widest font-bold text-charcoal/40 bg-charcoal/5 px-3 py-1">
-                      {productData.status}
+                      {isSoldOut ? 'OUT OF STOCK' : productData.status}
                     </span>
                   )}
                 </div>
@@ -318,7 +321,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 </div>
 
                 {/* FOMO Stock Scarcity Pulser */}
-                {productData.stock !== undefined && productData.stock <= 10 && productData.stock > 0 && (
+                {!isSoldOut && productData.stock !== undefined && productData.stock <= 10 && productData.stock > 0 && (
                   <motion.div 
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -327,6 +330,19 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                     <div className="w-2 h-2 rounded-full bg-bloodred animate-ping shadow-[0_0_10px_#800000]" />
                     <span className="text-[10px] uppercase tracking-[0.25em] font-bold">
                       LOW STOCK ALERT // ONLY {productData.stock} PIECES LEFT
+                    </span>
+                  </motion.div>
+                )}
+
+                {isSoldOut && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-3 bg-bloodred/10 border border-bloodred/20 p-4 rounded-sm text-bloodred"
+                  >
+                    <div className="w-2 h-2 rounded-full bg-bloodred" />
+                    <span className="text-[10px] uppercase tracking-[0.25em] font-bold">
+                      OUT OF STOCK // ARCHIVE PIECE
                     </span>
                   </motion.div>
                 )}
@@ -461,10 +477,10 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 <div className="pt-8">
                   <button 
                     onClick={handleAddToCart}
-                    disabled={productData.stock !== undefined && productData.stock === 0}
+                    disabled={isSoldOut}
                     className="w-full btn-luxury shadow-xl hover:shadow-2xl active:scale-[0.98] transition-all py-6 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {productData.stock !== undefined && productData.stock === 0 ? 'Out of Stock' : 'Order'}
+                    {isSoldOut ? 'Out of Stock' : 'Order'}
                   </button>
                   <div className="mt-8 flex justify-between items-center px-2">
                     <div className="flex flex-col items-center gap-2">

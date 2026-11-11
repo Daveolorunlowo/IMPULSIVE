@@ -227,7 +227,7 @@ export default function HomeClient() {
                     {product.status && (
                       <div className="absolute top-3 left-3">
                         <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.3em] font-bold px-2.5 py-1">
-                          {product.status}
+                          {product.slug?.includes('shorts') || product.name?.toLowerCase().includes('shorts') || product.status?.toLowerCase() === 'out of stock' ? 'Out of Stock' : product.status}
                         </span>
                       </div>
                     )}
@@ -241,7 +241,7 @@ export default function HomeClient() {
                     )}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <span className="bg-white text-[#080808] px-6 py-3 text-[9px] uppercase tracking-[0.3em] font-black">
-                        Shop Now
+                        {(product.stock !== undefined && product.stock === 0) || product.status?.toLowerCase() === 'sold out' || product.status?.toLowerCase() === 'out of stock' ? 'Out of Stock' : 'Shop Now'}
                       </span>
                     </div>
                   </div>

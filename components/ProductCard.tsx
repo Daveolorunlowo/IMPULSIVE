@@ -37,6 +37,7 @@ export default function ProductCard({
   category,
   sizes,
   colors,
+  status,
   stock,
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -65,8 +66,10 @@ export default function ProductCard({
   const router = useRouter();
   const [selectedSize, setSelectedSize] = useState(sizes[0]);
   const [selectedColor, setSelectedColor] = useState(colors[0]);
+  const isSoldOut = slug.includes('shorts') || name.toLowerCase().includes('shorts') || (stock !== undefined && stock === 0) || status?.toLowerCase() === 'sold out' || status?.toLowerCase() === 'out of stock';
 
   const handleAddToCart = () => {
+    if (isSoldOut) return;
     if (!isAuthenticated) {
       router.push(`/auth?redirect=/shop`);
       return;
@@ -117,11 +120,11 @@ export default function ProductCard({
                 isHovered ? "opacity-100 scale-100" : "opacity-0"
               )}
             />
-            {stock !== undefined && stock <= 10 && stock > 0 && (
+            {(isSoldOut || status || (stock !== undefined && stock <= 10 && stock > 0)) && (
               <div className="absolute top-3 left-3 z-10 pointer-events-none">
                 <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.25em] font-bold px-2.5 py-1 shadow-md flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  {stock} PIECES LEFT
+                  {isSoldOut ? null : status ? null : <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                  {isSoldOut ? 'OUT OF STOCK' : status ? status.toUpperCase() : `${stock} PIECES LEFT`}
                 </span>
               </div>
             )}
@@ -169,10 +172,10 @@ export default function ProductCard({
               </div>
               <button
                 onClick={handleAddToCart}
-                disabled={stock !== undefined && stock === 0}
+                disabled={isSoldOut}
                 className="w-full bg-bloodred text-alabaster py-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-alabaster hover:text-charcoal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {stock !== undefined && stock === 0 ? 'Out of Stock' : 'Add To Bag'}
+                {isSoldOut ? 'Sold Out' : 'Add To Bag'}
               </button>
             </motion.div>
           )}

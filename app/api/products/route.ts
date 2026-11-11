@@ -5,9 +5,12 @@ import { getSupabaseClient } from '@/lib/supabase';
 // Helper to convert snake_case DB columns to camelCase frontend model
 const toCamelCase = (dbProduct: any, hardcodedList: any[] = []) => {
   const match = hardcodedList.find((p: any) => p.id === dbProduct.id || p.slug === dbProduct.slug);
-  const variantStock = Array.isArray(dbProduct.variants) && dbProduct.variants.length > 0
+  const rawVariantStock = Array.isArray(dbProduct.variants) && dbProduct.variants.length > 0
     ? dbProduct.variants[0]?.stock_quantity 
     : (dbProduct.variants?.stock_quantity ?? match?.stock ?? 100);
+
+  const variantStock = match?.stock !== undefined && match.stock === 0 ? 0 : rawVariantStock;
+  const isOutOfStock = variantStock === 0 || dbProduct.status === 'Out of Stock' || match?.status === 'Out of Stock';
 
   return {
     id: dbProduct.id,
@@ -22,7 +25,7 @@ const toCamelCase = (dbProduct: any, hardcodedList: any[] = []) => {
     details: dbProduct.details || [],
     sizes: dbProduct.sizes || [],
     colors: dbProduct.colors || [],
-    status: dbProduct.status || 'in_stock',
+    status: isOutOfStock ? 'Out of Stock' : (dbProduct.status || match?.status || 'in_stock'),
     stock: variantStock,
   };
 };
