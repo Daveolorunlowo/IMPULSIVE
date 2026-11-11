@@ -13,21 +13,27 @@ export class EmailService {
     const trackingCode = metadata?.tracking_number;
 
     // Generate items HTML list
-    const itemsHtml = order_items && order_items.length > 0
-      ? order_items.map((item: any) => {
-          const product = item.variants?.products;
-          const name = product?.name || 'WEARIMPULSIVE Item';
-          const size = item.variants?.size || 'N/A';
-          const color = item.variants?.color || 'N/A';
-          const price = item.unit_price;
+    const rawItems = (metadata?.items && metadata.items.length > 0)
+      ? metadata.items
+      : (order_items || []);
+
+    const itemsHtml = rawItems.length > 0
+      ? rawItems.map((item: any) => {
+          const name = item.name || item.variants?.products?.name || 'WEARIMPULSIVE Item';
+          const size = item.size || item.variants?.size || 'Standard';
+          const color = typeof item.color === 'object' ? item.color?.name : (item.color || item.variants?.color || 'Standard');
+          const price = item.unitPrice || item.price || item.unit_price || 0;
+          const quantity = item.quantity || 1;
+          const customText = item.customText ? `<div style="color: #EAB308; font-size: 10px; margin-top: 4px;">CUSTOM EMBROIDERY: "${item.customText}"</div>` : '';
           
           return `
             <div style="border-bottom: 1px solid #1A1A1A; padding-bottom: 15px; margin-bottom: 15px;">
               <div style="color: #F9F9F7; font-size: 14px; font-weight: bold; margin-bottom: 5px;">${name}</div>
               <div style="color: #8E8E8E; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; display: flex; justify-content: space-between;">
-                <span>SIZE: ${size} | COLOR: ${color} | QTY: ${item.quantity}</span>
-                <span style="color: #F9F9F7;">NGN ${price.toLocaleString()}</span>
+                <span>SIZE: ${size} | COLOR: ${color} | QTY: ${quantity}</span>
+                <span style="color: #F9F9F7;">NGN ${Number(price).toLocaleString()}</span>
               </div>
+              ${customText}
             </div>
           `;
         }).join('')

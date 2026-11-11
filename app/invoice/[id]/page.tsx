@@ -101,22 +101,32 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               </tr>
             </thead>
             <tbody>
-              {order.order_items?.map((item: any, i: number) => {
-                const productName = item.variants?.products?.name || 'Item';
-                const variantInfo = [item.variants?.size, item.variants?.color].filter(Boolean).join(', ');
-                
-                return (
-                  <tr key={i} className="border-b border-gray-200">
-                    <td className="py-4">
-                      <p className="font-bold text-sm">{productName}</p>
-                      {variantInfo && <p className="text-xs text-gray-500 mt-1">Variant: {variantInfo}</p>}
-                    </td>
-                    <td className="py-4 text-center text-sm">{item.quantity}</td>
-                    <td className="py-4 text-right text-sm">{formatPrice(item.unit_price)}</td>
-                    <td className="py-4 text-right font-bold text-sm">{formatPrice(item.unit_price * item.quantity)}</td>
-                  </tr>
-                );
-              })}
+              {(() => {
+                const invoiceItems = (order.metadata?.items && order.metadata.items.length > 0)
+                  ? order.metadata.items
+                  : (order.order_items || []);
+
+                return invoiceItems.map((item: any, i: number) => {
+                  const productName = item.name || item.variants?.products?.name || 'IMPULSIVE Piece';
+                  const itemColor = typeof item.color === 'object' ? item.color?.name : (item.color || item.variants?.color);
+                  const itemSize = item.size || item.variants?.size;
+                  const variantInfo = [itemSize ? `Size: ${itemSize}` : '', itemColor ? `Color: ${itemColor}` : '', item.customText ? `Custom: "${item.customText}"` : ''].filter(Boolean).join(' | ');
+                  const unitPrice = Number(item.unitPrice || item.price || item.unit_price || 0);
+                  const quantity = Number(item.quantity) || 1;
+                  
+                  return (
+                    <tr key={i} className="border-b border-gray-200">
+                      <td className="py-4">
+                        <p className="font-bold text-sm">{productName}</p>
+                        {variantInfo && <p className="text-xs text-gray-500 mt-1 font-mono uppercase">{variantInfo}</p>}
+                      </td>
+                      <td className="py-4 text-center text-sm">{quantity}</td>
+                      <td className="py-4 text-right text-sm">{formatPrice(unitPrice)}</td>
+                      <td className="py-4 text-right font-bold text-sm">{formatPrice(unitPrice * quantity)}</td>
+                    </tr>
+                  );
+                });
+              })()}
             </tbody>
           </table>
         </div>

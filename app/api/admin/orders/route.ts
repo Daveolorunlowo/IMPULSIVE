@@ -50,7 +50,41 @@ export const GET = async (req: Request) => {
     // By default Supabase JS might not fetch auth.users directly via standard select unless a view exists.
     // For now, if the metadata contains the email, we'll use that as a fallback.
 
-    return NextResponse.json({ orders: orders || [] });
+    const formattedOrders = (orders || []).map((order: any) => {
+      const metaItems = Array.isArray(order.metadata?.items) ? order.metadata.items : [];
+      const normalizedItems = metaItems.length > 0
+        ? metaItems.map((item: any) => ({
+            id: item.id || item.productId,
+            name: item.name || 'IMPULSIVE Piece',
+            quantity: Number(item.quantity) || 1,
+            price: Number(item.unitPrice || item.price) || 0,
+            unit_price: Number(item.unitPrice || item.price) || 0,
+            size: item.size || 'Standard',
+            color: typeof item.color === 'object' ? item.color?.name : (item.color || 'Standard'),
+            colorHex: typeof item.color === 'object' ? item.color?.hex : (item.colorHex || ''),
+            image: item.image || '',
+            customText: item.customText || '',
+          }))
+        : (order.order_items || []).map((oi: any) => ({
+            id: oi.variant_id,
+            name: oi.variants?.products?.name || 'IMPULSIVE Piece',
+            quantity: Number(oi.quantity) || 1,
+            price: Number(oi.unit_price) || 0,
+            unit_price: Number(oi.unit_price) || 0,
+            size: oi.variants?.size || 'Standard',
+            color: oi.variants?.color || 'Standard',
+            colorHex: '',
+            image: oi.variants?.products?.main_image || '',
+            customText: '',
+          }));
+
+      return {
+        ...order,
+        order_items: normalizedItems,
+      };
+    });
+
+    return NextResponse.json({ orders: formattedOrders });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'INTERNAL_SERVER_ERROR';
     console.error('[Admin GET /orders]', message);

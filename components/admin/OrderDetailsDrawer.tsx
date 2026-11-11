@@ -4,13 +4,16 @@ import { X, Loader2, Check, Truck, Printer, Clock } from 'lucide-react';
 import { useCurrency } from '@/store/useCurrency';
 
 interface OrderItem {
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
   quantity: number;
-  price: number;
+  price?: number;
+  unit_price?: number;
   size?: string;
-  color?: string;
+  color?: string | { name?: string; hex?: string };
+  colorHex?: string;
   image?: string;
+  customText?: string;
   variants?: {
     size?: string;
     color?: string;
@@ -33,6 +36,7 @@ interface Order {
     shippingAddress?: any;
     name?: string;
     status_history?: { status: string; date: string }[];
+    items?: any[];
   };
   order_items: OrderItem[];
 }
@@ -186,37 +190,127 @@ export default function OrderDetailsDrawer({
 
               {/* Line Items */}
               <div>
-                <h4 className="text-[9px] uppercase tracking-widest text-bloodred font-bold mb-4">Line Items</h4>
-                <div className="space-y-4">
-                  {order.order_items?.map((item, idx) => {
-                    const itemName = item.name || item.variants?.products?.name || 'Unknown Item';
-                    const itemImage = item.image || item.variants?.products?.main_image || null;
-                    const itemSize = item.size || item.variants?.size || '';
-                    const itemColor = item.color || item.variants?.color || '';
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-[9px] uppercase tracking-widest text-bloodred font-bold">
+                    Ordered Products ({((order.order_items && order.order_items.length > 0) ? order.order_items : (order.metadata?.items || [])).reduce((sum: number, it: any) => sum + (it.quantity || 1), 0)} items)
+                  </h4>
+                  <span className="text-[9px] text-zinc-500 uppercase tracking-widest font-mono">Full Product Spec</span>
+                </div>
+                
+                {(() => {
+                  const displayItems = (order.order_items && order.order_items.length > 0)
+                    ? order.order_items
+                    : (order.metadata?.items || []);
 
+                  if (displayItems.length === 0) {
                     return (
-                      <div key={idx} className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-charcoal rounded overflow-hidden flex-shrink-0">
-                          {itemImage ? (
-                            <img src={itemImage} alt={itemName} className="object-cover w-full h-full" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-stone bg-white/5 text-[10px] uppercase">Img</div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-xs font-bold uppercase tracking-wider text-alabaster mb-1">
-                            {itemName}
-                          </p>
-                          <p className="text-[10px] text-zinc-400 uppercase tracking-widest">
-                            {itemSize ? `SIZE ${itemSize}` : ''}
-                            {itemColor ? ` - ${itemColor}` : ''}
-                            {` - QTY ${item.quantity}`}
-                          </p>
-                        </div>
+                      <div className="p-5 border border-white/10 bg-white/[0.02] rounded-xl text-center">
+                        <p className="text-xs text-zinc-400 uppercase tracking-wider">No line items stored for this order</p>
+                        <p className="text-[10px] text-zinc-600 mt-1">This was placed prior to item-level metadata persistence</p>
                       </div>
                     );
-                  })}
-                </div>
+                  }
+
+                  return (
+                    <div className="space-y-4">
+                      {displayItems.map((item: any, idx: number) => {
+                        const itemName = item.name || item.variants?.products?.name || 'IMPULSIVE Piece';
+                        const itemImage = item.image || item.variants?.products?.main_image || null;
+                        const itemSize = item.size || item.variants?.size || 'Standard';
+                        const rawColor = typeof item.color === 'object' ? item.color?.name : (item.color || item.variants?.color || 'Standard');
+                        const itemColor = rawColor || 'Standard';
+                        const itemColorHex = item.colorHex || (typeof item.color === 'object' ? item.color?.hex : '') || 
+                          (itemColor.toLowerCase().includes('black') ? '#000000' :
+                           itemColor.toLowerCase().includes('silver') ? '#C0C0C0' :
+                           itemColor.toLowerCase().includes('white') ? '#FFFFFF' :
+                           itemColor.toLowerCase().includes('red') ? '#800000' : '#444444');
+                        const itemPrice = Number(item.price || item.unit_price || 0);
+                        const quantity = Number(item.quantity) || 1;
+                        const customText = item.customText;
+
+                        return (
+                          <div 
+                            key={idx} 
+                            className="p-4 bg-[#0a0a0a] border border-white/10 rounded-xl hover:border-white/20 transition-all flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between"
+                          >
+                            <div className="flex items-center gap-4 flex-1">
+                              <div className="w-16 h-20 bg-charcoal rounded-lg overflow-hidden flex-shrink-0 border border-white/10 relative">
+                                {itemImage ? (
+                                  <img src={itemImage} alt={itemName} className="object-cover w-full h-full" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-stone bg-white/5 text-[9px] uppercase font-mono">No Img</div>
+                                )}
+                              </div>
+                              <div className="space-y-2 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="text-sm font-serif font-bold text-alabaster tracking-wide">
+                                    {itemName}
+                                  </p>
+                                  {item.id && (
+                                    <span className="text-[8px] font-mono uppercase bg-white/5 text-zinc-500 px-1.5 py-0.5 rounded border border-white/10">
+                                      ID: {item.id}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Product Specifications Badges */}
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  {/* Size Pill */}
+                                  <span className="inline-flex items-center gap-1 bg-white/10 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border border-white/15">
+                                    <span className="text-zinc-400">SIZE:</span>
+                                    <span>{itemSize}</span>
+                                  </span>
+
+                                  {/* Color Pill with Swatch */}
+                                  <span className="inline-flex items-center gap-1.5 bg-white/10 text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border border-white/15">
+                                    <span 
+                                      className="w-2.5 h-2.5 rounded-full border border-white/30 flex-shrink-0" 
+                                      style={{ backgroundColor: itemColorHex }} 
+                                    />
+                                    <span className="text-zinc-400">COLOR:</span>
+                                    <span>{itemColor}</span>
+                                  </span>
+
+                                  {/* Quantity Pill */}
+                                  <span className="inline-flex items-center gap-1 bg-bloodred/15 text-bloodred text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded border border-bloodred/30">
+                                    <span>QTY:</span>
+                                    <span className="font-mono">{quantity}</span>
+                                  </span>
+                                </div>
+
+                                {/* Custom Text / Customization */}
+                                {customText && (
+                                  <div className="mt-1">
+                                    <span className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-wider font-semibold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded border border-amber-500/30">
+                                      <span className="font-bold">CUSTOM EMBROIDERY:</span>
+                                      <span className="font-mono italic">"{customText}"</span>
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Pricing Breakdown */}
+                            <div className="text-left sm:text-right border-t sm:border-t-0 border-white/5 pt-2 sm:pt-0 w-full sm:w-auto">
+                              {itemPrice > 0 ? (
+                                <>
+                                  <p className="text-xs text-zinc-400 font-mono">
+                                    {formatPrice(itemPrice)} &times; {quantity}
+                                  </p>
+                                  <p className="text-sm font-bold text-bloodred font-mono mt-0.5">
+                                    {formatPrice(itemPrice * quantity)}
+                                  </p>
+                                </>
+                              ) : (
+                                <p className="text-xs text-zinc-500 font-mono">Complimentary</p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Shipment Status — clickable buttons */}

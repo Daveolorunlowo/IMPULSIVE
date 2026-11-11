@@ -571,8 +571,44 @@ export default function AdminDashboardPage() {
                               <td className="p-4 text-xs font-light text-alabaster">
                                 {order.metadata?.email || 'N/A'}
                               </td>
-                              <td className="p-4 text-[10px] text-zinc-300 font-semibold">
-                                {calculateTotalItems(order.order_items)}
+                              <td className="p-4 text-[10px] text-zinc-300">
+                                {(() => {
+                                  const itemsList = (order.order_items && order.order_items.length > 0)
+                                    ? order.order_items
+                                    : (order.metadata?.items || []);
+                                  const totalCount = calculateTotalItems(itemsList);
+
+                                  if (totalCount === 0) {
+                                    return <span className="text-zinc-500 italic">No items logged</span>;
+                                  }
+
+                                  return (
+                                    <div className="space-y-1 max-w-[280px]">
+                                      <div className="font-bold text-white flex items-center gap-1.5">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-bloodred" />
+                                        <span>{totalCount} {totalCount === 1 ? 'Piece' : 'Pieces'}</span>
+                                      </div>
+                                      <div className="space-y-0.5">
+                                        {itemsList.slice(0, 3).map((it: any, i: number) => {
+                                          const pName = it.name || it.variants?.products?.name || 'IMPULSIVE Piece';
+                                          const pSize = it.size || it.variants?.size || '';
+                                          const pColor = typeof it.color === 'object' ? it.color?.name : (it.color || it.variants?.color || '');
+                                          return (
+                                            <div key={i} className="text-[9px] text-zinc-400 truncate flex items-center gap-1">
+                                              <span className="text-alabaster font-medium truncate">{pName}</span>
+                                              {pSize && <span className="text-bloodred font-mono font-bold">[{pSize}]</span>}
+                                              {pColor && <span className="text-zinc-400">({pColor})</span>}
+                                              <span className="text-zinc-500 font-mono">&times;{it.quantity || 1}</span>
+                                            </div>
+                                          );
+                                        })}
+                                        {itemsList.length > 3 && (
+                                          <p className="text-[8px] text-zinc-500 italic">+ {itemsList.length - 3} more</p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
                               </td>
                               <td className="p-4 text-xs text-alabaster">
                                 {formatPrice(order.total_price)}

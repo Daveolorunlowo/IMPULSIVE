@@ -126,6 +126,10 @@ export default function CheckoutSummaryPage() {
           items: items.map(item => ({
             variantId: item.id,
             productId: item.id,
+            name: item.name,
+            size: item.selectedSize,
+            color: item.selectedColor,
+            image: item.image,
             quantity: item.quantity,
             claimedPrice: convert(item.price),
             customText: item.customText,

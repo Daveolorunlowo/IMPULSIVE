@@ -49,7 +49,7 @@ export const POST = async (req: Request) => {
     
     const { data: dbProducts, error: dbErr } = await supabase
       .from('products')
-      .select('id, price')
+      .select('id, price, name, main_image')
       .in('id', productIds);
       
     if (dbErr || !dbProducts) {
@@ -106,6 +106,24 @@ export const POST = async (req: Request) => {
       .toString()
       .padStart(4, '0')}`;
 
+    const enrichedItems = items.map((item: any) => {
+      const dbProd = (dbProducts || []).find((p: any) => p.id === (item.productId || item.variantId));
+      const colorName = typeof item.color === 'object' ? item.color?.name : (item.color || item.selectedColor?.name || item.selectedColor || 'Standard');
+      const colorHex = typeof item.color === 'object' ? item.color?.hex : (item.selectedColor?.hex || '#000000');
+      return {
+        id: item.productId || item.variantId,
+        productId: item.productId || item.variantId,
+        name: item.name || dbProd?.name || 'IMPULSIVE Piece',
+        size: item.size || item.selectedSize || 'Standard',
+        color: colorName || 'Standard',
+        colorHex: colorHex || '#000000',
+        quantity: Number(item.quantity) || 1,
+        unitPrice: Number(item.claimedPrice || item.price || dbProd?.price) || 0,
+        image: item.image || dbProd?.main_image || '',
+        customText: item.customText || '',
+      };
+    });
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
@@ -118,6 +136,7 @@ export const POST = async (req: Request) => {
           shippingAddress,
           promoCode,
           currency,
+          items: enrichedItems,
         },
       })
       .select()
@@ -126,14 +145,18 @@ export const POST = async (req: Request) => {
     if (orderError) throw new Error(orderError.message);
 
     // ── 4. INSERT ORDER ITEMS ─────────────────────────────────────────────
-    await supabase.from('order_items').insert(
-      items.map((item: any) => ({
-        order_id: order.id,
-        variant_id: item.variantId,
-        quantity: item.quantity,
-        unit_price: item.claimedPrice,
-      }))
-    );
+    try {
+      await supabase.from('order_items').insert(
+        items.map((item: any) => ({
+          order_id: order.id,
+          variant_id: item.variantId || item.productId,
+          quantity: item.quantity,
+          unit_price: item.claimedPrice,
+        }))
+      );
+    } catch (orderItemsErr) {
+      console.warn('[POST /api/orders] Non-fatal order_items insert warning:', orderItemsErr);
+    }
 
     // ── 5. INITIALISE PAYMENT ─────────────────────────────────────────────
     const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
