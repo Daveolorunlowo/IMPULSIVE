@@ -16,6 +16,7 @@ interface ProductCardProps {
   slug: string;
   name: string;
   price: number;
+  originalPrice?: number;
   mainImage: string;
   hoverImage: string;
   images: string[];
@@ -31,6 +32,7 @@ export default function ProductCard({
   slug,
   name,
   price,
+  originalPrice,
   mainImage,
   hoverImage,
   images,
@@ -66,7 +68,7 @@ export default function ProductCard({
   const router = useRouter();
   const [selectedSize, setSelectedSize] = useState(sizes[0]);
   const [selectedColor, setSelectedColor] = useState(colors[0]);
-  const isSoldOut = slug.includes('shorts') || name.toLowerCase().includes('shorts') || (stock !== undefined && stock === 0) || status?.toLowerCase() === 'sold out' || status?.toLowerCase() === 'out of stock';
+  const isSoldOut = (stock !== undefined && stock === 0) || status?.toLowerCase() === 'sold out' || status?.toLowerCase() === 'out of stock';
 
   const handleAddToCart = () => {
     if (isSoldOut) return;
@@ -122,9 +124,16 @@ export default function ProductCard({
             />
             {(isSoldOut || status || (stock !== undefined && stock <= 10 && stock > 0)) && (
               <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.25em] font-bold px-2.5 py-1 shadow-md flex items-center gap-1.5">
-                  {isSoldOut ? null : status ? null : <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />}
+                <span className="bg-black/90 border border-bloodred/60 text-white font-mono text-[8px] uppercase tracking-[0.25em] font-semibold px-2.5 py-1 backdrop-blur-md shadow-lg flex items-center gap-1.5">
+                  {isSoldOut ? null : <span className="w-1.5 h-1.5 rounded-full bg-bloodred animate-pulse" />}
                   {isSoldOut ? 'OUT OF STOCK' : status ? status.toUpperCase() : `${stock} PIECES LEFT`}
+                </span>
+              </div>
+            )}
+            {originalPrice && originalPrice > price && (
+              <div className="absolute top-3 right-3 z-10 pointer-events-none">
+                <span className="bg-bloodred text-white font-mono text-[8px] uppercase tracking-[0.2em] font-bold px-2 py-0.5 shadow-md">
+                  -{Math.round(((originalPrice - price) / originalPrice) * 100)}%
                 </span>
               </div>
             )}
@@ -184,13 +193,23 @@ export default function ProductCard({
 
       {/* Product Info - Luxury Centered */}
       <Link href={`/products/${slug}`} className="flex flex-col items-center text-center space-y-2 mt-8">
-
         <h3 className="text-xl font-serif text-alabaster group-hover:text-bloodred transition-colors duration-500">
           {name}
         </h3>
-        <p className="text-[10px] font-sans font-semibold tracking-widest text-bloodred" suppressHydrationWarning>
-          {formatPrice(price)}
-        </p>
+        {originalPrice && originalPrice > price ? (
+          <div className="flex items-center gap-2.5 font-mono" suppressHydrationWarning>
+            <span className="text-[10px] font-medium line-through text-alabaster/35">
+              {formatPrice(originalPrice)}
+            </span>
+            <span className="text-[10px] font-bold tracking-widest text-bloodred">
+              {formatPrice(price)}
+            </span>
+          </div>
+        ) : (
+          <p className="text-[10px] font-mono font-semibold tracking-widest text-bloodred" suppressHydrationWarning>
+            {formatPrice(price)}
+          </p>
+        )}
       </Link>
     </motion.div>
   );

@@ -24,10 +24,16 @@ export default function ShopPage() {
     <div className="pt-40 pb-40 min-h-screen bg-charcoal text-alabaster">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Header - Minimal Luxury */}
-        <header className="mb-24 flex flex-col md:flex-row justify-between items-end gap-12">
+        <header className="mb-24 flex flex-col md:flex-row justify-between items-end gap-12 border-b border-white/5 pb-12">
           <div className="space-y-4">
-
+            <div className="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.4em] text-bloodred font-bold">
+              <span className="w-2 h-2 rounded-full bg-bloodred animate-pulse" />
+              <span>BLACK FRIDAY PROTOCOL // ARCHIVE RESTOCK</span>
+            </div>
             <h1 className="text-6xl md:text-8xl font-serif text-alabaster tracking-tight">The Inventory</h1>
+            <p className="font-mono text-[10px] text-white/40 tracking-[0.2em] uppercase max-w-lg leading-relaxed">
+              Signature archival pieces released for the Black Friday event. Limited quantities available.
+            </p>
           </div>
           
           {/* Categories - Minimal Pill Buttons */}

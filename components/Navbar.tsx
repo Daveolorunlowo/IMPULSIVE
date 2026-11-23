@@ -68,7 +68,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-charcoal/80 backdrop-blur-md border-b border-bloodred/20 isolate text-alabaster">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#080808]/90 backdrop-blur-md border-b border-bloodred/20 isolate text-alabaster">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           
           {/* Left Section */}

@@ -8,30 +8,23 @@ import { useCurrency } from '@/store/useCurrency';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { ProductSkeleton } from '@/components/SkeletonLoaders';
 
-// --- MARQUEE COMPONENT ---
-function Marquee({ text, reverse = false, className = '' }: { text: string; reverse?: boolean; className?: string }) {
-  const items = Array(8).fill(text);
-  return (
-    <div className={`overflow-hidden whitespace-nowrap ${className}`}>
-      <motion.div
-        className="inline-flex"
-        animate={{ x: reverse ? ['0%', '50%'] : ['0%', '-50%'] }}
-        transition={{ repeat: Infinity, duration: 18, ease: 'linear' }}
-      >
-        {items.map((item, i) => (
-          <span key={i} className="inline-block px-6">{item} <span className="text-bloodred">✦</span></span>
-        ))}
-        {items.map((item, i) => (
-          <span key={`b-${i}`} className="inline-block px-6">{item} <span className="text-bloodred">✦</span></span>
-        ))}
-      </motion.div>
-    </div>
-  );
-}
-
 export default function HomeClient() {
-  const { products, isLoading } = useProducts();
-  const featuredProducts = products.slice(0, 4);
+  const { products, isLoading, fetchProducts } = useProducts();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  // Show only one of each product silhouette on the homepage; all colorways/pieces live in the shop
+  const featuredProducts = React.useMemo(() => {
+    const seen = new Set<string>();
+    return products.filter((product) => {
+      const baseName = product.name.replace(/\s*\([^)]*\)\s*$/, '').trim().toLowerCase();
+      if (seen.has(baseName)) return false;
+      seen.add(baseName);
+      return true;
+    });
+  }, [products]);
   const { formatPrice } = useCurrency();
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   const [cycleIndex, setCycleIndex] = useState(0);
@@ -112,6 +105,7 @@ export default function HomeClient() {
           <div className="absolute inset-0 bg-[#080808]/50" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/20 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#080808]/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#800000]/15 via-transparent to-transparent pointer-events-none" />
           {/* Grain texture */}
           <div className="absolute inset-0 opacity-[0.04] pointer-events-none" style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: '150px'}} />
         </div>
@@ -125,38 +119,48 @@ export default function HomeClient() {
             transition={{ delay: 0.3, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
             className="text-[9vw] sm:text-[10vw] md:text-[9vw] lg:text-[8vw] xl:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
           >
-            <span className="block text-white">WEAR</span>
-            <span className="block" style={{ WebkitTextStroke: '2px #d00000', color: 'transparent' }}>IMPULSIVE</span>
+            <span className="block text-white">BLACK</span>
+            <span className="block" style={{ WebkitTextStroke: '2px #800000', color: 'transparent' }}>FRIDAY</span>
+            <span className="block text-white/50 text-[3vw] sm:text-[2.5vw] md:text-[1.8vw] font-mono tracking-[0.35em] uppercase font-bold mt-4">
+              WEAR IMPULSIVE
+            </span>
           </motion.h1>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.6 }}
+            className="flex items-center gap-6"
           >
             <Link
               href="/shop"
               className="group relative px-10 py-4 bg-bloodred text-white font-black uppercase tracking-[0.25em] text-[10px] overflow-hidden inline-flex items-center gap-3 shrink-0"
             >
-              <span className="relative z-10">Shop Now</span>
+              <span className="relative z-10">Explore The Drop</span>
               <span className="relative z-10 transition-transform group-hover:translate-x-2">→</span>
               <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
-              <span className="absolute inset-0 z-10 flex items-center justify-center gap-3 text-[#080808] opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-black uppercase tracking-[0.25em] text-[10px]">Shop Now →</span>
+              <span className="absolute inset-0 z-10 flex items-center justify-center gap-3 text-[#080808] opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-black uppercase tracking-[0.25em] text-[10px]">Explore The Drop →</span>
             </Link>
+            <div className="hidden sm:flex flex-col font-mono text-[9px] uppercase tracking-[0.25em] text-white/50 border-l border-white/20 pl-6 py-1">
+              <span>Limited Archival Pieces</span>
+              <span className="text-bloodred font-bold">Worldwide Dispatch</span>
+            </div>
           </motion.div>
         </div>
-
-
       </section>
 
-
-
       {/* ─── SECTION 2: MANIFESTO ─── */}
-      <section className="relative py-32 md:py-48 px-6 md:px-16 overflow-hidden bg-[#080808]">
+      <section className="relative py-32 md:py-48 px-6 md:px-16 overflow-hidden bg-[#080808] border-t border-bloodred/20">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-          <span className="text-[30vw] font-black text-white/[0.02] leading-none">01</span>
+          <span className="text-[30vw] font-black text-white/[0.02] leading-none">BF</span>
         </div>
         <div className="relative z-10 max-w-5xl">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="w-8 h-[1px] bg-bloodred" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-bloodred font-bold">
+              01 // THE BLACK FRIDAY PROTOCOL
+            </span>
+          </div>
           <motion.h2
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -164,11 +168,11 @@ export default function HomeClient() {
             transition={{ duration: 0.8 }}
             className="text-[10vw] sm:text-[8vw] md:text-[7vw] lg:text-[6vw] xl:text-[5vw] font-black uppercase leading-[0.9] tracking-tighter text-white mb-8"
           >
-            MADE FOR THE
+            BLACK FRIDAY.
             <br />
-            <span className="text-bloodred">STREETS.</span>
+            <span className="text-bloodred">NO COMPROMISE.</span>
             <br />
-            <span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)', color: 'transparent' }}>NO RULES.</span>
+            <span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)', color: 'transparent' }}>RAW DESIGN.</span>
           </motion.h2>
         </div>
       </section>
@@ -178,15 +182,23 @@ export default function HomeClient() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-end justify-between mb-12 md:mb-20">
             <div>
-              <span className="text-[10px] uppercase tracking-[0.5em] text-bloodred font-bold block mb-3">The Collection</span>
+              <div className="flex items-center gap-2 mb-3 font-mono text-[9px] uppercase tracking-[0.4em] text-bloodred font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-bloodred animate-pulse" />
+                <span>02 // THE BLACK FRIDAY VAULT</span>
+              </div>
               <h2 className="text-[12vw] sm:text-[10vw] md:text-[8vw] lg:text-[6vw] xl:text-[5vw] font-black uppercase tracking-tighter leading-[0.9] text-white">
-                NEW<br/>DROPS
+                THE<br/>ARCHIVE
               </h2>
             </div>
-            <Link href="/shop" className="hidden md:flex items-center gap-3 text-white/50 hover:text-white transition-colors group text-[10px] uppercase tracking-[0.3em] font-bold">
-              <span>View All</span>
-              <span className="w-8 h-[1px] bg-white/30 group-hover:w-16 group-hover:bg-bloodred transition-all duration-500" />
-            </Link>
+            <div className="flex flex-col items-end gap-2 text-right">
+              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
+                LIMITED ARCHIVAL INVENTORY
+              </span>
+              <Link href="/shop" className="hidden md:flex items-center gap-3 text-white/50 hover:text-white transition-colors group text-[10px] uppercase tracking-[0.3em] font-bold">
+                <span>View Full Vault ({products.length})</span>
+                <span className="w-8 h-[1px] bg-white/30 group-hover:w-16 group-hover:bg-bloodred transition-all duration-500" />
+              </Link>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
@@ -225,20 +237,27 @@ export default function HomeClient() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/90 via-transparent to-transparent" />
                     {product.status && (
-                      <div className="absolute top-3 left-3">
-                        <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.3em] font-bold px-2.5 py-1">
-                          {product.slug?.includes('shorts') || product.name?.toLowerCase().includes('shorts') || product.status?.toLowerCase() === 'out of stock' ? 'Out of Stock' : product.status}
+                      <div className="absolute top-3 left-3 z-10 pointer-events-none">
+                        <span className="bg-black/85 border border-bloodred/60 text-white font-mono text-[8px] uppercase tracking-[0.25em] font-semibold px-2.5 py-1 backdrop-blur-md shadow-lg flex items-center gap-1.5">
+                          <span className="w-1 h-1 rounded-full bg-bloodred animate-pulse" />
+                          {(product.stock !== undefined && product.stock === 0) || product.status?.toLowerCase() === 'out of stock' ? 'Out of Stock' : product.status}
                         </span>
                       </div>
                     )}
-                    {product.stock !== undefined && product.stock <= 10 && product.stock > 0 && (
-                      <div className="absolute top-3 right-3">
-                        <span className="bg-bloodred text-white text-[8px] uppercase tracking-[0.25em] font-bold px-2.5 py-1 flex items-center gap-1.5 shadow-md">
-                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                          {product.stock} PIECES LEFT
+                    {product.originalPrice && product.originalPrice > product.price ? (
+                      <div className="absolute top-3 right-3 z-10 pointer-events-none">
+                        <span className="bg-bloodred text-white font-mono text-[8px] uppercase tracking-[0.2em] font-bold px-2 py-0.5 shadow-md">
+                          -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
                         </span>
                       </div>
-                    )}
+                    ) : product.stock !== undefined && product.stock <= 10 && product.stock > 0 ? (
+                      <div className="absolute top-3 right-3 z-10 pointer-events-none">
+                        <span className="bg-black/90 border border-white/20 text-white font-mono text-[8px] uppercase tracking-[0.2em] font-bold px-2.5 py-1 flex items-center gap-1.5 shadow-md">
+                          <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                          {product.stock} LEFT
+                        </span>
+                      </div>
+                    ) : null}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <span className="bg-white text-[#080808] px-6 py-3 text-[9px] uppercase tracking-[0.3em] font-black">
                         {(product.stock !== undefined && product.stock === 0) || product.status?.toLowerCase() === 'sold out' || product.status?.toLowerCase() === 'out of stock' ? 'Out of Stock' : 'Shop Now'}
@@ -250,9 +269,20 @@ export default function HomeClient() {
                       {product.name}
                     </h3>
                     <div className="flex items-center justify-between">
-                      <span className="text-bloodred font-black text-sm" suppressHydrationWarning>
-                        {formatPrice(product.price)}
-                      </span>
+                      {product.originalPrice && product.originalPrice > product.price ? (
+                        <div className="flex items-baseline gap-2 font-mono" suppressHydrationWarning>
+                          <span className="text-white/40 font-medium text-xs line-through">
+                            {formatPrice(product.originalPrice)}
+                          </span>
+                          <span className="text-bloodred font-black text-sm">
+                            {formatPrice(product.price)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-bloodred font-black text-sm font-mono" suppressHydrationWarning>
+                          {formatPrice(product.price)}
+                        </span>
+                      )}
                       <div className="flex gap-1">
                         {product.sizes?.slice(0, 3).map((s: string) => (
                           <span key={s} className="text-[7px] text-white/30 uppercase font-bold">{s}</span>
@@ -272,9 +302,9 @@ export default function HomeClient() {
             )}
           </div>
 
-          <div className="mt-10 text-center md:hidden">
-            <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] font-black text-white border border-white/20 px-8 py-4 hover:border-bloodred hover:text-bloodred transition-all">
-              View All Drops →
+          <div className="mt-14 text-center">
+            <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] font-black text-white border border-white/20 px-8 py-4 hover:border-bloodred hover:text-bloodred transition-all shadow-lg hover:shadow-bloodred/20">
+              View All Drops & Colorways ({products.length}) →
             </Link>
           </div>
         </div>
@@ -290,8 +320,8 @@ export default function HomeClient() {
             transition={{ repeat: Infinity, duration: 20, ease: 'linear' }}
             className="whitespace-nowrap text-[18vw] font-black uppercase text-black/10 leading-none"
           >
-            WEAR IMPULSIVE // STAY IMPULSIVE // WEAR IMPULSIVE // STAY IMPULSIVE //&nbsp;
-            WEAR IMPULSIVE // STAY IMPULSIVE // WEAR IMPULSIVE // STAY IMPULSIVE //&nbsp;
+            BLACK FRIDAY // WEAR IMPULSIVE // BLACK FRIDAY // WEAR IMPULSIVE //&nbsp;
+            BLACK FRIDAY // WEAR IMPULSIVE // BLACK FRIDAY // WEAR IMPULSIVE //&nbsp;
           </motion.div>
         </div>
         <div className="relative z-10 text-center px-6">
@@ -301,23 +331,23 @@ export default function HomeClient() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <span className="text-[8px] uppercase tracking-[0.6em] text-black/60 font-bold block mb-6">Impulsive Worldwide</span>
+            <span className="text-[9px] uppercase tracking-[0.6em] text-black/60 font-bold block mb-6 font-mono">03 // ANNUAL EVENT</span>
             <h2 className="text-[16vw] sm:text-[14vw] md:text-[12vw] lg:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter text-black">
-              PURE<br/>STYLE.
+              BLACK<br/>FRIDAY.
             </h2>
-            <p className="mt-6 text-black/60 text-xs uppercase tracking-[0.4em] font-bold">Designing the future of streetwear.</p>
+            <p className="mt-6 text-black/70 text-xs uppercase tracking-[0.4em] font-bold font-mono">The vault is fully unlocked.</p>
             <Link
               href="/shop"
               className="mt-12 inline-block bg-black text-white px-10 py-5 text-[10px] uppercase tracking-[0.3em] font-black hover:bg-white hover:text-black transition-all duration-300"
             >
-              Shop the Drop →
+              Shop The Collection →
             </Link>
           </motion.div>
         </div>
       </section>
 
       {/* ─── SECTION 5: NEWSLETTER / INNER CIRCLE ─── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center py-24 px-6 bg-[#050505] overflow-hidden">
+      <section className="relative min-h-screen flex flex-col items-center justify-center py-24 px-6 bg-[#050505] overflow-hidden border-t border-white/5">
         <div className="absolute inset-0">
           <Image
             src="/images/cta.png"
@@ -329,7 +359,7 @@ export default function HomeClient() {
         </div>
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-          <span className="text-[20vw] font-black text-white/[0.015] leading-none uppercase">JOIN</span>
+          <span className="text-[20vw] font-black text-white/[0.015] leading-none uppercase">BF</span>
         </div>
 
         <div className="relative z-10 text-center max-w-2xl mx-auto">
@@ -341,14 +371,14 @@ export default function HomeClient() {
           >
             <div className="flex items-center justify-center gap-4 mb-8">
               <div className="w-12 h-[1px] bg-bloodred" />
-              <span className="text-[9px] uppercase tracking-[0.5em] text-bloodred font-black">Inner Circle</span>
+              <span className="text-[9px] uppercase tracking-[0.5em] text-bloodred font-black font-mono">04 // VIP ACCESS</span>
               <div className="w-12 h-[1px] bg-bloodred" />
             </div>
             <h2 className="text-[14vw] sm:text-[12vw] md:text-[10vw] lg:text-[8vw] xl:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter text-white mb-6">
-              JOIN OUR<br/><span className="text-bloodred">CLUB.</span>
+              BLACK FRIDAY<br/><span className="text-bloodred">VIP.</span>
             </h2>
-            <p className="text-white/40 text-xs uppercase tracking-[0.3em] mb-14 max-w-sm mx-auto leading-relaxed">
-              Early access to new drops, limited releases & exclusive events.
+            <p className="text-white/40 text-xs uppercase tracking-[0.3em] mb-14 max-w-sm mx-auto leading-relaxed font-mono">
+              Exclusive early access to secret drops, archival restocks & private member releases.
             </p>
 
             <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-0 w-full max-w-md mx-auto">

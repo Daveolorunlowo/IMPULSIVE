@@ -7,17 +7,18 @@ const toCamelCase = (dbProduct: any, hardcodedList: any[] = []) => {
   const match = hardcodedList.find((p: any) => p.id === dbProduct.id || p.slug === dbProduct.slug);
   const rawVariantStock = Array.isArray(dbProduct.variants) && dbProduct.variants.length > 0
     ? dbProduct.variants[0]?.stock_quantity 
-    : (dbProduct.variants?.stock_quantity ?? match?.stock ?? 100);
+    : (dbProduct.variants?.stock_quantity ?? match?.stock ?? 20);
 
-  const variantStock = match?.stock !== undefined && match.stock === 0 ? 0 : rawVariantStock;
-  const isOutOfStock = variantStock === 0 || dbProduct.status === 'Out of Stock' || match?.status === 'Out of Stock';
+  const variantStock = match?.stock !== undefined ? match.stock : rawVariantStock;
+  const isOutOfStock = variantStock === 0 || match?.status === 'Out of Stock';
 
   return {
     id: dbProduct.id,
     slug: dbProduct.slug,
     name: dbProduct.name,
     category: dbProduct.category,
-    price: Number(dbProduct.price),
+    price: match?.price !== undefined ? match.price : Number(dbProduct.price),
+    originalPrice: match?.originalPrice ?? dbProduct.original_price,
     description: dbProduct.description,
     mainImage: dbProduct.main_image,
     hoverImage: dbProduct.hover_image,
@@ -25,7 +26,7 @@ const toCamelCase = (dbProduct: any, hardcodedList: any[] = []) => {
     details: dbProduct.details || [],
     sizes: dbProduct.sizes || [],
     colors: dbProduct.colors || [],
-    status: isOutOfStock ? 'Out of Stock' : (dbProduct.status || match?.status || 'in_stock'),
+    status: isOutOfStock ? 'Out of Stock' : (match?.status || dbProduct.status || 'In Stock'),
     stock: variantStock,
   };
 };

@@ -19,6 +19,22 @@ export const POST = withSupabase({ auth: 'none' }, async (req, ctx) => {
     
     const uppercaseCode = code.toUpperCase().trim();
 
+    // Built-in promotional codes for Black Friday & store campaigns
+    const staticPromos: Record<string, number> = {
+      BLACKFRIDAY: 30,
+      BF30: 30,
+      BF20: 20,
+      INSTINCT: 10,
+      ARCHIVE10: 10,
+    };
+
+    if (staticPromos[uppercaseCode]) {
+      return NextResponse.json({ 
+        success: true, 
+        discount_percentage: staticPromos[uppercaseCode] 
+      });
+    }
+
     const { data: promo, error } = await supabase
       .from('promo_codes')
       .select('discount_percentage, is_active')

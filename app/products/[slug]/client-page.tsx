@@ -54,7 +54,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
   const isFavorited = isInWishlist(productData.id);
   const productReviews = getReviewsForProduct(productData.slug);
   const averageRating = getAverageRating(productData.slug);
-  const isSoldOut = productData.slug.includes('shorts') || productData.name.toLowerCase().includes('shorts') || (productData.stock !== undefined && productData.stock === 0) || productData.status?.toLowerCase() === 'sold out' || productData.status?.toLowerCase() === 'out of stock';
+  const isSoldOut = (productData.stock !== undefined && productData.stock === 0) || productData.status?.toLowerCase() === 'sold out' || productData.status?.toLowerCase() === 'out of stock';
 
   const calculateAdvisorSize = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +73,6 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
   };
 
   const handleAddToCart = () => {
-    const isSoldOut = productData.slug.includes('shorts') || productData.name.toLowerCase().includes('shorts') || (productData.stock !== undefined && productData.stock === 0) || productData.status?.toLowerCase() === 'sold out' || productData.status?.toLowerCase() === 'out of stock';
     if (isSoldOut) return;
     if (!isAuthenticated) {
       router.push(`/auth?redirect=/products/${productData.slug}`);
@@ -241,9 +240,23 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                 </h1>
                 
                 <div className="flex items-center gap-6 flex-wrap">
-                  <span className="text-4xl font-serif text-stone" suppressHydrationWarning>
-                    {formatPrice(productData.price)}
-                  </span>
+                  {productData.originalPrice && productData.originalPrice > productData.price ? (
+                    <div className="flex items-center gap-4" suppressHydrationWarning>
+                      <span className="text-2xl font-serif text-stone/60 line-through">
+                        {formatPrice(productData.originalPrice)}
+                      </span>
+                      <span className="text-4xl font-serif text-bloodred font-bold">
+                        {formatPrice(productData.price)}
+                      </span>
+                      <span className="bg-bloodred text-white font-mono text-[9px] uppercase tracking-[0.2em] font-bold px-2.5 py-1 shadow-sm">
+                        -{Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100)}%
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-4xl font-serif text-stone" suppressHydrationWarning>
+                      {formatPrice(productData.price)}
+                    </span>
+                  )}
                   
                   {/* Reviews aggregate pill */}
                   {productReviews.length > 0 && (
@@ -255,7 +268,17 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                   )}
 
                   {(isSoldOut || productData.status) && (
-                    <span className="text-[10px] uppercase tracking-widest font-bold text-charcoal/40 bg-charcoal/5 px-3 py-1">
+                    <span className={cn(
+                      "text-[9px] font-mono uppercase tracking-[0.25em] font-bold px-3 py-1.5 flex items-center gap-2",
+                      isSoldOut
+                        ? "text-charcoal/40 bg-charcoal/5"
+                        : productData.status?.toLowerCase().includes('black friday')
+                        ? "bg-charcoal text-alabaster border border-bloodred/60 shadow-md"
+                        : productData.status?.toLowerCase().includes('restock')
+                        ? "bg-charcoal text-alabaster border border-charcoal/20"
+                        : "text-charcoal/40 bg-charcoal/5"
+                    )}>
+                      {!isSoldOut && <span className="w-1.5 h-1.5 rounded-full bg-bloodred animate-pulse" />}
                       {isSoldOut ? 'OUT OF STOCK' : productData.status}
                     </span>
                   )}
