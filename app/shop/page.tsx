@@ -31,9 +31,6 @@ export default function ShopPage() {
               <span>BLACK FRIDAY PROTOCOL // ARCHIVE RESTOCK</span>
             </div>
             <h1 className="text-6xl md:text-8xl font-serif text-alabaster tracking-tight">The Inventory</h1>
-            <p className="font-mono text-[10px] text-white/40 tracking-[0.2em] uppercase max-w-lg leading-relaxed">
-              Signature archival pieces released for the Black Friday event. Limited quantities available.
-            </p>
           </div>
           
           {/* Categories - Minimal Pill Buttons */}

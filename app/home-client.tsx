@@ -121,9 +121,6 @@ export default function HomeClient() {
           >
             <span className="block text-white">BLACK</span>
             <span className="block" style={{ WebkitTextStroke: '2px #800000', color: 'transparent' }}>FRIDAY</span>
-            <span className="block text-white/50 text-[3vw] sm:text-[2.5vw] md:text-[1.8vw] font-mono tracking-[0.35em] uppercase font-bold mt-4">
-              WEAR IMPULSIVE
-            </span>
           </motion.h1>
 
           <motion.div
@@ -142,7 +139,7 @@ export default function HomeClient() {
               <span className="absolute inset-0 z-10 flex items-center justify-center gap-3 text-[#080808] opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-black uppercase tracking-[0.25em] text-[10px]">Explore The Drop →</span>
             </Link>
             <div className="hidden sm:flex flex-col font-mono text-[9px] uppercase tracking-[0.25em] text-white/50 border-l border-white/20 pl-6 py-1">
-              <span>Limited Archival Pieces</span>
+              <span>Limited Pieces</span>
               <span className="text-bloodred font-bold">Worldwide Dispatch</span>
             </div>
           </motion.div>
@@ -170,9 +167,9 @@ export default function HomeClient() {
           >
             BLACK FRIDAY.
             <br />
-            <span className="text-bloodred">NO COMPROMISE.</span>
+            <span className="text-bloodred">MASSIVE DISCOUNT.</span>
             <br />
-            <span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)', color: 'transparent' }}>RAW DESIGN.</span>
+            <span style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)', color: 'transparent' }}>SAME EXPERIENCE.</span>
           </motion.h2>
         </div>
       </section>
@@ -187,17 +184,8 @@ export default function HomeClient() {
                 <span>02 // THE BLACK FRIDAY VAULT</span>
               </div>
               <h2 className="text-[12vw] sm:text-[10vw] md:text-[8vw] lg:text-[6vw] xl:text-[5vw] font-black uppercase tracking-tighter leading-[0.9] text-white">
-                THE<br/>ARCHIVE
+                OUR<br/>PIECES
               </h2>
-            </div>
-            <div className="flex flex-col items-end gap-2 text-right">
-              <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-white/40">
-                LIMITED ARCHIVAL INVENTORY
-              </span>
-              <Link href="/shop" className="hidden md:flex items-center gap-3 text-white/50 hover:text-white transition-colors group text-[10px] uppercase tracking-[0.3em] font-bold">
-                <span>View Full Vault ({products.length})</span>
-                <span className="w-8 h-[1px] bg-white/30 group-hover:w-16 group-hover:bg-bloodred transition-all duration-500" />
-              </Link>
             </div>
           </div>
 
