@@ -69,24 +69,24 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#080808]/90 backdrop-blur-md border-b border-bloodred/20 isolate text-alabaster">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6 grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 md:px-8 py-3.5 sm:py-4 md:py-6 grid grid-cols-[1fr_auto_1fr] items-center gap-1 sm:gap-2">
           
           {/* Left Section */}
-          <div className="flex items-center justify-start gap-4">
+          <div className="flex items-center justify-start gap-2 sm:gap-4">
             {/* Left Actions (Mobile) */}
-            <div className="flex items-center gap-4 md:hidden">
+            <div className="flex items-center gap-2 sm:gap-4 md:hidden">
               {!isHome && (
-                <button suppressHydrationWarning onClick={() => router.back()} className="p-2 text-alabaster/60 hover:text-bloodred transition-colors" aria-label="Go back">
-                  <ArrowLeft size={20} strokeWidth={1.5} />
+                <button suppressHydrationWarning onClick={() => router.back()} className="p-1.5 sm:p-2 text-alabaster/60 hover:text-bloodred transition-colors" aria-label="Go back">
+                  <ArrowLeft size={18} strokeWidth={1.5} />
                 </button>
               )}
-              <button suppressHydrationWarning onClick={() => setIsOpen(true)} aria-label="Open menu">
-                <Menu size={20} strokeWidth={1.5} />
+              <button suppressHydrationWarning onClick={() => setIsOpen(true)} className="p-1.5 sm:p-2 text-alabaster/60 hover:text-bloodred transition-colors" aria-label="Open menu">
+                <Menu size={18} strokeWidth={1.5} />
               </button>
             </div>
 
             {/* Left Nav (Desktop) */}
-            <div className="hidden md:flex items-center gap-12">
+            <div className="hidden md:flex items-center gap-8 lg:gap-12">
             {!isHome && (
               <button 
                 suppressHydrationWarning
@@ -112,17 +112,17 @@ export default function Navbar() {
           <div className="flex justify-center items-center">
             <Link 
               href="/" 
-              className="flex items-center group z-10"
+              className="flex items-center group z-10 shrink-0"
             >
               <Logo 
                 variant="red" 
-                className="h-7 sm:h-7 md:h-8 lg:h-8 w-28 sm:w-32 md:w-36 lg:w-40 transition-all duration-500 group-hover:scale-105"
+                className="h-6 sm:h-7 md:h-8 w-24 sm:w-28 md:w-36 lg:w-40 transition-all duration-500 group-hover:scale-105"
               />
             </Link>
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center justify-end gap-3 sm:gap-4 md:gap-8">
+          <div className="flex items-center justify-end gap-2.5 sm:gap-4 md:gap-6 lg:gap-8">
             {/* ksome-style Search Input Trigger (Desktop) */}
             <button 
               onClick={() => setIsCommandPaletteOpen(true)}
@@ -219,9 +219,9 @@ export default function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[60] bg-charcoal text-alabaster flex flex-col p-12"
+            className="fixed inset-0 z-[60] bg-charcoal text-alabaster flex flex-col p-6 sm:p-12 overflow-y-auto"
           >
-            <div className="flex justify-between items-center mb-12">
+            <div className="flex justify-between items-center mb-8 sm:mb-12">
               <Logo 
                 variant="red" 
                 className="h-8 w-40"
@@ -340,7 +340,7 @@ export default function Navbar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-charcoal/90 backdrop-blur-md flex items-center justify-center p-6"
+            className="fixed inset-0 z-[100] bg-charcoal/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
             onClick={() => setIsCommandPaletteOpen(false)}
           >
             <motion.div
@@ -348,7 +348,7 @@ export default function Navbar() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: -20 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="w-full max-w-2xl bg-stone/95 border border-bloodred/25 p-8 rounded-sm shadow-2xl flex flex-col gap-6 relative text-alabaster"
+              className="w-full max-w-2xl bg-stone/95 border border-bloodred/25 p-4 sm:p-8 rounded-sm shadow-2xl flex flex-col gap-4 sm:gap-6 relative text-alabaster max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}

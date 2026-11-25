@@ -136,11 +136,11 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
 
   return (
     <>
-      <div className="pt-40 pb-40 min-h-screen bg-alabaster">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="pt-28 sm:pt-36 lg:pt-40 pb-20 sm:pb-32 lg:pb-40 min-h-screen bg-alabaster">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
           
           {/* Main Layout Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-32">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 mb-16 lg:mb-32">
             
             {/* Gallery (Left Column) */}
             <div className="relative">
@@ -235,7 +235,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                   </div>
                 </div>
                 
-                <h1 className="text-6xl md:text-8xl font-serif text-charcoal leading-none mb-12">
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-serif text-charcoal leading-none mb-6 sm:mb-10">
                   {productData.name}
                 </h1>
                 
@@ -403,7 +403,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                     </div>
 
                     {/* Table */}
-                    <div className="overflow-hidden border-2 border-charcoal">
+                    <div className="overflow-x-auto border-2 border-charcoal scrollbar-thin">
                       {/* Header row */}
                       {(() => {
                         const hasLength = !!sizeChart[0]?.length;
@@ -417,7 +417,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                         const colCount = 1 + (hasLength ? 1 : 0) + (hasChest ? 1 : 0) + (hasWaist ? 1 : 0) + (hasFrontRise ? 1 : 0) + (hasThigh ? 1 : 0) + (hasHem ? 1 : 0) + (hasSleeve ? 1 : 0);
 
                         return (
-                          <>
+                          <div className="min-w-[480px]">
                             <div className="bg-charcoal text-alabaster px-5 py-4 grid gap-2" style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
                               <span className="text-[10px] uppercase tracking-[0.35em] font-black">Size</span>
                               {hasLength && <span className="text-[10px] uppercase tracking-[0.35em] font-black">Length (in)</span>}
@@ -456,7 +456,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ slug
                                 {hasSleeve && <span className="text-charcoal font-semibold text-sm">{row.sleeve}</span>}
                               </div>
                             ))}
-                          </>
+                          </div>
                         );
                       })()}
                     </div>

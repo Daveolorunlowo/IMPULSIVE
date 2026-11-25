@@ -147,30 +147,30 @@ export default function ProductCard({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute inset-x-0 bottom-0 bg-charcoal/95 backdrop-blur-md p-4 sm:p-6 flex flex-col gap-4 z-10 border-t border-bloodred/30"
+              className="absolute inset-x-0 bottom-0 bg-charcoal/95 backdrop-blur-md p-3 sm:p-5 flex flex-col gap-2.5 sm:gap-4 z-10 border-t border-bloodred/30"
             >
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2">
-                <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-2">
+                <div className="flex gap-1.5 sm:gap-2">
                   {colors.map((color) => (
                     <button
                       key={color.name}
                       onClick={() => setSelectedColor(color)}
                       style={{ backgroundColor: color.hex }}
                       className={cn(
-                        "w-5 h-5 rounded-full border transition-all",
+                        "w-4 h-4 sm:w-5 sm:h-5 rounded-full border transition-all",
                         selectedColor.name === color.name ? "border-bloodred scale-110 shadow-[0_0_10px_rgba(255,0,0,0.5)]" : "border-white/20"
                       )}
                       aria-label={`Select color ${color.name}`}
                     />
                   ))}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5 sm:gap-2">
                   {sizes.slice(0, 4).map((size) => (
                     <button
                       key={size}
                       onClick={() => setSelectedSize(size)}
                       className={cn(
-                        "text-[9px] font-bold uppercase tracking-widest px-2 py-1 transition-all",
+                        "text-[8px] sm:text-[9px] font-bold uppercase tracking-wider sm:tracking-widest px-1.5 sm:px-2 py-0.5 sm:py-1 transition-all",
                         selectedSize === size ? "bg-bloodred text-alabaster shadow-sm" : "text-alabaster/40 hover:text-bloodred"
                       )}
                     >
@@ -182,7 +182,7 @@ export default function ProductCard({
               <button
                 onClick={handleAddToCart}
                 disabled={isSoldOut}
-                className="w-full bg-bloodred text-alabaster py-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-alabaster hover:text-charcoal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-bloodred text-alabaster py-2.5 sm:py-3 text-[9px] sm:text-[10px] uppercase tracking-[0.25em] sm:tracking-[0.3em] font-bold hover:bg-alabaster hover:text-charcoal transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSoldOut ? 'Sold Out' : 'Add To Bag'}
               </button>
@@ -192,8 +192,8 @@ export default function ProductCard({
       </div>
 
       {/* Product Info - Luxury Centered */}
-      <Link href={`/products/${slug}`} className="flex flex-col items-center text-center space-y-2 mt-8">
-        <h3 className="text-xl font-serif text-alabaster group-hover:text-bloodred transition-colors duration-500">
+      <Link href={`/products/${slug}`} className="flex flex-col items-center text-center space-y-1 sm:space-y-2 mt-4 sm:mt-8 px-1">
+        <h3 className="text-sm sm:text-base md:text-xl font-serif text-alabaster group-hover:text-bloodred transition-colors duration-500 line-clamp-1">
           {name}
         </h3>
         {originalPrice && originalPrice > price ? (

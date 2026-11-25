@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply selection:bg-bloodred selection:text-alabaster bg-charcoal text-alabaster antialiased;
+    @apply selection:bg-bloodred selection:text-alabaster bg-charcoal text-alabaster antialiased overflow-x-hidden;
     font-family: var(--font-inter), sans-serif;
   }
 

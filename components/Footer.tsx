@@ -44,9 +44,9 @@ export default function Footer() {
 
 
   return (
-    <footer className="pt-40 pb-20 bg-charcoal text-alabaster overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-20 items-start mb-40">
+    <footer className="pt-20 sm:pt-28 md:pt-40 pb-12 sm:pb-16 md:pb-20 bg-charcoal text-alabaster overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-14 md:gap-16 lg:gap-20 items-start mb-16 sm:mb-24 md:mb-40">
           
           {/* Brand Info */}
           <div className="lg:col-span-1 space-y-8">
@@ -114,7 +114,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-12 border-t border-alabaster/5 flex flex-col md:flex-row justify-between items-center gap-8 relative">
+        <div className="pt-8 sm:pt-12 border-t border-alabaster/5 flex flex-col md:flex-row justify-between items-center gap-6 sm:gap-8 relative text-center md:text-left">
           <div className="text-[10px] uppercase tracking-[0.3em] text-alabaster/20 font-semibold">
             © 2026 Impulsive Studio. All Rights Reserved.
           </div>

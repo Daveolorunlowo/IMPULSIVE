@@ -21,25 +21,21 @@ export default function ShopPage() {
     : products.filter(p => p.category === activeCategory);
 
   return (
-    <div className="pt-40 pb-40 min-h-screen bg-charcoal text-alabaster">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <div className="pt-28 sm:pt-36 md:pt-40 pb-20 sm:pb-32 md:pb-40 min-h-screen bg-charcoal text-alabaster">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
         {/* Header - Minimal Luxury */}
-        <header className="mb-24 flex flex-col md:flex-row justify-between items-end gap-12 border-b border-white/5 pb-12">
+        <header className="mb-12 sm:mb-16 md:mb-24 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 sm:gap-12 border-b border-white/5 pb-8 sm:pb-12">
           <div className="space-y-4">
-            <div className="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.4em] text-bloodred font-bold">
-              <span className="w-2 h-2 rounded-full bg-bloodred animate-pulse" />
-              <span>BLACK FRIDAY PROTOCOL // ARCHIVE RESTOCK</span>
-            </div>
-            <h1 className="text-6xl md:text-8xl font-serif text-alabaster tracking-tight">The Inventory</h1>
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif text-alabaster tracking-tight">OUR STORE</h1>
           </div>
           
           {/* Categories - Minimal Pill Buttons */}
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-2 sm:gap-4">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-8 py-3 text-[10px] uppercase tracking-widest font-semibold border transition-all duration-500 ${
+                className={`px-5 sm:px-8 py-2.5 sm:py-3 text-[9px] sm:text-[10px] uppercase tracking-widest font-semibold border transition-all duration-500 ${
                   activeCategory === cat 
                     ? 'bg-bloodred border-bloodred text-alabaster shadow-lg shadow-bloodred/20' 
                     : 'border-alabaster/20 text-alabaster/40 hover:border-bloodred hover:text-bloodred'
@@ -53,7 +49,7 @@ export default function ShopPage() {
         </header>
 
         {/* Product Grid - Clean 4-Column */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 sm:gap-x-8 md:gap-x-12 gap-y-16 md:gap-y-24">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 sm:gap-x-6 md:gap-x-10 gap-y-10 sm:gap-y-16 md:gap-y-24">
           {isLoading ? (
             Array(8).fill(0).map((_, index) => (
               <ProductSkeleton key={index} />

@@ -22,7 +22,7 @@ interface FieldProps {
 
 function Field({ label, field, type = 'text', icon: Icon, placeholder, half = false, value, error, onChange }: FieldProps) {
   return (
-    <div className={half ? 'col-span-1' : 'col-span-2'}>
+    <div className={half ? 'col-span-2 sm:col-span-1' : 'col-span-2'}>
       <label className="block text-[9px] uppercase tracking-[0.2em] font-semibold text-charcoal/40 mb-1.5 ml-1">
         {label}
       </label>
@@ -101,7 +101,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#E5E5E2] flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
+    <div className="min-h-screen w-full bg-[#E5E5E2] flex items-center justify-center p-3 sm:p-6 md:p-8 overflow-hidden relative">
       {/* Decorative background blur */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-bloodred/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-charcoal/5 rounded-full blur-[100px] pointer-events-none" />
@@ -109,7 +109,7 @@ export default function CheckoutPage() {
       {/* Main Centered Floating Card */}
       <div className="w-full max-w-[600px] bg-white shadow-2xl rounded-2xl flex flex-col overflow-hidden max-h-[95vh] relative z-10">
         
-        <div className="p-8 md:p-12 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="p-6 sm:p-10 md:p-12 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           
           <Link href="/cart" className="inline-flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] font-bold text-charcoal/40 hover:text-charcoal transition-colors mb-10">
             <ArrowLeft size={12} /> Back to Cart

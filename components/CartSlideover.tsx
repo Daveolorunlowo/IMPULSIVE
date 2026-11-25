@@ -34,18 +34,18 @@ export default function CartSlideover() {
             className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-charcoal text-alabaster z-[101] flex flex-col shadow-2xl border-l border-bloodred/20"
           >
             {/* Header */}
-            <div className="p-8 border-b border-bloodred/20 flex justify-between items-center">
+            <div className="p-5 sm:p-8 border-b border-bloodred/20 flex justify-between items-center">
               <div>
-                <h2 className="text-2xl font-serif text-alabaster">Your Bag</h2>
-                <span className="text-[10px] uppercase tracking-widest text-stone font-bold">{items.length} Items Selected</span>
+                <h2 className="text-xl sm:text-2xl font-serif text-alabaster">Your Bag</h2>
+                <span className="text-[9px] sm:text-[10px] uppercase tracking-widest text-stone font-bold">{items.length} Items Selected</span>
               </div>
               <button onClick={toggleCart} aria-label="Close cart" className="p-2 hover:rotate-90 transition-transform text-alabaster/40 hover:text-bloodred">
-                <X size={24} strokeWidth={1.5} />
+                <X size={22} strokeWidth={1.5} />
               </button>
             </div>
 
             {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-8 space-y-8">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8">
               {items.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center">
                   <ShoppingBag size={48} strokeWidth={1} className="text-stone/40 mb-6" />
@@ -115,7 +115,7 @@ export default function CartSlideover() {
 
             {/* Footer */}
             {items.length > 0 && (
-              <div className="p-8 border-t border-bloodred/20 bg-charcoal">
+              <div className="p-5 sm:p-8 border-t border-bloodred/20 bg-charcoal">
                 <div className="space-y-2 mb-8">
                   <div className="flex justify-between items-baseline">
                     <span className="text-[10px] uppercase tracking-widest font-bold text-stone">Subtotal</span>

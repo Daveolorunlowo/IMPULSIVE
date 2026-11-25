@@ -52,16 +52,16 @@ export default function CartPage() {
   };
 
   return (
-    <div className="pt-40 pb-40 min-h-screen bg-alabaster">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="mb-24 text-center">
+    <div className="pt-28 sm:pt-36 md:pt-40 pb-20 sm:pb-32 md:pb-40 min-h-screen bg-alabaster">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
+        <div className="mb-12 sm:mb-16 md:mb-24 text-center">
           <span className="text-[10px] uppercase tracking-[0.4em] text-stone font-bold block mb-4">Your Shopping Bag</span>
-          <h1 className="text-6xl md:text-8xl font-serif text-charcoal">Checkout</h1>
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif text-charcoal">Checkout</h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20">
           {/* Cart Items */}
-          <div className="lg:col-span-8 space-y-12">
+          <div className="lg:col-span-8 space-y-8 sm:space-y-12">
             <AnimatePresence mode="popLayout">
               {items.length > 0 ? (
                 items.map((item) => {
@@ -73,9 +73,9 @@ export default function CartPage() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="flex flex-col md:flex-row gap-12 border-b border-stone/10 pb-12 group"
+                      className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-12 border-b border-stone/10 pb-8 sm:pb-12 group"
                     >
-                      <div className="relative aspect-[3/4] w-full md:w-48 bg-[#F5F5F3] overflow-hidden">
+                      <div className="relative aspect-[3/4] w-full sm:w-40 md:w-48 bg-[#F5F5F3] overflow-hidden shrink-0">
                         <Image 
                           src={item.image} 
                           alt={item.name} 

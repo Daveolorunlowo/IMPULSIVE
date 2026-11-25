@@ -178,7 +178,7 @@ export default function CheckoutSummaryPage() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#E5E5E2] flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
+    <div className="min-h-screen w-full bg-[#E5E5E2] flex items-center justify-center p-3 sm:p-6 md:p-8 overflow-hidden relative">
       {/* Decorative background blur */}
       <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-bloodred/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-charcoal/5 rounded-full blur-[100px] pointer-events-none" />
@@ -186,7 +186,7 @@ export default function CheckoutSummaryPage() {
       {/* Main Centered Floating Card */}
       <div className="w-full max-w-[500px] bg-white shadow-2xl rounded-2xl flex flex-col overflow-hidden max-h-[95vh] relative z-10">
         
-        <div className="p-8 md:p-12 flex flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="p-6 sm:p-10 md:p-12 flex flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           
           <Link href="/checkout" className="inline-flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] font-bold text-charcoal/40 hover:text-charcoal transition-colors mb-8">
             <ArrowLeft size={12} /> Edit Shipping Details

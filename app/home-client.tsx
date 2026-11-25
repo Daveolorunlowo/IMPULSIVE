@@ -111,13 +111,13 @@ export default function HomeClient() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 w-full px-6 md:px-16 pb-16 md:pb-24">
+        <div className="relative z-10 w-full px-4 sm:px-8 md:px-16 pb-12 sm:pb-16 md:pb-24">
 
           <motion.h1
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[9vw] sm:text-[10vw] md:text-[9vw] lg:text-[8vw] xl:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter mb-8"
+            className="text-6xl sm:text-7xl md:text-8xl lg:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter mb-6 sm:mb-8"
           >
             <span className="block text-white">BLACK</span>
             <span className="block" style={{ WebkitTextStroke: '2px #800000', color: 'transparent' }}>FRIDAY</span>
@@ -131,23 +131,19 @@ export default function HomeClient() {
           >
             <Link
               href="/shop"
-              className="group relative px-10 py-4 bg-bloodred text-white font-black uppercase tracking-[0.25em] text-[10px] overflow-hidden inline-flex items-center gap-3 shrink-0"
+              className="group relative px-7 sm:px-10 py-3.5 sm:py-4 bg-bloodred text-white font-black uppercase tracking-[0.25em] text-[9px] sm:text-[10px] overflow-hidden inline-flex items-center gap-3 shrink-0"
             >
               <span className="relative z-10">Explore The Drop</span>
               <span className="relative z-10 transition-transform group-hover:translate-x-2">→</span>
               <div className="absolute inset-0 bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out" />
-              <span className="absolute inset-0 z-10 flex items-center justify-center gap-3 text-[#080808] opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-black uppercase tracking-[0.25em] text-[10px]">Explore The Drop →</span>
+              <span className="absolute inset-0 z-10 flex items-center justify-center gap-3 text-[#080808] opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-black uppercase tracking-[0.25em] text-[9px] sm:text-[10px]">Explore The Drop →</span>
             </Link>
-            <div className="hidden sm:flex flex-col font-mono text-[9px] uppercase tracking-[0.25em] text-white/50 border-l border-white/20 pl-6 py-1">
-              <span>Limited Pieces</span>
-              <span className="text-bloodred font-bold">Worldwide Dispatch</span>
-            </div>
           </motion.div>
         </div>
       </section>
 
       {/* ─── SECTION 2: MANIFESTO ─── */}
-      <section className="relative py-32 md:py-48 px-6 md:px-16 overflow-hidden bg-[#080808] border-t border-bloodred/20">
+      <section className="relative py-20 sm:py-28 md:py-40 px-4 sm:px-8 md:px-16 overflow-hidden bg-[#080808] border-t border-bloodred/20">
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
           <span className="text-[30vw] font-black text-white/[0.02] leading-none">BF</span>
         </div>
@@ -163,7 +159,7 @@ export default function HomeClient() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-[10vw] sm:text-[8vw] md:text-[7vw] lg:text-[6vw] xl:text-[5vw] font-black uppercase leading-[0.9] tracking-tighter text-white mb-8"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black uppercase leading-[0.9] tracking-tighter text-white mb-6 sm:mb-8"
           >
             BLACK FRIDAY.
             <br />
@@ -175,21 +171,21 @@ export default function HomeClient() {
       </section>
 
       {/* ─── SECTION 3: FEATURED PRODUCTS GRID ─── */}
-      <section className="py-20 md:py-32 px-4 md:px-12 bg-[#0c0c0c]">
+      <section className="py-16 sm:py-24 md:py-32 px-3 sm:px-6 md:px-12 bg-[#0c0c0c]">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-end justify-between mb-12 md:mb-20">
+          <div className="flex items-end justify-between mb-8 sm:mb-12 md:mb-16">
             <div>
               <div className="flex items-center gap-2 mb-3 font-mono text-[9px] uppercase tracking-[0.4em] text-bloodred font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-bloodred animate-pulse" />
                 <span>02 // THE BLACK FRIDAY VAULT</span>
               </div>
-              <h2 className="text-[12vw] sm:text-[10vw] md:text-[8vw] lg:text-[6vw] xl:text-[5vw] font-black uppercase tracking-tighter leading-[0.9] text-white">
+              <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.9] text-white">
                 OUR<br/>PIECES
               </h2>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
             {isLoading ? (
               Array(4).fill(0).map((_, i) => (
                 <div key={`skeleton-${i}`} className="bg-[#111] p-4">
@@ -225,49 +221,49 @@ export default function HomeClient() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/90 via-transparent to-transparent" />
                     {product.status && (
-                      <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                        <span className="bg-black/85 border border-bloodred/60 text-white font-mono text-[8px] uppercase tracking-[0.25em] font-semibold px-2.5 py-1 backdrop-blur-md shadow-lg flex items-center gap-1.5">
+                      <div className="absolute top-2 sm:top-3 left-2 sm:left-3 z-10 pointer-events-none">
+                        <span className="bg-black/85 border border-bloodred/60 text-white font-mono text-[7px] sm:text-[8px] uppercase tracking-[0.2em] sm:tracking-[0.25em] font-semibold px-2 sm:px-2.5 py-0.5 sm:py-1 backdrop-blur-md shadow-lg flex items-center gap-1">
                           <span className="w-1 h-1 rounded-full bg-bloodred animate-pulse" />
                           {(product.stock !== undefined && product.stock === 0) || product.status?.toLowerCase() === 'out of stock' ? 'Out of Stock' : product.status}
                         </span>
                       </div>
                     )}
                     {product.originalPrice && product.originalPrice > product.price ? (
-                      <div className="absolute top-3 right-3 z-10 pointer-events-none">
-                        <span className="bg-bloodred text-white font-mono text-[8px] uppercase tracking-[0.2em] font-bold px-2 py-0.5 shadow-md">
+                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-10 pointer-events-none">
+                        <span className="bg-bloodred text-white font-mono text-[7px] sm:text-[8px] uppercase tracking-[0.2em] font-bold px-1.5 sm:px-2 py-0.5 shadow-md">
                           -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
                         </span>
                       </div>
                     ) : product.stock !== undefined && product.stock <= 10 && product.stock > 0 ? (
-                      <div className="absolute top-3 right-3 z-10 pointer-events-none">
-                        <span className="bg-black/90 border border-white/20 text-white font-mono text-[8px] uppercase tracking-[0.2em] font-bold px-2.5 py-1 flex items-center gap-1.5 shadow-md">
+                      <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-10 pointer-events-none">
+                        <span className="bg-black/90 border border-white/20 text-white font-mono text-[7px] sm:text-[8px] uppercase tracking-[0.2em] font-bold px-2 sm:px-2.5 py-0.5 sm:py-1 flex items-center gap-1 shadow-md">
                           <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
                           {product.stock} LEFT
                         </span>
                       </div>
                     ) : null}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="bg-white text-[#080808] px-6 py-3 text-[9px] uppercase tracking-[0.3em] font-black">
+                      <span className="bg-white text-[#080808] px-4 sm:px-6 py-2 sm:py-3 text-[8px] sm:text-[9px] uppercase tracking-[0.3em] font-black">
                         {(product.stock !== undefined && product.stock === 0) || product.status?.toLowerCase() === 'sold out' || product.status?.toLowerCase() === 'out of stock' ? 'Out of Stock' : 'Shop Now'}
                       </span>
                     </div>
                   </div>
-                  <div className="p-4 border-t border-white/5 bg-[#111]">
-                    <h3 className="text-[10px] uppercase tracking-widest font-black text-white leading-tight mb-2 truncate">
+                  <div className="p-2.5 sm:p-4 border-t border-white/5 bg-[#111]">
+                    <h3 className="text-[9px] sm:text-[10px] uppercase tracking-wider sm:tracking-widest font-black text-white leading-tight mb-1.5 sm:mb-2 truncate">
                       {product.name}
                     </h3>
                     <div className="flex items-center justify-between">
                       {product.originalPrice && product.originalPrice > product.price ? (
-                        <div className="flex items-baseline gap-2 font-mono" suppressHydrationWarning>
-                          <span className="text-white/40 font-medium text-xs line-through">
+                        <div className="flex items-baseline gap-1.5 sm:gap-2 font-mono" suppressHydrationWarning>
+                          <span className="text-white/40 font-medium text-[10px] sm:text-xs line-through">
                             {formatPrice(product.originalPrice)}
                           </span>
-                          <span className="text-bloodred font-black text-sm">
+                          <span className="text-bloodred font-black text-xs sm:text-sm">
                             {formatPrice(product.price)}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-bloodred font-black text-sm font-mono" suppressHydrationWarning>
+                        <span className="text-bloodred font-black text-xs sm:text-sm font-mono" suppressHydrationWarning>
                           {formatPrice(product.price)}
                         </span>
                       )}
@@ -282,7 +278,7 @@ export default function HomeClient() {
                 </Link>
               </motion.div>
             )) : (
-              <div className="col-span-4 flex items-center justify-center h-64">
+              <div className="col-span-2 sm:col-span-4 flex items-center justify-center h-64">
                 <div className="text-center">
                   <p className="text-[9px] uppercase tracking-[0.4em] text-white/30">No products found</p>
                 </div>
@@ -290,18 +286,16 @@ export default function HomeClient() {
             )}
           </div>
 
-          <div className="mt-14 text-center">
-            <Link href="/shop" className="inline-flex items-center gap-3 text-[10px] uppercase tracking-[0.4em] font-black text-white border border-white/20 px-8 py-4 hover:border-bloodred hover:text-bloodred transition-all shadow-lg hover:shadow-bloodred/20">
+          <div className="mt-10 sm:mt-14 text-center">
+            <Link href="/shop" className="w-full sm:w-auto inline-flex items-center justify-center gap-3 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] sm:tracking-[0.4em] font-black text-white border border-white/20 px-6 sm:px-8 py-3.5 sm:py-4 hover:border-bloodred hover:text-bloodred transition-all shadow-lg hover:shadow-bloodred/20">
               View All Drops & Colorways ({products.length}) →
             </Link>
           </div>
         </div>
       </section>
 
-
-
       {/* ─── SECTION 4: FULL-BLEED STATEMENT ─── */}
-      <section className="relative h-screen overflow-hidden flex items-center justify-center bg-bloodred">
+      <section className="relative min-h-[70vh] md:min-h-screen py-16 sm:py-24 overflow-hidden flex items-center justify-center bg-bloodred">
         <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none select-none">
           <motion.div
             animate={{ x: [0, -1000] }}
@@ -312,21 +306,21 @@ export default function HomeClient() {
             BLACK FRIDAY // WEAR IMPULSIVE // BLACK FRIDAY // WEAR IMPULSIVE //&nbsp;
           </motion.div>
         </div>
-        <div className="relative z-10 text-center px-6">
+        <div className="relative z-10 text-center px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <span className="text-[9px] uppercase tracking-[0.6em] text-black/60 font-bold block mb-6 font-mono">03 // ANNUAL EVENT</span>
-            <h2 className="text-[16vw] sm:text-[14vw] md:text-[12vw] lg:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter text-black">
+            <span className="text-[9px] uppercase tracking-[0.6em] text-black/60 font-bold block mb-4 sm:mb-6 font-mono">03 // ANNUAL EVENT</span>
+            <h2 className="text-5xl sm:text-7xl md:text-8xl lg:text-[10vw] font-black uppercase leading-[0.85] tracking-tighter text-black">
               BLACK<br/>FRIDAY.
             </h2>
-            <p className="mt-6 text-black/70 text-xs uppercase tracking-[0.4em] font-bold font-mono">The vault is fully unlocked.</p>
+            <p className="mt-4 sm:mt-6 text-black/70 text-xs uppercase tracking-[0.4em] font-bold font-mono">The vault is fully unlocked.</p>
             <Link
               href="/shop"
-              className="mt-12 inline-block bg-black text-white px-10 py-5 text-[10px] uppercase tracking-[0.3em] font-black hover:bg-white hover:text-black transition-all duration-300"
+              className="mt-8 sm:mt-12 inline-block bg-black text-white px-8 sm:px-10 py-4 sm:py-5 text-[9px] sm:text-[10px] uppercase tracking-[0.3em] font-black hover:bg-white hover:text-black transition-all duration-300"
             >
               Shop The Collection →
             </Link>
@@ -335,7 +329,7 @@ export default function HomeClient() {
       </section>
 
       {/* ─── SECTION 5: NEWSLETTER / INNER CIRCLE ─── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center py-24 px-6 bg-[#050505] overflow-hidden border-t border-white/5">
+      <section className="relative min-h-[70vh] md:min-h-screen flex flex-col items-center justify-center py-16 sm:py-24 px-4 sm:px-6 bg-[#050505] overflow-hidden border-t border-white/5">
         <div className="absolute inset-0">
           <Image
             src="/images/cta.png"
@@ -357,19 +351,19 @@ export default function HomeClient() {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <div className="w-12 h-[1px] bg-bloodred" />
+            <div className="flex items-center justify-center gap-4 mb-6 sm:mb-8">
+              <div className="w-8 sm:w-12 h-[1px] bg-bloodred" />
               <span className="text-[9px] uppercase tracking-[0.5em] text-bloodred font-black font-mono">04 // VIP ACCESS</span>
-              <div className="w-12 h-[1px] bg-bloodred" />
+              <div className="w-8 sm:w-12 h-[1px] bg-bloodred" />
             </div>
-            <h2 className="text-[14vw] sm:text-[12vw] md:text-[10vw] lg:text-[8vw] xl:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter text-white mb-6">
+            <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-[7vw] font-black uppercase leading-[0.85] tracking-tighter text-white mb-4 sm:mb-6">
               BLACK FRIDAY<br/><span className="text-bloodred">VIP.</span>
             </h2>
-            <p className="text-white/40 text-xs uppercase tracking-[0.3em] mb-14 max-w-sm mx-auto leading-relaxed font-mono">
+            <p className="text-white/40 text-xs uppercase tracking-[0.3em] mb-8 sm:mb-14 max-w-sm mx-auto leading-relaxed font-mono">
               Exclusive early access to secret drops, archival restocks & private member releases.
             </p>
 
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-0 w-full max-w-md mx-auto">
+            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-2 sm:gap-0 w-full max-w-md mx-auto">
               <input
                 type="email"
                 required
@@ -377,13 +371,13 @@ export default function HomeClient() {
                 onChange={e => setEmail(e.target.value)}
                 disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
                 placeholder="YOUR EMAIL ADDRESS"
-                className="flex-1 bg-white/5 border border-white/10 focus:border-bloodred text-white placeholder:text-white/20 px-6 py-5 outline-none text-[9px] uppercase tracking-[0.2em] transition-all disabled:opacity-50"
+                className="flex-1 bg-white/5 border border-white/10 focus:border-bloodred text-white placeholder:text-white/20 px-5 sm:px-6 py-4 sm:py-5 outline-none text-[9px] uppercase tracking-[0.2em] transition-all disabled:opacity-50"
                 suppressHydrationWarning
               />
               <button
                 type="submit"
                 disabled={newsletterStatus === 'loading' || newsletterStatus === 'success'}
-                className="bg-bloodred text-white px-8 py-5 text-[9px] uppercase tracking-[0.3em] font-black hover:bg-white hover:text-[#080808] transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 border border-bloodred"
+                className="bg-bloodred text-white px-6 sm:px-8 py-4 sm:py-5 text-[9px] uppercase tracking-[0.3em] font-black hover:bg-white hover:text-[#080808] transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0 border border-bloodred"
                 suppressHydrationWarning
               >
                 {newsletterStatus === 'loading' ? '...' : newsletterStatus === 'success' ? '✓ Joined' : 'Join Now'}
