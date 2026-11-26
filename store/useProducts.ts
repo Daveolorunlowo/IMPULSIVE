@@ -40,7 +40,7 @@ export const useProducts = create<ProductsStore>()(
     }),
     {
       name: 'impulsive-products-cache',
-      version: 20,
+      version: 21,
       migrate: () => {
         return {
           products: defaultProducts,
