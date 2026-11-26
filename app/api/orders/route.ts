@@ -81,7 +81,10 @@ export const POST = async (req: Request) => {
       }
     }
 
-    const shippingFee = calculateShipping(shippingAddress?.state || '');
+    const shippingFee = calculateShipping(
+      shippingAddress?.state || '',
+      `${shippingAddress?.city || ''} ${shippingAddress?.address || ''}`
+    );
     const finalExpectedPrice = expectedTotalPrice + shippingFee;
 
     if (Math.abs(totalPrice - finalExpectedPrice) > 0.01) {

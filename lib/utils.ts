@@ -5,19 +5,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function calculateShipping(stateName: string): number {
-  if (!stateName) return 0;
+export function calculateShipping(stateName: string, additionalContext?: string): number {
+  if (!stateName && !additionalContext) return 0;
   
-  const stateNormalized = stateName.trim().toLowerCase();
+  const combined = `${stateName || ''} ${additionalContext || ''}`.trim().toLowerCase();
   let feeNGN = 6000; // Default: Other states - 6000 NGN
 
-  if (stateNormalized.includes('oyo')) {
+  if (combined.includes('bowen')) {
+    feeNGN = 3000;
+  } else if (combined.includes('oyo')) {
     feeNGN = 0;
-  } else if (stateNormalized.includes('lagos')) {
+  } else if (combined.includes('lagos')) {
     feeNGN = 6000;
-  } else if (stateNormalized.includes('osun')) {
+  } else if (combined.includes('osun')) {
     feeNGN = 2000;
-  } else if (stateNormalized.includes('ogun')) {
+  } else if (combined.includes('ogun')) {
     feeNGN = 2000;
   }
 

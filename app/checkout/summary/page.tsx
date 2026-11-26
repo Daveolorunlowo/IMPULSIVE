@@ -27,7 +27,7 @@ export default function CheckoutSummaryPage() {
     setMounted(true);
   }, []);
 
-  const shippingFee = calculateShipping(details.state);
+  const shippingFee = calculateShipping(details.state, `${details.city} ${details.address}`);
 
   const [generalError, setGeneralError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
